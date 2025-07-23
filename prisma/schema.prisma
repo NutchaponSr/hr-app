@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model User {
+  id              String   @id @default(uuid())
+  name            String
+  email           String?
+  emailVerified   Boolean
+  image           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  role            UserRole @default(USER)
+  username        String
+  displayUsername String?
+  banned          Boolean? @default(false)
+  banReason       String?
+  banExpries      DateTime?
+
+  accounts Account[]
+  sessions Session[]
+
+  employee Employee @relation(fields: [username], references: [id], onDelete: Cascade)
+
+  @@unique([username])
+  @@map("user")
+}
+
+model Session {
+  id              String   @id @default(uuid())
+  expiresAt       DateTime
+  token           String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  ipAddress       String?
+  userAgent       String?
+  impersonatedBy  String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+enum Division {
+  SAT
+  ICP2
+  SAA
+  SFT1
+  SBM
+  SFT3
+  SFT2
+  SBM_AUTO
+  SDS
+  ICP1
+  SBM_NON_AUTO
+}
+
+enum Position {
+  President
+  MD
+  VP
+  GM
+  AGM
+  MGR
+  SMGR
+  Chief
+  Foreman
+  Staff
+  Worker
+  Officer
+}
+
+model Employee {
+  id         String   @id @db.VarChar(10)
+  fullName   String
+  email      String?
+  position   String
+  division   Division
+  level      Position
+  rank       Position
+  department String
+
+  user User?
+
+  @@map("employee")
+}
