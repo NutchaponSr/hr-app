@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Krub } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn(font.className, "antialiased")}>
         {children}
+        <Toaster position="top-center" />
       </body>
     </html>
   );
