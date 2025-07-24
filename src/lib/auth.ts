@@ -4,13 +4,16 @@ import {
   type Options
 } from "@node-rs/argon2";
 import { betterAuth } from "better-auth";
-import { username } from "better-auth/plugins";
+import { admin, username } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 
 import { prisma } from "@/lib/prisma";
 import { VALID_DOMAINS } from "@/lib/utils";
+import { ac, roles } from "@/lib/permissions";
+
+import { UserRole } from "@/generated/prisma";
 
 const opts: Options = {
   memoryCost: 19456,
@@ -80,6 +83,12 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    admin({
+      ac,
+      roles,
+      defaultRole: UserRole.USER,
+      adminRoles: [UserRole.ADMIN],
+    }),
     nextCookies(),
     username(),
   ],
