@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
-import { Krub } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { cn } from "@/lib/utils";
 
 import "./globals.css";
 
-const font = Krub({
-  subsets: ["latin", "thai"],
-  weight: ["300", "400", "500", "600", "700"],
+// const font = Krub({
+//   subsets: ["latin", "thai"],
+//   weight: ["300", "400", "500", "600", "700"],
+// });
+
+const font = Inter({
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -24,8 +29,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(font.className, "antialiased")}>
-        {children}
-        <Toaster position="top-center" />
+        <NuqsAdapter>
+          {children}
+          <Toaster position="top-center" />
+        </NuqsAdapter>
       </body>
     </html>
   );

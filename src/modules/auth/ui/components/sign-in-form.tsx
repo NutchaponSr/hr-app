@@ -31,7 +31,7 @@ export const SignInForm = () => {
     if (error) {
       setError(error);
     } else {
-      toast.success("ล็อกอินสำเร็จ");
+      toast.success("Login successfully");
 
       router.push("/");
     }
@@ -43,7 +43,7 @@ export const SignInForm = () => {
     <>
       <form onSubmit={onSubmit} className="text-left flex flex-col gap-4 w-full">
         <Label className="flex flex-col items-start">
-          <div>Email หรือ รหัสพนักงาน</div>
+          <div>Email / Employee Id</div>
           <Input 
             required
             value={emailOrUsername}
@@ -51,11 +51,11 @@ export const SignInForm = () => {
             onChange={(e) => setEmailOrUsername(e.target.value)}
           />
           <p className="text-xs text-tertiary font-normal">
-            ใช้อีเมลขององค์กรเพื่อทำงานร่วมกับเพื่อนร่วมทีม
+            Use an organization email to easily collaborate with teammates
           </p>
         </Label>
         <Label className="flex flex-col items-start">
-          <div>รหัสผ่าน</div>
+          <div>Password</div>
           <Input 
             required
             disabled={isPending}
@@ -64,11 +64,11 @@ export const SignInForm = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <a href="/auth/forget-password" className="text-xs underline hover:text-danger text-tertiary font-normal">
-            ลืมรหัสผ่าน?
+            Forget your password?
           </a>
         </Label>
         <Button size="lg" disabled={isPending}>
-          เข้าสู่ระบบ
+          Continue
         </Button>
       </form>
       <div data-error={!!error} className="data-[error=true]:block hidden mt-3 text-destructive text-center w-full text-sm transition-all">

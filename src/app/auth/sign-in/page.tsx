@@ -3,7 +3,7 @@ import { SignInForm } from "@/modules/auth/ui/components/sign-in-form";
 
 const Page = () => {
   return (
-    <AuthCard title="เข้าสู่ระบบบัญชีของคุณ">
+    <AuthCard title="Sign in to your account">
       <SignInForm />
     </AuthCard>
   );

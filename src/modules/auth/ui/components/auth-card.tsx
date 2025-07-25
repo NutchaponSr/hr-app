@@ -19,7 +19,7 @@ export const AuthCard = ({ children, title }: Props) => {
           {children}
         </div>
         <div className="w-full text-center text-balance text-tertiary text-xs leading-4 mt-2">
-          เมื่อดำเนินการต่อ แสดงว่าคุณเข้าใจและยอมรับข้อกำหนดและเงื่อนไขและนโยบายความเป็นส่วนตัว
+          By continuing, you acknowledge that you understand and agree to the Terms & Conditions and Privacy Policy
         </div>
       </div>
     </div>

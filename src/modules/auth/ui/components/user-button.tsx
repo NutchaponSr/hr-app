@@ -47,12 +47,12 @@ export const UserButton = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <SettingsIcon className="stroke-[0.3]" />
-          การตั้งค่า
+          <SettingsIcon />
+          Settings
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <ContrastIcon className="stroke-[0.3]" />
-          ธีม
+          <ContrastIcon />
+          Theme
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={() => authClient.signOut({
@@ -62,8 +62,8 @@ export const UserButton = () => {
             }
           }
         })}>
-          <LogOutIcon className="stroke-[0.3]" />
-          ออกจากระบบ
+          <LogOutIcon />
+          Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
