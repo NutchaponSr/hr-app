@@ -1,10 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 
 import { UserButton } from "@/modules/auth/ui/components/user-button";
 import { Navbar } from "./navbar";
+import { useScrollTop } from "@/hooks/use-scroll-top";
 
 export const Header = () => {
+  const scrolling = useScrollTop();
+
   return (
     <header className="sticky top-0 transition-all z-100">
       <nav className="relative top-0 left-0 right-0 z-100 min-h-16">
@@ -22,6 +27,9 @@ export const Header = () => {
             <UserButton />
           </div>
         </div>  
+        <div data-scroll={scrolling} className="flex flex-row item-center justify-between px-6 mx-auto opacity-0 data-[scroll=true]:opacity-100 transition-opacity">
+          <div className="shrink-0 w-full h-[1.25px] bg-border" />
+        </div>
       </nav>
     </header>
   );

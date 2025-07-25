@@ -16,17 +16,17 @@ export const SidebarContent = ({
     <section className="mb-6">
       <div className="flex flex-row items-center mb-2">
         <Image 
-          src="/reference-badge-small.png"
+          src="/view-cozy.svg"
           alt="App"
-          width={45}
-          height={36}
-          className="mr-3"
+          width={40}
+          height={32}
+          className="mr-2"
         />
         <header className="mr-3">
-          <h2 className="leading-5 text-primary font-medium text-base">
+          <h2 className="leading-5 text-primary  text-base">
             {title}
           </h2>
-          <p className="text-sm text-secondary">
+          <p className="text-xs text-secondary">
             {description}
           </p>
         </header>
@@ -36,7 +36,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             Performance
           </Link>
         </dt> 
@@ -46,7 +46,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             Requests & Tasks
           </Link>
         </dt> 
@@ -56,7 +56,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             Employees
           </Link>
         </dt> 
@@ -66,7 +66,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             Vibe
           </Link>
         </dt> 
@@ -76,7 +76,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             Reimbursement
           </Link>
         </dt> 
@@ -86,7 +86,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             Compensation
           </Link>
         </dt> 
@@ -96,7 +96,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             Attendance
           </Link>
         </dt> 
@@ -106,7 +106,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             HR Documents
           </Link>
         </dt> 
@@ -116,7 +116,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             Recruitment
           </Link>
         </dt> 
@@ -126,7 +126,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             Calendar
           </Link>
         </dt> 
@@ -136,7 +136,7 @@ export const SidebarContent = ({
           <button className="flex items-center justify-center size-4 rounded transition hover:bg-accent">
             <IoTriangle className="size-2 rotate-90 text-muted" />
           </button>
-          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors font-medium w-full">
+          <Link href="/performance" className="text-xs text-tertiary hover:text-primary transition-colors  w-full">
             Project
           </Link>
         </dt> 

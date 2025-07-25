@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -17,7 +18,7 @@ export function Navbar() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [hoverStyle, setHoverStyle] = useState({});
   const [activeStyle, setActiveStyle] = useState({ left: "0px", width: "0px" });
-  const tabRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Set active index based on current pathname
   useEffect(() => {
@@ -66,7 +67,7 @@ export function Navbar() {
       <div className="relative">
         {/* Hover Highlight */}
         <div
-          className="absolute h-[30px] transition-all duration-300 ease-out bg-gray-100 dark:bg-white/10 rounded-md flex items-center"
+          className="absolute h-[30px] transition-all duration-300 ease-out bg-accent rounded flex items-center"
           style={{
             ...hoverStyle,
             opacity: hoveredIndex !== null ? 1 : 0,
@@ -75,20 +76,20 @@ export function Navbar() {
 
         {/* Active Indicator */}
         <div
-          className="absolute bottom-[-6px] h-[2px] bg-gray-900 dark:bg-white transition-all duration-300 ease-out rounded-full"
+          className="absolute bottom-[-6px] h-[2px] bg-primary transition-all duration-300 ease-out rounded"
           style={activeStyle}
         />
 
         {/* Tabs */}
         <div className="relative flex space-x-1 items-center">
           {tabs.map((tab, index) => (
-            <div
+            <button
               key={tab.name}
               ref={(el) => { tabRefs.current[index] = el; }}
-              className={`px-3 py-2 cursor-pointer transition-colors duration-300 h-[30px] rounded-md ${index === activeIndex
-                  ? "text-gray-900 dark:text-white"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                }`}
+              className={cn(
+                "px-3 py-2 cursor-pointer transition-colors duration-300 h-[30px] rounded",
+                index === activeIndex ? "text-primary" : "text-neutral"
+              )}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
               onClick={() => router.push(tab.path)}
@@ -96,7 +97,7 @@ export function Navbar() {
               <div className="text-sm font-medium leading-5 whitespace-nowrap flex items-center justify-center h-full">
                 {tab.name}
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

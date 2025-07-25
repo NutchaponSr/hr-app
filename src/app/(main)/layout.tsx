@@ -1,3 +1,4 @@
+import { Footer } from "./_components/footer";
 import { Header } from "./_components/header";
 import { Sidebar } from "./_components/sidebar";
 
@@ -17,6 +18,7 @@ const Layout = ({ children }: Props) => {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
