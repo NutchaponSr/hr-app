@@ -3,9 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import { UserButton } from "@/modules/auth/ui/components/user-button";
-import { Navbar } from "./navbar";
 import { useScrollTop } from "@/hooks/use-scroll-top";
+
+import { UserButton } from "@/modules/auth/ui/components/user-button";
+
+import { Navbar } from "./navbar";
 
 export const Header = () => {
   const scrolling = useScrollTop();

@@ -1,0 +1,28 @@
+{
+  "auth": {
+    "sign-in": {
+      "title": "Log in to your account",
+      "form": {
+        "email": {
+          "label": "Email / Employee Id",
+          "placeholder": "Enter your email address",
+          "message": "Use an organization email to easily collaborate with teammates"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "********",
+          "message": "Forget your password?"
+        },
+        "toast": {
+          "success": "Login successfully"
+        },
+        "submit": "Continue"
+      }
+    },
+    "footer": "By continuing, you acknowledge that you understand and agree to the Terms & Conditions and Privacy Policy"
+  },
+  "lang": {
+    "en": "English (US)",
+    "th": "Thai"
+  }
+}
