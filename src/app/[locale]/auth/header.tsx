@@ -1,5 +1,9 @@
 import Image from "next/image";
 
+import { Separator } from "@/components/ui/separator";
+
+import { LanguageSelector } from "@/components/language-selector";
+
 export const Header = () => {
   return (
     <header className="fixed z-99 w-full">
@@ -13,6 +17,8 @@ export const Header = () => {
             height={48}
           />
         </div>
+        <Separator orientation="vertical" className="!h-6 mx-4" />
+        <LanguageSelector />
       </nav>
     </header>
   );

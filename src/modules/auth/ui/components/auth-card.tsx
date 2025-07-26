@@ -1,9 +1,16 @@
+import { Dictionary } from "@/lib/dictionaries";
+
 interface Props {
+  t: Dictionary;
   title: string;
   children: React.ReactNode;
 }
 
-export const AuthCard = ({ children, title }: Props) => {
+export const AuthCard = ({ 
+  t,
+  title, 
+  children
+}: Props) => {
   return (
     <div className="flex flex-col items-center">
       <div className="mt-[10vh] mb-6 max-w-90">
@@ -19,7 +26,7 @@ export const AuthCard = ({ children, title }: Props) => {
           {children}
         </div>
         <div className="w-full text-center text-balance text-tertiary text-xs leading-4 mt-2">
-          By continuing, you acknowledge that you understand and agree to the Terms & Conditions and Privacy Policy
+          {t.auth.footer}
         </div>
       </div>
     </div>

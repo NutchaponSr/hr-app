@@ -26,7 +26,7 @@ export const APP_CATEGORIES: AppCategory[] = [
         title: "Requests & Tasks",
         href: "/requests-tasks",
         description: "Submit and manage various workplace requests and tasks",
-        image: "/quick-reference.svg",  
+        image: "/quick-reference.svg",
       },
     ],
     color: {
@@ -125,3 +125,14 @@ export const APP_CATEGORIES: AppCategory[] = [
     },
   }
 ];
+
+export const LANGUAGES = [
+  {
+    code: "en" as const,
+    name: "English (US)",
+  },
+  {
+    code: "th" as const,
+    name: "ภาษาไทย",
+  }
+]
