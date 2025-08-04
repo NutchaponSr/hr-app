@@ -13,7 +13,9 @@ const Layout = ({ children }: Props) => {
       <main className="container mx-auto px-0 xl:px-32">
         <div className="md:my-10">
           <div className="grid grid-cols-12 gap-x-[3.125vw] w-full">
-            {children}
+            <div className="order-2 content col-span-12 lg:col-span-9">
+              {children}
+            </div>
             <Sidebar />
           </div>
         </div>

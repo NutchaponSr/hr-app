@@ -1,13 +1,5 @@
-import { hash, Options } from "@node-rs/argon2";
-
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-const opts: Options = {
-  memoryCost: 19456,
-  timeCost: 2,
-  outputLen: 32,
-  parallelism: 1,
-}
 
 const seed = async () => {
   await prisma.employee.deleteMany();
@@ -17,7 +9,7 @@ const seed = async () => {
     data: [
       {
         id: "08736",
-        fullName: "นายวัชรธร กิตะพาณิชย์",
+        fullName: "Tester1",
         position: "กรรมการผู้อำนวยการ",
         division: "SAT",
         level: "President",
@@ -27,7 +19,7 @@ const seed = async () => {
       },
       {
         id: "04326",
-        fullName: "นายวารสา สวนดี",
+        fullName: "Tester2",
         position: "กรรมการผู้จัดการ กลุ่มบริษัท - SBM&ICP",
         division: "SAT",
         level: "MD",
@@ -37,7 +29,7 @@ const seed = async () => {
       },
       {
         id: "11092",
-        fullName: "นายเอกนาวิน ทับทวี",
+        fullName: "Tester3",
         position: "ผู้จัดการแผนกผลิต (Machining)",
         division: "SFT1",
         level: "MGR",
@@ -48,23 +40,25 @@ const seed = async () => {
   });
 
   for (const employee of employees) {
-    const hashedPassword = await hash("12345678", opts)
-
-    await prisma.user.create({
-      data: {
-        name: employee.fullName,
-        email: employee.email,
-        username: employee.id,
-        emailVerified: true,
-        accounts: {
-          create: {
-            providerId: "credential",
-            accountId: employee.email || employee.id,
-            password: hashedPassword,
-          }
-        }
-      }
-    });
+    if (employee.email) {
+      await auth.api.signUpEmail({
+        body: {
+          name: employee.fullName,
+          email: employee.email,
+          password: "12345678",
+          username: employee.id,
+        },
+      });
+    } else {
+      await auth.api.signUpEmail({
+        body: {
+          name: employee.fullName,
+          email: "t@somboon.co.th",
+          username: employee.id,
+          password: "12345678",
+        },
+      });
+    }
   }
 }
 

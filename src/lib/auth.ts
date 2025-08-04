@@ -4,10 +4,10 @@ import {
   type Options
 } from "@node-rs/argon2";
 import { betterAuth } from "better-auth";
-import { admin, username } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError, createAuthMiddleware } from "better-auth/api";
+import { admin, username, customSession } from "better-auth/plugins";
 
 import { prisma } from "@/lib/prisma";
 import { VALID_DOMAINS } from "@/lib/utils";
@@ -26,6 +26,20 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          return {
+            data: {
+              ...user,
+              email: user.email === "t@somboon.co.th" ? undefined : user.email,
+            }
+          }
+        }
+      }
+    }
+  },
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 6,
@@ -61,10 +75,14 @@ export const auth = betterAuth({
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/sign-up/email") {
         const email = String(ctx.body.email);
-        const domain = email.split("@")[1].toLowerCase();
-
-        if (!VALID_DOMAINS().includes(domain)) {
-          throw new APIError("BAD_REQUEST", { message: "Invalid email domain" });
+        
+        // Skip domain validation if email is empty or invalid
+        if (email && email.includes("@")) {
+          const domain = email.split("@")[1]?.toLowerCase();
+          
+          if (domain && !VALID_DOMAINS().includes(domain)) {
+            throw new APIError("BAD_REQUEST", { message: "Invalid email domain" });
+          }
         }
 
         return {
@@ -88,6 +106,28 @@ export const auth = betterAuth({
       roles,
       defaultRole: UserRole.USER,
       adminRoles: [UserRole.ADMIN],
+    }),
+    customSession(async ({ user, session }) => {
+      const userDb = await prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          employee: true,
+        },
+      });
+
+      if (!userDb) {
+        throw new APIError("NOT_FOUND", { message: "User not found" });
+      }
+
+      return {
+        user: {
+          ...user,
+          level: userDb.employee.level,
+        },
+        session,
+      }
     }),
     nextCookies(),
     username(),
