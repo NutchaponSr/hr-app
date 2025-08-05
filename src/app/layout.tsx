@@ -6,6 +6,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { cn } from "@/lib/utils";
 
 import "./globals.css";
+import QueryProvider from "@/providers/query-provider";
 
 // const font = Krub({
 //   subsets: ["latin", "thai"],
@@ -29,10 +30,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(font.className, "antialiased")}>
-        <NuqsAdapter>
-          {children}
-          <Toaster position="top-center" />
-        </NuqsAdapter>
+        <QueryProvider>
+          <NuqsAdapter>
+            {children}
+            <Toaster position="top-center" />
+          </NuqsAdapter>
+        </QueryProvider>
       </body>
     </html>
   );

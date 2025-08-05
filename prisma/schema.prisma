@@ -20,19 +20,19 @@ enum UserRole {
 }
 
 model User {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   name            String
   email           String?
   emailVerified   Boolean
   image           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  role            UserRole @default(USER)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  role            UserRole  @default(USER)
   username        String
   displayUsername String?
-  banned          Boolean? @default(false)
+  banned          Boolean?  @default(false)
   banReason       String?
-  banExpries      DateTime?
+  banExpires      DateTime?
 
   accounts Account[]
   sessions Session[]
@@ -44,14 +44,14 @@ model User {
 }
 
 model Session {
-  id              String   @id @default(uuid())
-  expiresAt       DateTime
-  token           String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  ipAddress       String?
-  userAgent       String?
-  impersonatedBy  String?
+  id             String   @id @default(uuid())
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -119,7 +119,28 @@ model Employee {
   rank       Position
   department String
 
-  user User?
+  user    User?
+  approvalsAsSelf     Approve[] @relation("SelfApprovals")
+  approvalsAsChecker  Approve[] @relation("CheckerApprovals")
+  approvalsAsApprover Approve[] @relation("ApproverApprovals")
 
   @@map("employee")
+}
+
+enum App {
+  KIP
+}
+
+model Approve {
+  id         String   @id @default(cuid())
+  app        App
+  selfId     String
+  checkerId  String?
+  approverId String
+
+  self     Employee @relation("SelfApprovals", fields: [selfId], references: [id], onDelete: Cascade)
+  checker  Employee? @relation("CheckerApprovals", fields: [checkerId], references: [id], onDelete: Cascade)
+  approver Employee @relation("ApproverApprovals", fields: [approverId], references: [id], onDelete: Cascade)
+
+  @@map("approve")
 }

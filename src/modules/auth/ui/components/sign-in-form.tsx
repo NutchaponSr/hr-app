@@ -43,7 +43,7 @@ export const SignInForm = () => {
     <>
       <form onSubmit={onSubmit} className="text-left flex flex-col gap-4 w-full">
         <Label className="flex flex-col items-start">
-          <div>Email / Employee Id</div>
+          <div>Employee Id</div>
           <Input 
             required
             value={emailOrUsername}
@@ -51,21 +51,19 @@ export const SignInForm = () => {
             onChange={(e) => setEmailOrUsername(e.target.value)}
           />
           <p className="text-xs text-tertiary font-normal">
-            Use an organization email to easily collaborate with teammates
+            Use an employee id to easily collaborate with teammates
           </p>
         </Label>
         <Label className="flex flex-col items-start">
-          <div>Password</div>
+          <div>Last 5 digits of ID card</div>
           <Input 
             required
             disabled={isPending}
             value={password}
             type="password"
+            placeholder="*****"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <a href="/auth/forget-password" className="text-xs underline hover:text-danger text-tertiary font-normal">
-            Forget your password?
-          </a>
         </Label>
         <Button size="lg" disabled={isPending}>
           Continue
