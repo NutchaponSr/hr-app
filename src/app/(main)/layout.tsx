@@ -10,7 +10,7 @@ const Layout = ({ children }: Props) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="container mx-auto px-0 xl:px-32">
+      <main className="container mx-auto px-0 xl:px-32 mt-12 pt-8 md:mt-16">
         <div className="md:my-10">
           <div className="grid grid-cols-12 gap-x-[3.125vw] w-full">
             <div className="order-2 content col-span-12 lg:col-span-9">

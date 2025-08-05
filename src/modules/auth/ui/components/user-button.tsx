@@ -55,13 +55,16 @@ export const UserButton = () => {
           Theme
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={() => authClient.signOut({
-          fetchOptions: {
-            onSuccess: () => {
-              router.push("/auth/sign-in")
+        <DropdownMenuItem 
+          variant="destructive" 
+          onClick={() => authClient.signOut({
+            fetchOptions: {
+              onSuccess: () => {
+                router.refresh();
+              }
             }
-          }
-        })}>
+          })}
+        >
           <LogOutIcon />
           Sign out
         </DropdownMenuItem>

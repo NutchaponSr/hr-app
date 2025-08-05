@@ -1,7 +1,7 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { NextRequest, NextResponse } from "next/server";
 
-const protectedRoutes = ["/", "/dashboard"];
+const protectedRoutes = ["/", "/dashboard", "/performance"];
 
 export async function middleware(req: NextRequest) {
   const { nextUrl } = req;
