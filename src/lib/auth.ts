@@ -14,6 +14,7 @@ import { VALID_DOMAINS } from "@/lib/utils";
 import { ac, roles } from "@/lib/permissions";
 
 import { UserRole } from "@/generated/prisma";
+import { env } from "@/env";
 
 const opts: Options = {
   memoryCost: 19456,
@@ -132,6 +133,10 @@ export const auth = betterAuth({
     nextCookies(),
     username(),
   ],
+  trustedOrigins: [
+    env.BETTER_AUTH_URL,
+  ],
+  baseURL: "/api/auth",
 });
 
 export type ErrorCode = keyof typeof auth.$ERROR_CODES | "UNKNOWN";
