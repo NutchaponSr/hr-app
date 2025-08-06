@@ -136,7 +136,6 @@ export const auth = betterAuth({
   trustedOrigins: [
     env.BETTER_AUTH_URL,
   ],
-  baseURL: "/api/auth",
 });
 
 export type ErrorCode = keyof typeof auth.$ERROR_CODES | "UNKNOWN";
