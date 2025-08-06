@@ -31,7 +31,7 @@ export const Header = () => {
               height={48}
             />
           </Link>
-          {permission.data!.success && (
+          {permission.data?.success && (
             <Button asChild variant="outline" size="sm">
               <Link href="/dashboard">
                 Dashboard

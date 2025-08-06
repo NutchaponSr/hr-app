@@ -49,11 +49,11 @@ const findChecker = (employee: Employee, employees: Employee[]) => {
     getPositionLevel(emp.rank) === selfLevel - 1,
   );
 
-  potentialCheckers.sort((a, b) =>
-    getPositionLevel(b.rank) - getPositionLevel(a.rank)
-  );
-  
-  return potentialCheckers[0].id;
+  if (potentialCheckers.length > 0) {
+    return potentialCheckers[0].id;
+  }
+
+  return null;
 }
 
 const findApprover = (
@@ -138,6 +138,12 @@ const seed = async () => {
     for (const employee of employees) {
       const checkerId = findChecker(employee, employees);
       const approverId = findApprover(employee, employees);
+
+      console.log({
+        self: employee,
+        checker: employees.find((f) => f.id === checkerId),
+        approver: employees.find((f) => f.id === approverId),
+      });
 
       await prisma.approve.create({
         data: {
