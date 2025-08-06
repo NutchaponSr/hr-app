@@ -6,7 +6,7 @@ import { parse } from "csv-parse/sync";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-import { App, Division, Employee, Position } from "@/generated/prisma";
+import { App, Division, Employee, Position } from "@/generated/prisma"
 
 interface EmployeeCVSProps {
   order: string;
@@ -49,25 +49,11 @@ const findChecker = (employee: Employee, employees: Employee[]) => {
     getPositionLevel(emp.rank) === selfLevel - 1,
   );
 
-  if (potentialCheckers.length > 0) {
-    return potentialCheckers[0].id;
-  }
-
-  // หาคนที่ต่ำกว่าทุกระดับ
-  const lowerLevelCheckers = employees.filter(emp =>
-    emp.department === employee.department &&
-    emp.id !== employee.id &&
-    getPositionLevel(emp.rank) < selfLevel
+  potentialCheckers.sort((a, b) =>
+    getPositionLevel(b.rank) - getPositionLevel(a.rank)
   );
-
-  if (lowerLevelCheckers.length > 0) {
-    lowerLevelCheckers.sort((a, b) =>
-      getPositionLevel(b.rank) - getPositionLevel(a.rank) // ให้คนที่ rank สูงสุดในกลุ่มต่ำกว่า
-    );
-    return lowerLevelCheckers[0].id;
-  }
-
-  return null;
+  
+  return potentialCheckers[0].id;
 }
 
 const findApprover = (

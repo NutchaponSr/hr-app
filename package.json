@@ -10,7 +10,11 @@
     "db:seed": "tsx src/seed.ts",
     "db:studio": "npx prisma studio",
     "db:generate": "npx prisma generate",
-    "db:push": "npx prisma db push"
+    "db:push": "npx prisma db push",
+    "postinstall": "prisma generate --no-engine"
+  },
+  "prisma": {
+    "seed": "tsx src/seed.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.0.2",
