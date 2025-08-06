@@ -1,8 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { env } from "@/env";
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -10,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export function VALID_DOMAINS() {
   const domains = ["somboon.co.th"];
 
-  if (env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === "development") {
     domains.push("@gmail.com");
   }
 

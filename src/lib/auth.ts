@@ -14,7 +14,6 @@ import { VALID_DOMAINS } from "@/lib/utils";
 import { ac, roles } from "@/lib/permissions";
 
 import { UserRole } from "@/generated/prisma";
-import { env } from "@/env";
 
 const opts: Options = {
   memoryCost: 19456,
@@ -134,7 +133,7 @@ export const auth = betterAuth({
     username(),
   ],
   trustedOrigins: [
-    env.BETTER_AUTH_URL,
+    String(process.env.BETTER_AUTH_URL),
   ],
 });
 
