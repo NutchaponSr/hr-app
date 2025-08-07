@@ -39,7 +39,7 @@ export const TopicSection = () => {
           <p className="text-tertiary text-lg">No application be found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 md:mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-10 md:mt-8">
           {displayItems.map((item) => (
             <Link
               key={item.href}

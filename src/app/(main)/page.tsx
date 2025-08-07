@@ -17,9 +17,6 @@ const Page = async () => {
       <TopicSection />
       <hr className="h-px mx-auto w-full border-t-[1.25px] border-border" />
       <ExploreSection />
-      {/* <pre className="text-primary text-xs">
-        {JSON.stringify(session, null, 2)}
-      </pre> */}
     </>
   );  
 }
