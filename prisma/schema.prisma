@@ -110,19 +110,17 @@ enum Position {
 }
 
 model Employee {
-  id         String   @id @db.VarChar(10)
-  fullName   String
-  email      String?
-  position   String
-  division   Division
-  level      Position
-  rank       Position
+  id String @id @db.VarChar(10)
+  fullName String
+  email String?
+  position String
+  division Division
+  level Position
+  rank Position
   department String
 
-  user    User?
-  approvalsAsSelf     Approve[] @relation("SelfApprovals")
-  approvalsAsChecker  Approve[] @relation("CheckerApprovals")
-  approvalsAsApprover Approve[] @relation("ApproverApprovals")
+  user User?
+  records KpiRecord[]
 
   @@map("employee")
 }
@@ -131,16 +129,49 @@ enum App {
   KIP
 }
 
-model Approve {
-  id         String   @id @default(cuid())
-  app        App
-  selfId     String
-  checkerId  String?
-  approverId String
+model Kpi {
+  id String @id @default(uuid())
+  name String
+  weight Int
+  target Json
+  definition String?
+  actual String
+  achievement Int
 
-  self     Employee @relation("SelfApprovals", fields: [selfId], references: [id], onDelete: Cascade)
-  checker  Employee? @relation("CheckerApprovals", fields: [checkerId], references: [id], onDelete: Cascade)
-  approver Employee @relation("ApproverApprovals", fields: [approverId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@map("approve")
+  records KpiRecord[]
+
+  @@map("kpis")
+}
+
+model KpiRecord {
+  id String @id @default(uuid())
+  kpiId String
+  employeeId String
+  ApprovalId String
+  totalScore Decimal
+
+  kpi Kpi @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  approval Approval @relation(fields: [ApprovalId], references: [id], onDelete: Cascade)
+
+  @@map("kpiRecord")
+}
+
+model Approval {
+  id String @id @default(cuid())
+  app App
+  preparedBy String
+  checkedBy String?
+  approvedBy String
+
+  preparedAt DateTime
+  checkedAt DateTime
+  approvedAt DateTime
+
+  records KpiRecord[]
+
+  @@map("approval")
 }

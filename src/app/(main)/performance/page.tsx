@@ -1,17 +1,25 @@
-"use client"; 
-
+import { Suspense } from "react";
 import { ChartNoAxesCombinedIcon } from "lucide-react";
-import { Hero } from "../_components/hero";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
+import { getQueryClient, trpc } from "@/trpc/server";
+
 import { TimelineCard } from "@/components/timeline-card";
 
-const Page = () => {
+import { Hero } from "../_components/hero";
+import { Client } from "./client";
+
+const Page = async () => {
+  const queryClient = getQueryClient();
+
+  void queryClient.prefetchQuery(trpc.greeting.queryOptions({ name: "Pondpopza" }));
+
   const kpiSteps = [
     {
       step: 1,
       date: "Jan",
       title: "KPI Definition",
       completed: false,
-      onClick: () => {}
     },
     {
       step: 2,
@@ -39,6 +47,12 @@ const Page = () => {
             steps={kpiSteps}
             defaultValue={0}
           />
+
+          <HydrationBoundary state={dehydrate(queryClient)}>
+            <Suspense fallback={<p>Loading</p>}>
+              <Client />
+            </Suspense>
+          </HydrationBoundary>
         </section>
       </div>
     </>
