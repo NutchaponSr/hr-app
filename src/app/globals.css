@@ -44,6 +44,9 @@
 
 @theme inline {
   --breakpoint-xs: 375px;
+  --breakpoint-s: 600px;
+  --breakpoint-m: 1080px;
+  --breakpoint-lg: 1440px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
