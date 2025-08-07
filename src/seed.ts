@@ -133,27 +133,27 @@ const seed = async () => {
     }
 
     console.log(`✅ Successfully created ${employees.length} employees`);
-    console.log("🔄 Creating approval records...");
+    // console.log("🔄 Creating approval records...");
 
-    for (const employee of employees) {
-      const checkerId = findChecker(employee, employees);
-      const approverId = findApprover(employee, employees);
+    // for (const employee of employees) {
+    //   const checkerId = findChecker(employee, employees);
+    //   const approverId = findApprover(employee, employees);
 
-      console.log({
-        self: employee,
-        checker: employees.find((f) => f.id === checkerId),
-        approver: employees.find((f) => f.id === approverId),
-      });
+    //   console.log({
+    //     self: employee,
+    //     checker: employees.find((f) => f.id === checkerId),
+    //     approver: employees.find((f) => f.id === approverId),
+    //   });
 
-      await prisma.approve.create({
-        data: {
-          app: App.KIP,
-          selfId: employee.id,
-          checkerId,
-          approverId,
-        },
-      });
-    }
+    //   await prisma.approve.create({
+    //     data: {
+    //       app: App.KIP,
+    //       selfId: employee.id,
+    //       checkerId,
+    //       approverId,
+    //     },
+    //   });
+    // }
 
     await Promise.all(csvRecords.map(async (employee) => {
       const userEmail = employee.email || "t@somboon.co.th";

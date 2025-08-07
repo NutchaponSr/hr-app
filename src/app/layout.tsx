@@ -5,8 +5,9 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { cn } from "@/lib/utils";
 
+import { TRPCReactProvider } from "@/trpc/client";
+
 import "./globals.css";
-import QueryProvider from "@/providers/query-provider";
 
 const font = Inter({
   subsets: ["latin"],
@@ -25,12 +26,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(font.className, "antialiased")}>
-        <QueryProvider>
+        <TRPCReactProvider>
           <NuqsAdapter>
             {children}
             <Toaster position="top-center" />
           </NuqsAdapter>
-        </QueryProvider>
+        </TRPCReactProvider>
       </body>
     </html>
   );
