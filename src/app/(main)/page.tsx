@@ -1,16 +1,8 @@
-import { headers } from "next/headers";
-
-import { auth } from "@/lib/auth";
-
 import { SearchHero } from "./_components/search-hero";
 import { TopicSection } from "./_components/topic-section";
 import { ExploreSection } from "./_components/explore-section";
 
-const Page = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
+const Page = () => {
   return (
     <>
       <SearchHero />

@@ -10,7 +10,7 @@ import { ChevronRightIcon } from "lucide-react";
 export const Breadcrumbs = () => {
   const pathname = usePathname();
 
-  const paths: string[] = pathname.split("/");
+  const paths: string[] = pathname.split("/").filter(Boolean);
 
   if (pathname === "/") return null;
 
@@ -20,14 +20,17 @@ export const Breadcrumbs = () => {
         Apps
       </Link>
       <ChevronRightIcon className="size-3" />
-      {paths.splice(1).map((path, index) => (
-        <React.Fragment key={index}>
-          <Link href={path} className="first-letter:uppercase text-primary text-xs">
-            {path}
-          </Link>
-          {paths.length !== index + 1 && <ChevronRightIcon />}
-        </React.Fragment>
-      ))}
+      {paths.map((path, index) => {
+        const href = "/" + paths.slice(0, index + 1).join("/");
+        return (
+          <React.Fragment key={index}>
+            <Link href={href} className="first-letter:uppercase text-primary text-xs">
+              {path}
+            </Link>
+            {index < paths.length - 1 && <ChevronRightIcon className="size-3" />}
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 }
