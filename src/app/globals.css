@@ -88,6 +88,7 @@
   --color-tertiary: var(--tertiary);
   --color-neutral: var(--neutral);
   --color-marine: var(--marine);
+  --color-marine-muted: var(--marine-muted);
   --color-warning: var(--warning);
 
   /* Theme Colors */
@@ -162,6 +163,7 @@
   --destructive: oklch(0.6534 0.1835 23.68);
   --danger: oklch(0.6201 0.208 34.62);
   --marine: oklch(0.6035 0.1685 253.08);
+  --marine-muted: oklch(0.5654 0.1676 251.69);
   --warning: oklch(0.8364 0.1407 82.68);
   --secondary-foreground: oklch(0.9581 0.0041 91.45 / 60%);
 
@@ -237,6 +239,7 @@
   --destructive: oklch(0.6534 0.1835 23.68);
   --danger: oklch(0.6201 0.208 34.62);
   --marine: oklch(0.6035 0.1685 253.08);
+  --marine-muted: oklch(0.5654 0.1676 251.69);
   --warning: oklch(0.8364 0.1407 82.68);
   
   --sidebar: oklch(0.2435 0 0);

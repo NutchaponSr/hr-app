@@ -1,22 +1,28 @@
-import Image from "next/image";
+import { IconType } from "react-icons";
 
-export const Hero = () => {
+interface Props {
+  title: string;
+  description: string;
+  icon: IconType;
+}
+
+export const Hero = ({ title, description, icon: Icon }: Props) => {
   return (
-    <section className="w-full relative text-center flex flex-col items-center justify-center mb-0 md:text-left md:mb-5 md:flex-row">
-      <div className="flex flex-col order-2 space-y-2">
-        <h1 className="font-bold text-2xl md:text-3xl text-primary">Performance</h1>
-        <p className="md:w-2/3 text-sm text-tertiary mb-7.5 md:mb-0">
-          Track and manage employee performance reviews and goals
-        </p>
-      </div>
-      <div className="md:ml-auto md:order-2 order-1">
-        <Image 
-          src="/keyboard-double-arrow-up.svg"
-          alt="Performance"
-          width={85}
-          height={70}
-          className="mb-2 md:mb-0"
-        />
+    <section className="w-full relative md:text-left">
+      <div className="mb-2 w-full">
+        <div className="flex justify-start">
+          <div className="flex items-center justify-center size-9 relative shrink-0 mr-2">
+            <Icon className="size-8 text-marine" />
+          </div>
+          <h1 className="text-primary font-bold leading-[1.2] text-3xl whitespace-break-spaces break-words">
+            {title}
+          </h1>
+        </div>
+        <div className="max-w-full overflow-hidden mb-3">
+          <p className="max-w-full w-[780px] whitespace-break-spaces break-words text-primary text-sm">
+            {description}
+          </p>
+        </div>
       </div>
     </section>
   );
