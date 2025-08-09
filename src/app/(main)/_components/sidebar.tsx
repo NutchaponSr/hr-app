@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 
 import { IoTriangle } from "react-icons/io5";
+import { BsFillGridFill } from "react-icons/bs";
 
 import { APP_CATEGORIES } from "@/constants";
 
@@ -16,12 +16,7 @@ export const Sidebar = () => {
               <div className="self-start w-full">
                 <div className="mb-4 text-[#0009]">
                   <Link href="/" className="flex flex-row items-center mb-2 gap-2.5 px-3 py-1.5 group transition-opacity">
-                    <Image 
-                      src="/view-cozy.svg"
-                      alt="App"
-                      width={36}
-                      height={36}
-                    />
+                    <BsFillGridFill className="size-8 text-primary" />
                     <div className="flex flex-col">
                       <h5 className="text-xs font-semibold text-primary">
                         Applications

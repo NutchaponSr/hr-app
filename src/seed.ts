@@ -6,7 +6,7 @@ import { parse } from "csv-parse/sync";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-import { App, Division, Employee, Position } from "@/generated/prisma"
+import { Division, Employee, Position } from "@/generated/prisma"
 
 interface EmployeeCVSProps {
   order: string;
@@ -21,55 +21,55 @@ interface EmployeeCVSProps {
   password: string;
 }
 
-const POSITION_HIERARCHY: Position[] = [
-  Position.President,
-  Position.MD,
-  Position.VP,
-  Position.GM,
-  Position.AGM,
-  Position.MGR,
-  Position.SMGR,
-  Position.Chief,
-  Position.Foreman,
-  Position.Staff,
-  Position.Worker,
-  Position.Officer
-] as const;
+// const POSITION_HIERARCHY: Position[] = [
+//   Position.President,
+//   Position.MD,
+//   Position.VP,
+//   Position.GM,
+//   Position.AGM,
+//   Position.MGR,
+//   Position.SMGR,
+//   Position.Chief,
+//   Position.Foreman,
+//   Position.Staff,
+//   Position.Worker,
+//   Position.Officer
+// ] as const;
 
-const getPositionLevel = (position: Position) => {
-  return POSITION_HIERARCHY.indexOf(position);
-}
+// const getPositionLevel = (position: Position) => {
+//   return POSITION_HIERARCHY.indexOf(position);
+// }
 
-const findChecker = (employee: Employee, employees: Employee[]) => {
-  const selfLevel = getPositionLevel(employee.rank);
+// const findChecker = (employee: Employee, employees: Employee[]) => {
+//   const selfLevel = getPositionLevel(employee.rank);
 
-  const potentialCheckers = employees.filter((emp) => 
-    emp.department === employee.department && 
-    emp.id !== employee.id && 
-    getPositionLevel(emp.rank) === selfLevel - 1,
-  );
+//   const potentialCheckers = employees.filter((emp) => 
+//     emp.department === employee.department && 
+//     emp.id !== employee.id && 
+//     getPositionLevel(emp.rank) === selfLevel - 1,
+//   );
 
-  if (potentialCheckers.length > 0) {
-    return potentialCheckers[0].id;
-  }
+//   if (potentialCheckers.length > 0) {
+//     return potentialCheckers[0].id;
+//   }
 
-  return null;
-}
+//   return null;
+// }
 
-const findApprover = (
-  self: Employee, 
-  employees: Employee[]
-) => {
-  const departmentEmployees = employees.filter(emp => 
-    emp.department === self.department
-  );
+// const findApprover = (
+//   self: Employee, 
+//   employees: Employee[]
+// ) => {
+//   const departmentEmployees = employees.filter(emp => 
+//     emp.department === self.department
+//   );
 
-  departmentEmployees.sort((a, b) =>
-    getPositionLevel(a.rank) - getPositionLevel(b.rank)
-  );
+//   departmentEmployees.sort((a, b) =>
+//     getPositionLevel(a.rank) - getPositionLevel(b.rank)
+//   );
   
-  return departmentEmployees[0].id;
-} 
+//   return departmentEmployees[0].id;
+// } 
 
 const seed = async () => {
   console.log("🗑️ Cleaning up existing data...");

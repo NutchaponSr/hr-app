@@ -26,12 +26,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(font.className, "antialiased")}>
-        <TRPCReactProvider>
-          <NuqsAdapter>
+        <NuqsAdapter>
+          <TRPCReactProvider>
             {children}
             <Toaster position="top-center" />
-          </NuqsAdapter>
-        </TRPCReactProvider>
+          </TRPCReactProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );
