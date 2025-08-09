@@ -1,14 +1,23 @@
+import { Suspense } from "react";
+
 import { SearchHero } from "./_components/search-hero";
-import { TopicSection } from "./_components/topic-section";
-import { ExploreSection } from "./_components/explore-section";
+import { CategoryCarasel } from "./_components/category-carousel";
+import { ReferenceSection } from "./_components/reference-sections";
+import { ApplicationSection } from "./_components/application-section";
 
 const Page = () => {
   return (
     <>
       <SearchHero />
-      <TopicSection />
-      <hr className="h-px mx-auto w-full border-t-[1.25px] border-border" />
-      <ExploreSection />
+      <div className="flex flex-col gap-8 mt-4">
+        <Suspense>
+          <CategoryCarasel />
+        </Suspense>
+        <Suspense>
+          <ApplicationSection />
+        </Suspense>
+        <ReferenceSection />
+      </div>
     </>
   );  
 }
