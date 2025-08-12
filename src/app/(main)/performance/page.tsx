@@ -1,18 +1,12 @@
 import { BsArrowUpSquareFill } from "react-icons/bs";
 
-import { getQueryClient, trpc } from "@/trpc/server";
-
 import { Tasks } from "@/modules/performance/ui/components/tasks";
 import { BonusScreen } from "@/modules/performance/ui/components/bonus-screen";
 import { MeritScreen } from "@/modules/performance/ui/components/merit-screen";
 
 import { Hero } from "../_components/hero";
 
-const Page = async () => {
-  const queryClient = getQueryClient();
-
-  void queryClient.prefetchQuery(trpc.greeting.queryOptions({ name: "Pondpopza" }));
-
+const Page = () => {
   return (
     <>
       <Hero 

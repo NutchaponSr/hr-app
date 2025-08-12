@@ -125,6 +125,7 @@ export const auth = betterAuth({
         user: {
           ...user,
           level: userDb.employee.level,
+          employeeId: userDb.employee.id,
         },
         session,
       }

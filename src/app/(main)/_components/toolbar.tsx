@@ -1,7 +1,8 @@
-import { ArrowDownUpIcon, ChevronDownIcon, FilterIcon } from "lucide-react";
+import { ArrowDownUpIcon, FilterIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CreateButton } from "./create-button";
 
 export const Toolbar = () => {
   return (
@@ -18,26 +19,19 @@ export const Toolbar = () => {
       <div className="grow">
         <div className="flex flex-row items-center justify-end gap-0.5">
           <Button
-            size="icon"
+            size="iconSm"
             variant="ghost"
           >
             <FilterIcon className="text-muted" />
           </Button>
           <Button
-            size="icon"
+            size="iconSm"
             variant="ghost"
           >
             <ArrowDownUpIcon className="text-muted" />
           </Button>
 
-          <div className="relative inline-flex shrink-0 rounded overflow-hidden h-7 ml-1">
-            <button className="transition flex items-center justify-center whitespace-nowrap rounded-l px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted">
-              New
-            </button>
-            <button className="transition flex items-center justify-center whitespace-nowrap rounded-r bg-marine shadow-[inset_1px_0_0_rgba(55,53,47,0.16)] text-white text-sm w-6 hover:bg-marine-muted">
-              <ChevronDownIcon className="size-4" />
-            </button>
-          </div>
+          <CreateButton />
         </div>
       </div>
     </div>

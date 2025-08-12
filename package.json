@@ -7,16 +7,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:seed": "tsx src/seed.ts",
+    "db:seed": "tsx src/seeds/main.ts",
     "db:studio": "npx prisma studio",
     "db:generate": "npx prisma generate",
     "db:push": "npx prisma db push",
     "postinstall": "prisma generate --no-engine"
   },
   "prisma": {
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seeds/main.ts"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
     "@node-rs/argon2": "^2.0.2",
     "@prisma/client": "^6.12.0",
     "@prisma/extension-accelerate": "^2.0.2",
@@ -44,6 +45,7 @@
     "radix-ui": "^1.4.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-hook-form": "^7.62.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
     "server-only": "^0.0.1",

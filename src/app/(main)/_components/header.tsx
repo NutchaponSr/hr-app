@@ -46,7 +46,7 @@ export const Header = () => {
           </div>
         </div>
         <Button 
-          size="icon"
+          size="iconSm"
           variant="ghost"
           className="flex md:hidden"
         >

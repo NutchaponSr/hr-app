@@ -35,6 +35,9 @@ export const protectedProcedure = t.procedure.use(async function isAuthed(opts) 
     where: {
       id: ctx.session.user.id,
     },
+    include: {
+      employee: true,
+    },
   });
 
   if (!user) {

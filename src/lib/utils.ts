@@ -42,3 +42,4 @@ export function getFirstNameFromFullName(fullName: string): string {
   const firstToken = cleaned.split(/\s+/)[0];
   return firstToken ? `คุณ${firstToken}` : "";
 };
+
