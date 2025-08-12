@@ -1,17 +1,9 @@
-import { z } from "zod";
+import { createTRPCRouter } from "@/trpc/init";
 
-import { baseProcedure, createTRPCRouter } from "@/trpc/init";
+import { bonusProcedure } from "@/modules/bonus/server/procedure";
 
 export const appRouter = createTRPCRouter({
-  greeting: baseProcedure
-    .input(
-      z.object({
-        name: z.string(),
-      }),
-    )
-    .query(async ({ input }) => {
-      return `Hello ${input.name}`;
-    })
+  kpiBonus: bonusProcedure,
 });
 
 export type AppRouter = typeof appRouter;

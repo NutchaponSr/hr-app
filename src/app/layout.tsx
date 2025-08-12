@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 
 import { TRPCReactProvider } from "@/trpc/client";
 
+import { SheetProvider } from "@/providers/sheet-provider";
+
 import "./globals.css";
 
 const font = Inter({
@@ -26,12 +28,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(font.className, "antialiased")}>
-        <NuqsAdapter>
-          <TRPCReactProvider>
+        <TRPCReactProvider>
+          <NuqsAdapter>
             {children}
+            <SheetProvider />
             <Toaster position="top-center" />
-          </TRPCReactProvider>
-        </NuqsAdapter>
+          </NuqsAdapter>
+        </TRPCReactProvider>
       </body>
     </html>
   );

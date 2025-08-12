@@ -109,69 +109,71 @@ enum Position {
   Officer
 }
 
+enum App {
+  KPI
+}
+
 model Employee {
-  id String @id @db.VarChar(10)
-  fullName String
-  email String?
-  position String
-  division Division
-  level Position
-  rank Position
+  id         String      @id @db.VarChar(10)
+  fullName   String
+  email      String?     @unique
+  position   String
+  division   Division
+  level      Position
+  rank       Position
   department String
 
-  user User?
-  records KpiRecord[]
+  user       User?
+  records    KpiRecord[]
 
   @@map("employee")
 }
 
-enum App {
-  KIP
-}
-
 model Kpi {
-  id String @id @default(uuid())
-  name String
-  weight Int
-  target Json
-  definition String?
-  actual String
-  achievement Int
+  id           String      @id @default(cuid())
+  name         String
+  weight       Int
+  target       Json
+  definition   String?
+  actual       String?
+  achievement  Int?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
-  records KpiRecord[]
+  kpiRecordId  String
+  kpiRecord    KpiRecord   @relation(fields: [kpiRecordId], references: [id], onDelete: Cascade)
 
   @@map("kpis")
 }
 
 model KpiRecord {
-  id String @id @default(uuid())
-  kpiId String
-  employeeId String
-  ApprovalId String
-  totalScore Decimal
+  id          String     @id @default(uuid())
+  employeeId  String
+  approvalId  String
+  totalScore  Decimal
+  year        Int        
 
-  kpi Kpi @relation(fields: [kpiId], references: [id], onDelete: Cascade)
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  approval Approval @relation(fields: [ApprovalId], references: [id], onDelete: Cascade)
+  kpis        Kpi[]
+  employee    Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  approval    Approval   @relation(fields: [approvalId], references: [id], onDelete: Cascade)
 
+  @@unique([employeeId, year]) 
   @@map("kpiRecord")
 }
 
 model Approval {
-  id String @id @default(cuid())
-  app App
-  preparedBy String
-  checkedBy String?
-  approvedBy String
+  id          String     @id @default(cuid())
+  app         App
+  preparedBy  String
+  checkedBy   String?
+  approvedBy  String
 
-  preparedAt DateTime
-  checkedAt DateTime
-  approvedAt DateTime
+  preparedAt  DateTime   @default(now())
+  checkedAt   DateTime?
+  approvedAt  DateTime?
 
-  records KpiRecord[]
+  records     KpiRecord[]
 
   @@map("approval")
 }
