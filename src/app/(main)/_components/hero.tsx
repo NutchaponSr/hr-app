@@ -9,7 +9,7 @@ interface Props {
 export const Hero = ({ title, description, icon: Icon }: Props) => {
   return (
     <section className="w-full relative md:text-left">
-      <div className="mb-2 w-full">
+      <div className="mb-2 w-full pr-24">
         <div className="flex justify-start">
           <div className="flex items-center justify-center size-9 relative shrink-0 mr-2">
             <Icon className="size-8 text-marine" />

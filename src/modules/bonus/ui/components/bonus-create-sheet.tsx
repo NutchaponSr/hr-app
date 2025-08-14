@@ -7,15 +7,20 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
-import { BonusCreateForm } from "@/modules/bonus/ui/views/bonus-create-form";
+import { BonusCreateForm } from "@/modules/bonus/ui/components/bonus-create-form";
 
 import { useCreateSheetStore } from "@/modules/performance/store/use-create-sheet-store";
 
 export const BonusCreateSheet = () => {
-  const { isOpen, onClose } = useCreateSheetStore();
+  const { isOpen, type, onClose } = useCreateSheetStore();
+
+  const open = isOpen && type === "kpi-bonus";
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
+    <Sheet
+      open={open}
+      onOpenChange={onClose}
+    >
       <SheetContent>
         <SheetHidden />
         <div className="flex justify-between h-10 items-center px-3 relative">

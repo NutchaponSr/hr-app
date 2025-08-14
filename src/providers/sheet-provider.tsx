@@ -1,6 +1,6 @@
 "use client";
 
-import { BonusCreateSheet } from "@/modules/performance/ui/components/bonus-create-sheet";
+import { BonusCreateSheet } from "@/modules/bonus/ui/components/bonus-create-sheet";
 import { useEffect, useState } from "react";
 
 export const SheetProvider = () => {

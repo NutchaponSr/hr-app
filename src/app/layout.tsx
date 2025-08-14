@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
@@ -11,7 +11,7 @@ import { SheetProvider } from "@/providers/sheet-provider";
 
 import "./globals.css";
 
-const font = Inter({
+const font = Geist({
   subsets: ["latin"],
 });
 

@@ -151,7 +151,7 @@ model KpiRecord {
   id          String     @id @default(uuid())
   employeeId  String
   approvalId  String
-  totalScore  Decimal
+  totalScore  Int
   year        Int        
 
   kpis        Kpi[]

@@ -1,11 +1,12 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
 
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { kpiBonusSchema } from "@/modules/performance/schema";
-import { TRPCError } from "@trpc/server";
+import { convertAmountToUnit } from "@/lib/utils";
 
 export const bonusProcedure = createTRPCRouter({
   getByEmployeeId: protectedProcedure
@@ -16,22 +17,19 @@ export const bonusProcedure = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      const records = await prisma.kpiRecord.findMany({
-        where: input,
+      const res = await prisma.kpiRecord.findMany({
+        where: {
+          employeeId: input.employeeId,
+        },
         include: {
           kpis: true,
         }
       });
 
-      // TODO: Handle Demical
-      const serialized = records.map(({ totalScore, ...rest }) => ({
-        ...rest,
-        totalScore: typeof (totalScore as unknown as { toNumber?: () => number }).toNumber === "function"
-          ? (totalScore as unknown as { toNumber: () => number }).toNumber()
-          : Number(totalScore as unknown as number),
-      }));
-
-      return serialized;
+      return {
+        years: res.map((kpi) => kpi.year),
+        record: res.find((f) => f.year === input.year),
+      };
     }),
   create: protectedProcedure
     .input(kpiBonusSchema)
@@ -75,6 +73,7 @@ export const bonusProcedure = createTRPCRouter({
           ...input,
           actual: "",
           achievement: 0,
+          weight: convertAmountToUnit(parseFloat(input.weight), 2),
           kpiRecordId: record.id,
         },
       });

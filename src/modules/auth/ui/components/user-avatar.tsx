@@ -19,7 +19,7 @@ export const UserAvatar = ({ className, src, name }: Props) => {
   const fallback = name.charAt(3).toUpperCase();
 
   return (
-    <Avatar className={cn(className?.container, "hover:opacity-80 transition")}>
+    <Avatar className={cn(className?.container)}>
       <AvatarImage src={src} alt={name} />
       <AvatarFallback className={cn(className?.fallback, "bg-marine text-white font-bold")}>
         {fallback}

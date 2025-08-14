@@ -43,3 +43,10 @@ export function getFirstNameFromFullName(fullName: string): string {
   return firstToken ? `คุณ${firstToken}` : "";
 };
 
+export function convertAmountFormUnit(amount: number, decimal: number) {
+  return amount / Math.pow(10, decimal);
+}
+
+export function convertAmountToUnit(amount: number, decimal: number) {
+  return Math.round(amount * Math.pow(10, decimal));
+}
