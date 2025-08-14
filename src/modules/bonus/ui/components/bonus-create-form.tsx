@@ -17,12 +17,16 @@ import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCreateSheetStore } from "@/modules/performance/store/use-create-sheet-store";
 import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
+import { useYear } from "@/hooks/use-year";
 
 const values = [100, 90, 80, 70] as const;
 
 export const BonusCreateForm = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  
+  const { year } = useYear();
   const { data: session } = authClient.useSession();
 
   const { onClose } = useCreateSheetStore();
@@ -33,7 +37,7 @@ export const BonusCreateForm = () => {
     kpiBonusSchema,
     {
       name: "",
-      weight: 0,
+      weight: "",
       target: { 
         "100": "", 
         "90": "", 
@@ -56,22 +60,29 @@ export const BonusCreateForm = () => {
     );
   }
 
+  const onSubmit = (value: KpiBonusSchema) => {
+    const loadingToast = toast.loading("Creating KPI Bonus...");
+
+    createBonus.mutate({ ...value }, {
+      onSuccess: () => {
+        toast.success("Bonus created successfully!", {
+          id: loadingToast,
+        });
+
+        queryClient.invalidateQueries(trpc.kpiBonus.getByEmployeeId.queryOptions({
+          employeeId: session!.user.employeeId,
+          year,
+        }))
+        
+        onClose();
+      },
+    });
+  }
+
   return (
     <form
-      onSubmit={handleSubmit((data) => {
-        // TODO: integrate mutation
-        createBonus.mutate({ ...data }, {
-          onSuccess: () => {
-            queryClient.invalidateQueries(trpc.kpiBonus.getByEmployeeId.queryOptions({
-              employeeId: session!.user.employeeId,
-              year: new Date().getFullYear(),
-            }))
-            
-            onClose();
-          },
-        });
-      })}
-      className="grid [grid-template-columns:_[full-start]_76px_[content-start]_1fr_[content-end]_76px_[full-end]] w-full select-none"
+      onSubmit={handleSubmit(onSubmit)}
+      className="grid [grid-template-columns:_[full-start]_76px_[content-start]_1fr_[content-end]_76px_[full-end]] w-full"
     >
       <div className="mb-3 pb-3 col-start-2">
         <div className="flex items-center leading-[1.2] text-sm font-medium max-w-full w-full whitespace-break-spaces break-words text-primary py-1">
@@ -105,15 +116,22 @@ export const BonusCreateForm = () => {
                   <PopoverTrigger asChild>
                     <button className="transition hover:bg-primary/6 relative text-sm overflow-hidden inline-block rounded w-full h-8 py-1.5 px-2.5">
                       <div className="leading-5 break-words whitespace-pre-wrap text-foreground text-start">
-                      {isNaN(currentWeight) || currentWeight <= 0 ? "Empty" : `${currentWeight} %`}
+                      {!currentWeight
+                        ? "Empty" 
+                        : `${Number(currentWeight).toLocaleString("en-US", {
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 2,
+                        })} %`
+                      }
                       </div>
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-49 p-0" sideOffset={-32}>
                     <input
                       type="number"
+                      value={watch("weight")?.toString() ?? ""}
                       className="w-full focus-visible:outline-none h-8 px-2 text-sm text-primary"
-                      {...register("weight", { valueAsNumber: true })}
+                      {...register("weight")}
                     />
                   </PopoverContent>
                 </Popover>

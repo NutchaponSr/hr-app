@@ -23,7 +23,7 @@ export const ApplicationCard = ({
 }: Props) => {
   return (
     <article className="relative w-full flex group cursor-pointer">
-      <Link href={href} className="flex select-none transition relative rounded flex-col overflow-hidden w-full h-auto flex-1">
+      <Link href={href} className="flex select-none transition relative rounded flex-col overflow-hidden w-full h-auto flex-1 z-2">
         <div className="relative transition">
           <div className={cn("bg-accent block h-16")} />
           <div className="absolute top-11 left-6">
@@ -49,7 +49,7 @@ export const ApplicationCard = ({
           </div>
         </div>
       </Link>
-      <div className="absolute rounded inset-0 -z-1 shadow-[0_12px_32px_0_rgba(0,0,0,0.02),0_0_0_1px_rgba(0,0,0,0.05)] group-hover:shadow-[0_12px_32px_0_rgba(0,0,0,0.02),0_0_0_1px_rgba(0,0,0,0.089)]" />
+      <div className="absolute rounded inset-0 z-1 shadow-[0_12px_32px_0_rgba(0,0,0,0.02),0_0_0_1px_rgba(0,0,0,0.05)] group-hover:shadow-[0_12px_32px_0_rgba(0,0,0,0.02),0_0_0_1px_rgba(0,0,0,0.089)]" />
     </article>
   );
 }

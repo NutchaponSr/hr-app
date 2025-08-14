@@ -7,18 +7,18 @@ import { ApplicationSection } from "./_components/application-section";
 
 const Page = () => {
   return (
-    <>
-      <SearchHero />
-      <div className="flex flex-col gap-8 mt-4">
+    <main className="grid [grid-template-columns:minmax(96px,1fr)_minmax(auto,1248px)_minmax(96px,1fr)] w-full overflow-auto relative">
+      <div className="col-start-2 mt-1">
+        <SearchHero />
+      </div>
+      <div className="col-start-2 flex flex-col gap-5">
         <Suspense>
           <CategoryCarasel />
-        </Suspense>
-        <Suspense>
           <ApplicationSection />
         </Suspense>
         <ReferenceSection />
       </div>
-    </>
+    </main>
   );  
 }
 

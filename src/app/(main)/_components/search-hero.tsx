@@ -19,7 +19,7 @@ export const SearchHero = async () => {
   const name = getFirstNameFromFullName(session.user.name);
 
   return (
-    <section className="flex justify-between relative w-full isolation-auto items-center">
+    <section className="flex justify-between relative w-full isolation-auto items-center min-h-25">
       <h1 className="text-2xl font-semibold leading-6 text-primary">
         Hi {name}, How can we help you?
       </h1>

@@ -13,6 +13,8 @@ export const useZodForm = <
     register,
     watch,
     reset,
+    setValue,
+    getValues,
     handleSubmit,
     formState: { errors },
   } = useForm<TValues>({
@@ -24,6 +26,8 @@ export const useZodForm = <
     register,
     watch,
     reset,
+    setValue,
+    getValues,
     handleSubmit,
     errors,
   };
