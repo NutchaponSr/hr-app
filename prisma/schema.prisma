@@ -129,14 +129,32 @@ model Employee {
   @@map("employee")
 }
 
+enum Project {
+  PROJECT
+  IMPROVEMENT
+}
+
+enum Strategy {
+  POEPLE_CAPABILITY
+  POEPLE_CONTINUITY
+  POEPLE_EFFICIENCY
+  OTHER
+}
+
 model Kpi {
   id           String      @id @default(cuid())
   name         String
   weight       Int
+  objective    String
+  strategy     Strategy
+
   target       Json
-  definition   String?
   actual       String?
   achievement  Int?
+  type         Project
+
+  definition   String?
+  method       String?
 
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
