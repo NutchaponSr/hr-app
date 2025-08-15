@@ -49,7 +49,6 @@ interface AppCategory extends VariantProps<typeof appVariants> {
   categoryIcon: LucideIcon | IconType;
 }
 
-
 export const APP_CATEGORIES: AppCategory[] = [
   {
     title: "Performance & Tasks",
