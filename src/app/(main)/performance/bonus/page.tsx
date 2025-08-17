@@ -45,7 +45,7 @@ const Page = async ({ searchParams }: Props) => {
             <div className="h-6 w-full flex" />
             <Hero 
               title="KPI Bonus" 
-              description="Track and manage employee performance reviews and goals"
+              description="Reward employees with performance-based bonuses tied to goals and business impact."
               icon={GoProject} 
             />
           </div>

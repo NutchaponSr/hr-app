@@ -77,13 +77,18 @@ export const BonusCreateForm = () => {
         
         onClose();
       },
+      onError: (error) => {
+        toast.error(error.message, {
+          id: loadingToast,
+        });
+      },
     });
   }
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="grid [grid-template-columns:_[full-start]_76px_[content-start]_1fr_[content-end]_76px_[full-end]] w-full"
+      className="grid [grid-template-columns:_[full-start]_76px_[content-start]_1fr_[content-end]_76px_[full-end]] w-full pb-[120px]"
     >
       <div className="mb-3 pb-3 col-start-2">
         <div className="flex items-center leading-[1.2] text-sm font-medium max-w-full w-full whitespace-break-spaces break-words text-primary py-1">
@@ -109,8 +114,8 @@ export const BonusCreateForm = () => {
               variant="numeric" 
               label="Weight" 
               name="weight"
+              value={watch("weight")}
               register={register}
-              watch={watch}
               errors={errors}
             />
             <FormFieldRow 
@@ -118,7 +123,6 @@ export const BonusCreateForm = () => {
               label="Strategy" 
               name="strategy"
               register={register}
-              watch={watch}
               errors={errors}
               value={strategies[watch("strategy")]}
               onClear={() => setValue("strategy", "" as Strategy)}
@@ -133,7 +137,7 @@ export const BonusCreateForm = () => {
               label="Objective" 
               name="objective"
               register={register}
-              watch={watch}
+              value={watch("objective")}
               errors={errors}
             />
             <FormFieldRow 
@@ -141,7 +145,6 @@ export const BonusCreateForm = () => {
               label="Type" 
               name="type"
               register={register}
-              watch={watch}
               errors={errors}
               value={projectTypes[watch("type")]}
               onClear={() => setValue("type", "" as Project)}

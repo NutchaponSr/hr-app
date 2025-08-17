@@ -61,9 +61,7 @@ export const bonusProcedure = createTRPCRouter({
         record = await prisma.kpiRecord.create({
           data: {
             year,
-            totalScore: 0,
             employeeId: ctx.user.employee.id,
-            approvalId: approval.id,
           },
         });
       }
@@ -71,8 +69,6 @@ export const bonusProcedure = createTRPCRouter({
       const res = await prisma.kpi.create({
         data: {
           ...input,
-          actual: "",
-          achievement: 0,
           weight: convertAmountToUnit(parseFloat(input.weight), 2),
           kpiRecordId: record.id,
         },

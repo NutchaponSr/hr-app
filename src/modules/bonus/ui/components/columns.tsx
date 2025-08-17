@@ -1,10 +1,12 @@
 import { ColumnDef } from "@tanstack/react-table";
 
-import { Kpi } from "@/generated/prisma";
+import { Kpi, Project, Strategy } from "@/generated/prisma";
 import { KpiTargetMap } from "@/types/kpi";
 import { cn, convertAmountFormUnit } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { projectTypes, strategies } from "../../constants";
+import { SelectionBadge } from "@/components/selection-badge";
 
 export const columns: ColumnDef<Kpi>[] = [
   {
@@ -65,6 +67,20 @@ export const columns: ColumnDef<Kpi>[] = [
     },
   },
   {
+    accessorKey: "strategy",
+    header: () => "Link to Strategy",
+    cell: ({ row }) => (
+      <div className="whitespace-nowrap leading-[1.5] break-normal text-end">
+        <div className="inline items-center text-nowrap text-ellipsis break-normal text-primary text-sm">
+          <SelectionBadge label={strategies[row.getValue("strategy") as Strategy]} />
+        </div>
+      </div>
+    ),
+    meta: {
+      width: "160px",
+    },
+  },
+  {
     accessorKey: "weight",
     header: () => "Weight",
     cell: ({ row }) => (
@@ -76,6 +92,20 @@ export const columns: ColumnDef<Kpi>[] = [
     ),
     meta: {
       width: "100px",
+    },
+  },
+  {
+    accessorKey: "type",
+    header: () => "Type",
+    cell: ({ row }) => (
+      <div className="whitespace-nowrap leading-[1.5] break-normal text-end">
+        <div className="inline items-center text-nowrap text-ellipsis break-normal text-primary text-sm">
+          <SelectionBadge label={projectTypes[row.getValue("type") as Project]} />
+        </div>
+      </div>
+    ),
+    meta: {
+      width: "160px",
     },
   },
   {
