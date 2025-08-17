@@ -77,6 +77,11 @@ export const BonusCreateForm = () => {
         
         onClose();
       },
+      onError: (error) => {
+        toast.error(error.message, {
+          id: loadingToast,
+        });
+      },
     });
   }
 
@@ -110,7 +115,7 @@ export const BonusCreateForm = () => {
               label="Weight" 
               name="weight"
               register={register}
-              watch={watch}
+              value={watch("weight")}
               errors={errors}
             />
             <FormFieldRow 
@@ -118,7 +123,6 @@ export const BonusCreateForm = () => {
               label="Strategy" 
               name="strategy"
               register={register}
-              watch={watch}
               errors={errors}
               value={strategies[watch("strategy")]}
               onClear={() => setValue("strategy", "" as Strategy)}
@@ -133,7 +137,7 @@ export const BonusCreateForm = () => {
               label="Objective" 
               name="objective"
               register={register}
-              watch={watch}
+              value={watch("objective")}
               errors={errors}
             />
             <FormFieldRow 
@@ -141,7 +145,6 @@ export const BonusCreateForm = () => {
               label="Type" 
               name="type"
               register={register}
-              watch={watch}
               errors={errors}
               value={projectTypes[watch("type")]}
               onClear={() => setValue("type", "" as Project)}
