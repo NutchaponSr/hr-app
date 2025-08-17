@@ -3,28 +3,22 @@ import {
   FieldValues, 
   Path, 
   UseFormRegister, 
-  UseFormWatch 
 } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 
-import { InputProvider } from "@/providers/input-provider";
-
 import { inputIcons, InputVariants } from "@/types/inputs";
 
+import { FieldInput } from "@/components/field-input";
+import { InputDisplay } from "@/components/input-display";
 
 interface Props<T extends FieldValues> {
   name: Path<T>;
   label: string;
-  value?: string;
-  options?: {
-    key: string;
-    label: string;
-    onSelect: (value: string) => void;
-  }[];
+  value: string;
+  options?: { key: string; label: string; onSelect: (value: string) => void }[];
   variant: InputVariants;
   errors: FieldErrors<FieldValues>;
   register: UseFormRegister<T>;
-  watch: UseFormWatch<T>;
   onClear?: () => void;
 }
 
@@ -35,35 +29,6 @@ export const FormFieldRow = <T extends FieldValues,>({
   ...props
 }: Props<T>) => {
   const Icon = inputIcons[variant];
-
-  const getInputProviderProps = () => {
-    const baseProps = {
-      name: props.name,
-      register: props.register,
-      watch: props.watch,
-    };
-
-    switch (variant) {
-      case "select":
-        return {
-          ...baseProps,
-          variant: "select" as const,
-          value: props.value || "",
-          options: props.options || [],
-          onClear: props.onClear || (() => {}),
-        };
-      case "numeric":
-        return {
-          ...baseProps,
-          variant: "numeric" as const,
-        };
-      case "text":
-        return {
-          ...baseProps,
-          variant: "text" as const,
-        };
-    }
-  };
 
   return (
     <>
@@ -78,7 +43,13 @@ export const FormFieldRow = <T extends FieldValues,>({
           </div>
         </div>
         <div role="cell" className="flex h-full flex-1 flex-col ms-1">
-          <InputProvider {...getInputProviderProps()}/>
+          <FieldInput variant={variant} {...props}>
+            <button className="transition hover:bg-primary/6 relative text-sm overflow-hidden inline-block rounded w-full py-1.5 px-2.5">
+              <div className="leading-5 break-all whitespace-pre-wrap text-foreground text-start">
+                <InputDisplay  variant={variant} {...props} />
+              </div>
+            </button>
+          </FieldInput>
         </div>
       </div>
       <ErrorMessage 

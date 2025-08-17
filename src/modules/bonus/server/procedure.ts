@@ -2,11 +2,11 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
+import { convertAmountToUnit } from "@/lib/utils";
 
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { kpiBonusSchema } from "@/modules/performance/schema";
-import { convertAmountToUnit } from "@/lib/utils";
 
 export const bonusProcedure = createTRPCRouter({
   getByEmployeeId: protectedProcedure
@@ -61,9 +61,7 @@ export const bonusProcedure = createTRPCRouter({
         record = await prisma.kpiRecord.create({
           data: {
             year,
-            totalScore: 0,
             employeeId: ctx.user.employee.id,
-            approvalId: approval.id,
           },
         });
       }
@@ -71,8 +69,6 @@ export const bonusProcedure = createTRPCRouter({
       const res = await prisma.kpi.create({
         data: {
           ...input,
-          actual: "",
-          achievement: 0,
           weight: convertAmountToUnit(parseFloat(input.weight), 2),
           kpiRecordId: record.id,
         },

@@ -1,4 +1,4 @@
-import { ChevronsRightIcon, MaximizeIcon } from "lucide-react";
+import { BsChevronDoubleRight, BsFullscreen } from "react-icons/bs";
 
 import {
   Sheet,
@@ -6,6 +6,7 @@ import {
   SheetHidden
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { BonusCreateForm } from "@/modules/bonus/ui/components/bonus-create-form";
 
@@ -26,16 +27,18 @@ export const BonusCreateSheet = () => {
         <div className="flex justify-between h-10 items-center px-3 relative">
           <div className="grid grid-flow-col gap-0.5 items-center">
             <Button variant="ghost" size="iconXs" onClick={onClose}>
-              <ChevronsRightIcon className="size-4.5" />
+              <BsChevronDoubleRight className="stroke-[0.25]" />
             </Button>
             <Button variant="ghost" size="iconXs">
-              <MaximizeIcon className="size-4.5" />
+              <BsFullscreen className="stroke-[0.25]" />
             </Button>
           </div>
         </div>
-        <div className="w-full flex flex-col relative items-center grow">
-          <BonusCreateForm />
-        </div>
+        <ScrollArea className="flex flex-col grow relative overflow-y-auto overflow-x-hidden">
+          <div className="w-full flex flex-col relative items-center grow">
+            <BonusCreateForm />
+          </div>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );

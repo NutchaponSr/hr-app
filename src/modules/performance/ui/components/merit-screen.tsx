@@ -26,7 +26,7 @@ export const MeritScreen = () => {
           <Stepper 
             action={
               <div className="mt-1.5 ps-2.5">
-                <Link href="/performance/bonus" className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] rounded text-xs">
+                <Link href="/performance/merit" className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] rounded text-xs">
                   <PlusIcon className="size-4 stroke-[1.75] mr-1" />
                   Create KPIs
                 </Link>
