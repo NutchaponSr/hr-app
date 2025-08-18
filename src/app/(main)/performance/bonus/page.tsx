@@ -1,11 +1,7 @@
 import { Suspense } from "react";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { GoProject } from "react-icons/go";
 import type { SearchParams } from "nuqs/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-
-import { auth } from "@/lib/auth";
 
 import { loadSearchParams } from "@/search-params";
 
@@ -22,17 +18,10 @@ interface Props {
 const Page = async ({ searchParams }: Props) => {
   const { year } = await loadSearchParams(searchParams);
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) redirect("/auth/sign-in");
-
   const queryClient = getQueryClient();
 
   void queryClient.prefetchQuery(
     trpc.kpiBonus.getByEmployeeId.queryOptions({ 
-      employeeId: session.user.employeeId,
       year
     }),
   );
@@ -53,7 +42,7 @@ const Page = async ({ searchParams }: Props) => {
           
         <HydrationBoundary state={dehydrate(queryClient)}>
           <Suspense fallback={<p>Loading...</p>}> {/* TODO: Loading Skeleton */}
-            <BonusView year={year} employeeId={session.user.employeeId} />
+            <BonusView year={year} />
           </Suspense>
         </HydrationBoundary>
       </div>

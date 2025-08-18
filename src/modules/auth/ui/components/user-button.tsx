@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDownIcon } from "lucide-react";
 import { GoGear, GoMoveToStart } from "react-icons/go";
@@ -25,14 +26,24 @@ export const UserButton = () => {
   const { collapse } = useSidebar();
   const { data: session, isPending } = authClient.useSession();
 
+  const [open, setOpen] = useState(false);
+
   if (isPending || !session) {
     return <div className="rounded h-8 w-full bg-accent animate-pulse" />
   }
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <div role="button" className="transition flex items-center min-w-0 h-8 w-auto rounded hover:bg-black/3">
+        <div 
+          role="button" 
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setOpen(!open)
+          }}
+          className="transition flex items-center min-w-0 h-8 w-auto rounded hover:bg-black/3"
+        >
           <div className="flex items-center w-full text-sm min-h-7 h-[30px] py-1 px-2 overflow-hidden">
             <div className="shrink-0 grow-0 rounded text-tertiary size-6 flex items-center justify-center mr-2">
               <UserAvatar 
@@ -53,7 +64,12 @@ export const UserButton = () => {
             <div className="items-center inline-flex me-0.5 gap-0.5">
               <Button 
                 variant="ghost" 
-                onClick={collapse}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  collapse();
+                }}
                 className="size-6.5 group-hover:opacity-100 opacity-0 transition-opacity" 
               >
                 <GoMoveToStart className="size-4 text-tertiary stroke-[0.3]" />

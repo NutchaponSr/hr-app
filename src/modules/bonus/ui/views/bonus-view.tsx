@@ -1,7 +1,7 @@
 "use client";
 
 import { PlusIcon } from "lucide-react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 
 import { useYear } from "@/hooks/use-year";
 import { useTable } from "@/hooks/use-table";
@@ -17,28 +17,30 @@ import { columns } from "@/modules/bonus/ui/components/columns";
 
 import { Toolbar } from "@/components/toolbar";
 import { useCreateSheetStore } from "@/modules/performance/store/use-create-sheet-store";
+import toast from "react-hot-toast";
 
 interface Props {
   year: number;
-  employeeId: string;
 }
 
 export const BonusView = ({
   year,
-  employeeId
 }: Props) => {
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
   const { setYear } = useYear();
   const { onOpen } = useCreateSheetStore();
 
   const { data } = useSuspenseQuery(
     trpc.kpiBonus.getByEmployeeId.queryOptions({
       year,
-      employeeId,
     }),
   );
 
   const { table } = useTable({ data: data.record?.kpis || [], columns });
+
+  const create = useMutation(trpc.kpiBonus.instantCreate.mutationOptions());
 
   return (
     <Tabs defaultValue={String(year)} className="contents">
@@ -65,6 +67,20 @@ export const BonusView = ({
               <LayoutProvider 
                 table={table}
                 variant="table" 
+                onCreate={() => {
+                  create.mutate({ year }, {
+                    onSuccess: () => {
+                      queryClient.invalidateQueries(
+                        trpc.kpiBonus.getByEmployeeId.queryOptions({
+                          year,
+                        }),
+                      );
+                    },
+                    onError: (error) => {
+                      toast.error(error.message);
+                    },
+                  });
+                }}
               />
             )}
           </div>

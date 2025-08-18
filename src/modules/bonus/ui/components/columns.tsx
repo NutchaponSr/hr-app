@@ -1,14 +1,15 @@
 import { ColumnDef } from "@tanstack/react-table";
 
-import { cn, convertAmountFormUnit } from "@/lib/utils";
+import { cn, convertAmountFromUnit } from "@/lib/utils";
 
-import { KpiTargetMap } from "@/types/kpi";
-import { Kpi, Project, Strategy } from "@/generated/prisma";
+import { Kpi } from "@/generated/prisma";
 
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { SelectionBadge } from "@/components/selection-badge";
+
+import { BonusCellInput } from "./bonus-cell-input";
 
 import { projectTypes, strategies } from "@/modules/bonus/constants";
 
@@ -24,7 +25,7 @@ export const columns: ColumnDef<Kpi>[] = [
                 "size-9 flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-opacity",
                 (table.getIsAllRowsSelected() || table.getIsSomePageRowsSelected()) && "opacity-100"
               )}>
-                <Checkbox 
+                <Checkbox
                   checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
                   onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                   aria-label="Select all"
@@ -44,9 +45,9 @@ export const columns: ColumnDef<Kpi>[] = [
                 "size-9 flex items-center justify-center opacity-0 group-hover/row:opacity-50 hover:opacity-100 transition-opacity",
                 row.getIsSelected() && "opacity-100 group-hover/row:opacity-100"
               )}>
-                <Checkbox 
-                  checked={row.getIsSelected()} 
-                  onCheckedChange={(value) => row.toggleSelected(!!value)} 
+                <Checkbox
+                  checked={row.getIsSelected()}
+                  onCheckedChange={(value) => row.toggleSelected(!!value)}
                   aria-label="Select row"
                 />
               </div>
@@ -59,127 +60,253 @@ export const columns: ColumnDef<Kpi>[] = [
   {
     accessorKey: "name",
     header: () => "Name",
-    cell: ({ row }) => (
-      <div className="flex items-start gap-px">
-        <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-          {row.getValue("name")}
-        </div>
-      </div>
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant}
+        data={row.original.name}
+        fieldName="name"
+      >
+        {(displayValue) => (
+          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
+            <div className="flex items-start gap-px">
+              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
+                {displayValue}
+              </div>
+            </div>
+          </button>
+        )}
+      </BonusCellInput>
     ),
     meta: {
       width: "320px",
+      variant: "main",
     },
   },
   {
     accessorKey: "strategy",
     header: () => "Link to Strategy",
-    cell: ({ row }) => (
-      <div className="whitespace-nowrap leading-[1.5] break-normal text-end">
-        <div className="inline items-center text-nowrap text-ellipsis break-normal text-primary text-sm">
-          <SelectionBadge label={strategies[row.getValue("strategy") as Strategy]} />
-        </div>
-      </div>
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        variant={column.columnDef.meta!.variant}
+        data={row.original.strategy}
+        fieldName="strategy"
+        options={Object.entries(strategies).map(([key, item]) => ({
+          key,
+          label: item,
+        }))}
+      >
+        {(displayValue) => (
+          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
+            <div className="flex items-start gap-px">
+              <div className="leading-[1.5] whitespace-nowrap break-normal inline me-1 text-sm text-primary">
+                {displayValue && <SelectionBadge label={displayValue} />}
+              </div>
+            </div>
+          </button>
+        )}
+      </BonusCellInput>
     ),
     meta: {
       width: "160px",
+      variant: "select",
     },
   },
   {
     accessorKey: "weight",
     header: () => "Weight",
-    cell: ({ row }) => (
-      <div className="whitespace-nowrap leading-[1.5] break-normal text-end">
-        <div className="inline items-center text-nowrap text-ellipsis break-normal text-primary text-sm">
-          {convertAmountFormUnit(row.getValue("weight"), 2).toFixed(2)}
-        </div>
-      </div>
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant}
+        data={convertAmountFromUnit(row.original.weight, 2)}
+        fieldName="weight"
+      >
+        {(displayValue) => (
+          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
+            <div className="whitespace-nowrap text-end break-normal">
+              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-normal me-1 text-sm text-primary">
+                {displayValue && Number(displayValue).toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                  minimumFractionDigits: 2,
+                })}
+              </div>
+            </div>
+          </button>
+        )}
+      </BonusCellInput>
     ),
     meta: {
       width: "100px",
+      variant: "numeric",
     },
   },
   {
     accessorKey: "type",
     header: () => "Type",
-    cell: ({ row }) => (
-      <div className="whitespace-nowrap leading-[1.5] break-normal text-end">
-        <div className="inline items-center text-nowrap text-ellipsis break-normal text-primary text-sm">
-          <SelectionBadge label={projectTypes[row.getValue("type") as Project]} />
-        </div>
-      </div>
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        variant={column.columnDef.meta!.variant}
+        data={row.original.type}
+        fieldName="type"
+        options={Object.entries(projectTypes).map(([key, item]) => ({
+          key,
+          label: item,
+        }))}
+      >
+        {(displayValue) => (
+          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
+            <div className="whitespace-nowrap leading-[1.5] break-normal text-end">
+              <div className="inline items-center text-nowrap text-ellipsis break-normal text-primary text-sm">
+               {displayValue && <SelectionBadge label={displayValue} />}
+              </div>
+            </div>
+          </button>
+        )}
+      </BonusCellInput>
     ),
     meta: {
       width: "160px",
+      variant: "select",
     },
   },
   {
     id: "target-100",
     header: () => "Target 100%",
-    cell: ({ row }) => (
-      <div className="flex items-start gap-px">
-        <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-          {(row.original.target as KpiTargetMap)["100"]}
-        </div>
-      </div>
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant}
+        data={row.original.target100}
+        fieldName="target100"
+      >
+        {(displayValue) => (
+          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
+            <div className="flex items-start gap-px">
+              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
+                {displayValue}
+              </div>
+            </div>
+          </button>
+        )}
+      </BonusCellInput>
     ),
     meta: {
       width: "270px",
+      variant: "text",
     },
   },
   {
     id: "target-90",
     header: () => "Target 90%",
-    cell: ({ row }) => (
-      <div className="flex items-start gap-px">
-        <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-          {(row.original.target as KpiTargetMap)["90"]}
-        </div>
-      </div>
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant}
+        data={row.original.target90}
+        fieldName="target90"
+      >
+        {(displayValue) => (
+          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
+            <div className="flex items-start gap-px">
+              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
+                {displayValue}
+              </div>
+            </div>
+          </button>
+        )}
+      </BonusCellInput>
     ),
     meta: {
       width: "270px",
+      variant: "text",
     },
   },
   {
     id: "target-80",
     header: () => "Target 80%",
-    cell: ({ row }) => (
-      <div className="flex items-start gap-px">
-        <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-          {(row.original.target as KpiTargetMap)["80"]}
-        </div>
-      </div>
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant}
+        data={row.original.target80}
+        fieldName="target80"
+      >
+        {(displayValue) => (
+          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
+            <div className="flex items-start gap-px">
+              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
+                {displayValue}
+              </div>
+            </div>
+          </button>
+        )}
+      </BonusCellInput>
     ),
     meta: {
       width: "270px",
+      variant: "text",
     },
   },
   {
     id: "target-70",
     header: () => "Target 70%",
-    cell: ({ row }) => (
-      <div className="flex items-start gap-px">
-        <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-          {(row.original.target as KpiTargetMap)["70"]}
-        </div>
-      </div>
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant}
+        data={row.original.target70}
+        fieldName="target70"
+      >
+        {(displayValue) => (
+          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
+            <div className="flex items-start gap-px">
+              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
+                {displayValue}
+              </div>
+            </div>
+          </button>
+        )}
+      </BonusCellInput>
     ),
     meta: {
       width: "270px",
+      variant: "text",
     },
   },
   {
     accessorKey: "definition",
     header: () => "Definition",
-    cell: ({ row }) => (
-      <div className="flex items-start gap-px">
-        <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-          {(row.getValue("definition"))}
-        </div>
-      </div>
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant}
+        data={row.original.definition}
+        fieldName="definition"
+      >
+        {(displayValue) => (
+          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
+            <div className="flex items-start gap-px">
+              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
+                {displayValue}
+              </div>
+            </div>
+          </button>
+        )}
+      </BonusCellInput>
     ),
     meta: {
       width: "320px",
+      variant: "text",
     },
   },
 ]

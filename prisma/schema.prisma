@@ -143,15 +143,18 @@ enum Strategy {
 
 model Kpi {
   id String @id @default(cuid()) @unique
-  name String
-  weight Int
-  objective String
-  strategy Strategy
+  name String?
+  weight Int?
+  objective String? @db.Text
+  strategy Strategy?
 
-  target Json
-  type Project
-  definition String?
-  method String?
+  target100 String? @db.Text
+  target80 String? @db.Text
+  target90 String? @db.Text
+  target70 String? @db.Text
+  type Project?
+  definition String? @db.Text
+  method String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
