@@ -26,6 +26,8 @@ export const SelectionBadge = ({
   label,
   onClick
 }: Props) => {
+  if (!label) return null;
+
   return (
     <div className={cn(badgeVariant({ color }))}>
       <span className="whitespace-nowrap overflow-hidden text-ellipsis inline-flex items-center h-5 leading-5">

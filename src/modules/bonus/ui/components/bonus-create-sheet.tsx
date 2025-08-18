@@ -34,8 +34,8 @@ export const BonusCreateSheet = () => {
             </Button>
           </div>
         </div>
-        <ScrollArea className="flex flex-col grow relative overflow-y-auto overflow-x-hidden">
-          <div className="w-full flex flex-col relative items-center grow">
+        <ScrollArea className="flex flex-col grow relative overflow-y-auto overflow-x-hidden]">
+          <div className="w-full flex flex-col relative items-center grow pb-[180px]">
             <BonusCreateForm />
           </div>
         </ScrollArea>

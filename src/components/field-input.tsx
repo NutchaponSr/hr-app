@@ -12,7 +12,7 @@ interface Props<T extends FieldValues> {
   children: React.ReactNode;
   name: Path<T>;
   register: UseFormRegister<T>;
-  value: string;
+  value: string | null;
   options?: { key: string; label: string; onSelect: (value: string) => void }[];
   onClear?: () => void;
 }
@@ -23,7 +23,7 @@ export const FieldInput = <T extends FieldValues>({
   variant,
   ...props
 }: Props<T>) => {
-  const FieldComponent: Record<InputVariants, JSX.Element> = {
+  const FieldComponent: Record<Exclude<InputVariants, "action" | "main">, JSX.Element> = {
     numeric: <FieldInput.Numeric {...props} />,
     text: <FieldInput.Text {...props} />,
     select: <FieldInput.Select {...props as SelectInputProps<T>} />,
@@ -35,7 +35,7 @@ export const FieldInput = <T extends FieldValues>({
         {children}
       </PopoverTrigger>
       <PopoverContent className={cn(className, "w-[248px] p-0")} sideOffset={-32}>
-        {FieldComponent[variant]}
+        {variant in FieldComponent ? FieldComponent[variant as keyof typeof FieldComponent] : null}
       </PopoverContent>
     </Popover>
   );
@@ -46,7 +46,7 @@ FieldInput.Numeric = function NumericInput<T extends FieldValues>({
   value,
   register,
 }: {
-  value: string;
+  value: string | null;
   name: Path<T>;
   register: UseFormRegister<T>;
 }) {

@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+
 import { useState } from "react";
 import { IoTriangle } from "react-icons/io5";
 
@@ -6,12 +8,10 @@ import { Button } from "@/components/ui/button";
 import { AutoResizeTextarea } from "@/components/auto-resize-textarea";
 import { cn } from "@/lib/utils";
 import { useZodForm } from "@/hooks/use-zod-form";
-import { kpiBonusSchema, type KpiBonusSchema } from "@/modules/performance/schema";
+import { kpiBonusSchema, type KpiBonusSchema } from "@/modules/bonus/schema";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCreateSheetStore } from "@/modules/performance/store/use-create-sheet-store";
-import { authClient } from "@/lib/auth-client";
-import toast from "react-hot-toast";
 import { useYear } from "@/hooks/use-year";
 import { projectTypes, strategies } from "../../constants";
 import { Project, Strategy } from "@/generated/prisma";
@@ -22,39 +22,36 @@ const values = [100, 90, 80, 70] as const;
 export const BonusCreateForm = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  
+
   const { year } = useYear();
-  const { data: session } = authClient.useSession();
 
   const { onClose } = useCreateSheetStore();
 
   const [openIndexs, setOpenIndexs] = useState<number[]>(values.map((_, index) => index));
 
-  const { 
-    register, 
-    handleSubmit, 
-    setValue, 
-    watch, 
-    errors 
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    errors
   } = useZodForm<KpiBonusSchema, typeof kpiBonusSchema>(
     kpiBonusSchema,
     {
       name: "",
       weight: "",
       objective: "",
-      target: { 
-        "100": "", 
-        "90": "", 
-        "80": "", 
-        "70": "" 
-      },
-    }
+      target100: "",
+      target90: "",
+      target80: "",
+      target70: "",
+    },
   );
 
   const createBonus = useMutation(trpc.kpiBonus.create.mutationOptions());
 
   const toggleIndex = (index: number) => {
-    setOpenIndexs((prev) => 
+    setOpenIndexs((prev) =>
       prev.includes(index)
         ? prev.filter((i) => i !== index)
         : [...prev, index]
@@ -70,11 +67,8 @@ export const BonusCreateForm = () => {
           id: loadingToast,
         });
 
-        queryClient.invalidateQueries(trpc.kpiBonus.getByEmployeeId.queryOptions({
-          employeeId: session!.user.employeeId,
-          year,
-        }))
-        
+        queryClient.invalidateQueries(trpc.kpiBonus.getByEmployeeId.queryOptions({ year }))
+
         onClose();
       },
       onError: (error) => {
@@ -97,7 +91,7 @@ export const BonusCreateForm = () => {
         <div className="flex items-center leading-[1.2] text-2xl pt-1 font-bold max-w-full w-full text-primary">
           <AutoResizeTextarea
             {...register("name")}
-            autoFocus 
+            autoFocus
             size="lg"
             placeholder="New KPI"
           />
@@ -110,17 +104,17 @@ export const BonusCreateForm = () => {
       <div className="mt-2 col-start-2">
         <div className="flex flex-col gap-2">
           <div role="table">
-            <FormFieldRow 
-              variant="numeric" 
-              label="Weight" 
+            <FormFieldRow
+              variant="numeric"
+              label="Weight"
               name="weight"
               register={register}
               value={watch("weight")}
               errors={errors}
             />
-            <FormFieldRow 
-              variant="select" 
-              label="Strategy" 
+            <FormFieldRow
+              variant="select"
+              label="Strategy"
               name="strategy"
               register={register}
               errors={errors}
@@ -132,17 +126,17 @@ export const BonusCreateForm = () => {
                 onSelect: (value) => setValue("strategy", value as Strategy, { shouldValidate: true }),
               }))}
             />
-            <FormFieldRow 
-              variant="text" 
-              label="Objective" 
+            <FormFieldRow
+              variant="text"
+              label="Objective"
               name="objective"
               register={register}
               value={watch("objective")}
               errors={errors}
             />
-            <FormFieldRow 
-              variant="select" 
-              label="Type" 
+            <FormFieldRow
+              variant="select"
+              label="Type"
               name="type"
               register={register}
               errors={errors}
@@ -169,9 +163,9 @@ export const BonusCreateForm = () => {
             return (
               <div key={value} className="w-full my-px pt-1.5 flex items-start text-primary">
                 <div className="w-6 flex items-center justify-center me-0.5">
-                  <Button 
-                    variant="ghost" 
-                    size="iconXs" 
+                  <Button
+                    variant="ghost"
+                    size="iconXs"
                     type="button"
                     onClick={() => toggleIndex(index)}
                   >
@@ -182,16 +176,12 @@ export const BonusCreateForm = () => {
                   <h4 className="text-primary p-0.5 font-medium">{value}</h4>
                   {isOpen && (
                     <AutoResizeTextarea
-                      {...register((`target.${String(value)}` as unknown) as
-                        | "target.100"
-                        | "target.90"
-                        | "target.80"
-                        | "target.70")}
+                      {...register(`target${value}` as keyof KpiBonusSchema)}
                     />
                   )}
                   {(() => {
-                    const key = String(value) as "100" | "90" | "80" | "70";
-                    const err = errors.target?.[key]?.message;
+                    const fieldName = `target${value}` as keyof KpiBonusSchema;
+                    const err = errors[fieldName]?.message;
                     return err ? (
                       <div className="text-destructive text-xs mt-1">{String(err)}</div>
                     ) : null;

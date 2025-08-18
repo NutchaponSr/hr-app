@@ -7,10 +7,11 @@ import { LayoutVariant } from "@/types/layouts";
 interface Props<T> {
   variant: LayoutVariant;
   table: TB<T>;
+  onCreate: () => void;
 }
 
 export const LayoutProvider = <T,>({ variant, ...props }: Props<T>) => {
-  const layoutMap: Record<LayoutVariant, React.ComponentType<{ table: TB<T> }>> = {
+  const layoutMap: Record<LayoutVariant, React.ComponentType<{ table: TB<T>, onCreate: () => void; }>> = {
     table: Table,
   }
 

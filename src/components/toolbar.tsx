@@ -8,10 +8,8 @@ import {
   TabsList, 
   TabsTrigger 
 } from "@/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-
-// import { useResizeObserver } from "@/hooks/use-resize-observer";
-
 interface Props {
   tabTriggers: {
     value: string;
@@ -21,12 +19,6 @@ interface Props {
 } 
 
 export const Toolbar = ({ tabTriggers, onClick }: Props) => {
-  // const onSize = useCallback((rect: DOMRectReadOnly) => {
-  //   onWidthChange?.(rect.width);
-  // }, [onWidthChange]);
-
-  // const ref = useResizeObserver<HTMLDivElement>(onSize);
-
   return (
     <div className="min-h-9 px-24 sticky top-0 left-0 shrink-0 z-86">
       <div className="relative">
@@ -68,9 +60,16 @@ export const Toolbar = ({ tabTriggers, onClick }: Props) => {
                 <button onClick={onClick} className="transition flex items-center justify-center whitespace-nowrap rounded-l px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted">
                   New
                 </button>
-                <button className="transition flex items-center justify-center whitespace-nowrap rounded-r bg-marine shadow-[inset_1px_0_0_rgba(55,53,47,0.16)] text-white text-sm w-6 hover:bg-marine-muted">
-                  <ChevronDownIcon className="size-4" />
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="transition flex items-center justify-center whitespace-nowrap rounded-r bg-marine shadow-[inset_1px_0_0_rgba(55,53,47,0.16)] text-white text-sm w-6 hover:bg-marine-muted focus-visible:outline-none">
+                      <ChevronDownIcon className="size-4" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </div>
