@@ -69,13 +69,11 @@ export const columns: ColumnDef<Kpi>[] = [
         fieldName="name"
       >
         {(displayValue) => (
-          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
-            <div className="flex items-start gap-px">
-              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-                {displayValue}
-              </div>
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
             </div>
-          </button>
+          </div>
         )}
       </BonusCellInput>
     ),
@@ -99,13 +97,64 @@ export const columns: ColumnDef<Kpi>[] = [
         }))}
       >
         {(displayValue) => (
-          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
-            <div className="flex items-start gap-px">
-              <div className="leading-[1.5] whitespace-nowrap break-normal inline me-1 text-sm text-primary">
-                {displayValue && <SelectionBadge label={displayValue} />}
-              </div>
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue && <SelectionBadge label={displayValue} />}
             </div>
-          </button>
+          </div>
+        )}
+      </BonusCellInput>
+    ),
+    meta: {
+      width: "160px",
+      variant: "select",
+    },
+  },
+  {
+    accessorKey: "objective",
+    header: () => "Objective",
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant}
+        data={row.original.objective}
+        fieldName="objective"
+      >
+        {(displayValue) => (
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
+            </div>
+          </div>
+        )}
+      </BonusCellInput>
+    ),
+    meta: {
+      width: "320px",
+      variant: "text",
+    },
+  },
+  {
+    accessorKey: "type",
+    header: () => "Type",
+    cell: ({ row, column }) => (
+      <BonusCellInput
+        id={row.original.id}
+        variant={column.columnDef.meta!.variant}
+        data={row.original.type}
+        fieldName="type"
+        options={Object.entries(projectTypes).map(([key, item]) => ({
+          key,
+          label: item,
+        }))}
+      >
+        {(displayValue) => (
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue && <SelectionBadge label={displayValue} />}
+            </div>
+          </div>
         )}
       </BonusCellInput>
     ),
@@ -126,17 +175,15 @@ export const columns: ColumnDef<Kpi>[] = [
         fieldName="weight"
       >
         {(displayValue) => (
-          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
-            <div className="whitespace-nowrap text-end break-normal">
-              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-normal me-1 text-sm text-primary">
-                {displayValue && Number(displayValue).toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                  minimumFractionDigits: 2,
-                })}
-              </div>
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue && Number(displayValue).toLocaleString("en-US", {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2,
+              })}
             </div>
-          </button>
-        )}
+          </div>
+        )}  
       </BonusCellInput>
     ),
     meta: {
@@ -145,81 +192,47 @@ export const columns: ColumnDef<Kpi>[] = [
     },
   },
   {
-    accessorKey: "type",
-    header: () => "Type",
-    cell: ({ row, column }) => (
-      <BonusCellInput
-        id={row.original.id}
-        variant={column.columnDef.meta!.variant}
-        data={row.original.type}
-        fieldName="type"
-        options={Object.entries(projectTypes).map(([key, item]) => ({
-          key,
-          label: item,
-        }))}
-      >
-        {(displayValue) => (
-          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
-            <div className="whitespace-nowrap leading-[1.5] break-normal text-end">
-              <div className="inline items-center text-nowrap text-ellipsis break-normal text-primary text-sm">
-               {displayValue && <SelectionBadge label={displayValue} />}
-              </div>
-            </div>
-          </button>
-        )}
-      </BonusCellInput>
-    ),
-    meta: {
-      width: "160px",
-      variant: "select",
-    },
-  },
-  {
-    id: "target-100",
-    header: () => "Target 100%",
+    accessorKey: "definition",
+    header: () => "Definition",
     cell: ({ row, column }) => (
       <BonusCellInput
         id={row.original.id}
         width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant}
-        data={row.original.target100}
-        fieldName="target100"
+        data={row.original.definition}
+        fieldName="definition"
       >
         {(displayValue) => (
-          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
-            <div className="flex items-start gap-px">
-              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-                {displayValue}
-              </div>
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
             </div>
-          </button>
+          </div>
         )}
       </BonusCellInput>
     ),
     meta: {
-      width: "270px",
+      width: "320px",
       variant: "text",
     },
   },
   {
-    id: "target-90",
-    header: () => "Target 90%",
+    id: "target-70",
+    header: () => "Target 70%",
     cell: ({ row, column }) => (
       <BonusCellInput
         id={row.original.id}
         width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant}
-        data={row.original.target90}
-        fieldName="target90"
-      >
+        data={row.original.target70}
+        fieldName="target70"
+        >
         {(displayValue) => (
-          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
-            <div className="flex items-start gap-px">
-              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-                {displayValue}
-              </div>
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
             </div>
-          </button>
+          </div>
         )}
       </BonusCellInput>
     ),
@@ -238,15 +251,13 @@ export const columns: ColumnDef<Kpi>[] = [
         variant={column.columnDef.meta!.variant}
         data={row.original.target80}
         fieldName="target80"
-      >
+        >
         {(displayValue) => (
-          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
-            <div className="flex items-start gap-px">
-              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-                {displayValue}
-              </div>
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
             </div>
-          </button>
+          </div>
         )}
       </BonusCellInput>
     ),
@@ -256,24 +267,22 @@ export const columns: ColumnDef<Kpi>[] = [
     },
   },
   {
-    id: "target-70",
-    header: () => "Target 70%",
+    id: "target-90",
+    header: () => "Target 90%",
     cell: ({ row, column }) => (
       <BonusCellInput
-        id={row.original.id}
-        width={column.columnDef.meta?.width}
+      id={row.original.id}
+      width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant}
-        data={row.original.target70}
-        fieldName="target70"
-      >
+        data={row.original.target90}
+        fieldName="target90"
+        >
         {(displayValue) => (
-          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
-            <div className="flex items-start gap-px">
-              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-                {displayValue}
-              </div>
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
             </div>
-          </button>
+          </div>
         )}
       </BonusCellInput>
     ),
@@ -283,29 +292,27 @@ export const columns: ColumnDef<Kpi>[] = [
     },
   },
   {
-    accessorKey: "definition",
-    header: () => "Definition",
+    id: "target-100",
+    header: () => "Target 100%",
     cell: ({ row, column }) => (
       <BonusCellInput
         id={row.original.id}
         width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant}
-        data={row.original.definition}
-        fieldName="definition"
+        data={row.original.target100}
+        fieldName="target100"
       >
         {(displayValue) => (
-          <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap h-9 min-h-9 p-2">
-            <div className="flex items-start gap-px">
-              <div className="leading-[1.5] whitespace-nowrap break-normal inline font-medium me-1 text-sm text-primary">
-                {displayValue}
-              </div>
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
             </div>
-          </button>
+          </div>
         )}
       </BonusCellInput>
     ),
     meta: {
-      width: "320px",
+      width: "270px",
       variant: "text",
     },
   },

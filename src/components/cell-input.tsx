@@ -15,6 +15,7 @@ interface RowInputProps {
   value: string;
   className?: string;
   width?: string;
+  height?: number;
   children: React.ReactNode;
   options?: SelectOption[];
   onClear?: () => void;
@@ -45,7 +46,7 @@ const NumericInput = ({ value, onChange }: InputComponentProps) => (
 );
 
 const TextInput = ({ value, onChange }: InputComponentProps) => (
-  <div className="p-2 min-h-[38px] flex flex-col justify-between grow text-sm">
+  <div className="p-2 min-h-[38px] flex flex-col justify-between grow text-sm h-full">
     <textarea
       value={value}
       onChange={onChange}
@@ -57,7 +58,7 @@ const TextInput = ({ value, onChange }: InputComponentProps) => (
 const SelectInput = ({ value, options = [], onClear, onSelect }: SelectInputProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredOptions = useMemo(() => 
+  const filteredOptions = useMemo(() =>
     options.filter(option =>
       option.label.toLowerCase().includes(searchQuery.toLowerCase())
     ), [options, searchQuery]
@@ -75,7 +76,7 @@ const SelectInput = ({ value, options = [], onClear, onSelect }: SelectInputProp
     }
   }, [onSelect]);
 
-  const selectedOption = useMemo(() => 
+  const selectedOption = useMemo(() =>
     options.find(opt => opt.key === value), [options, value]
   );
 
@@ -159,6 +160,7 @@ export const RowInput = ({
   children,
   variant,
   width,
+  height,
   onOpenChange,
   ...inputProps
 }: RowInputProps) => {
@@ -175,9 +177,10 @@ export const RowInput = ({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        style={{ width }}
+        style={{ width, height: variant === "select" ? "100%" : height }}
         className={cn(className, "w-[248px] p-0")}
-        sideOffset={-37}
+        side="bottom"
+        sideOffset={height ? height * -1 : 0}
       >
         <InputComponent {...inputProps} />
       </PopoverContent>

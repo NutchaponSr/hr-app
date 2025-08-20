@@ -81,6 +81,22 @@ export const bonusProcedure = createTRPCRouter({
 
       return res;
     }),
+  createRecord: protectedProcedure
+    .input(
+      z.object({
+        year: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const res = await prisma.kpiRecord.create({
+        data: {
+          employeeId: ctx.user.employee.id, 
+          year: input.year, 
+        },
+      });
+
+      return res;
+    }),
   create: protectedProcedure
     .input(kpiBonusSchema)
     .mutation(async ({ ctx, input }) => {

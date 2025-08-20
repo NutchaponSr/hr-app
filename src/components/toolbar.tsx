@@ -1,5 +1,6 @@
 import { 
   BsArrowDownUp, 
+  BsFiletypeCsv, 
   BsFilterCircle 
 } from "react-icons/bs";
 import { ChevronDownIcon } from "lucide-react";
@@ -8,39 +9,50 @@ import {
   TabsList, 
   TabsTrigger 
 } from "@/components/ui/tabs";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
 interface Props {
-  tabTriggers: {
+  tabTriggers?: {
     value: string;
     onChange: () => void;
   }[];
+  className?: string;
   onClick: () => void;
 } 
 
-export const Toolbar = ({ tabTriggers, onClick }: Props) => {
+export const Toolbar = ({ className, tabTriggers, onClick }: Props) => {
   return (
-    <div className="min-h-9 px-24 sticky top-0 left-0 shrink-0 z-86">
+    <div className={cn("min-h-9 relative shrink-0 z-86", className)}>
       <div className="relative">
         <div className="flex items-center h-9 start-24 border-b-[1.25px] border-border">
-          <TabsList role="tablist" className="flex items-center h-full grow-10 overflow-hidden -ms-1">
-            <div className="flex items-center h-full">
-              <div className="inline-flex h-full">
-                {tabTriggers.map(({ value, onChange }, index) => (
-                  <TabsTrigger 
-                    key={index}
-                    role="tab"
-                    value={value}
-                    onClick={onChange}
-                  >
-                    <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                      {value}
-                    </span>
-                  </TabsTrigger>
-                ))}
+          {!!tabTriggers && (
+            <TabsList role="tablist" className="flex items-center h-full grow-10 overflow-hidden -ms-1">
+              <div className="flex items-center h-full">
+                <div className="inline-flex h-full">
+                  {tabTriggers.map(({ value, onChange }, index) => (
+                    <TabsTrigger 
+                      key={index}
+                      role="tab"
+                      value={value}
+                      onClick={onChange}
+                    >
+                      <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                        {value}
+                      </span>
+                    </TabsTrigger>
+                  ))}
+                </div>
               </div>
-            </div>
-          </TabsList>
+            </TabsList>
+          )}
           <div className="grow h-full">
             <div className="flex flex-row justify-end items-center h-full gap-0.5">
               <Button
@@ -66,8 +78,17 @@ export const Toolbar = ({ tabTriggers, onClick }: Props) => {
                       <ChevronDownIcon className="size-4" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-
+                  <DropdownMenuContent align="end" className="w-[260px]">
+                    <DropdownMenuLabel>Import</DropdownMenuLabel>
+                    <DropdownMenuItem className="h-auto">
+                      <div className="flex items-center justify-center min-w-5 min-h-5 self-start">
+                        <BsFiletypeCsv className="!stroke-[0.15] size-5 mt-0.5" />
+                      </div>
+                      <div className="grow shrink basis-auto">
+                        <h5 className="whitespace-nowrap overflow-hidden text-ellipsis font-medium">CSV</h5>
+                        <p className="text-xs text-tertiary break-words">Upload and process a CSV file</p>
+                      </div>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

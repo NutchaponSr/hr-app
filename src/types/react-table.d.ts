@@ -1,5 +1,6 @@
 import "@tanstack/react-table";
-import { InputVariants } from "./inputs";
+
+import { InputVariants } from "@/types/inputs";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta {
