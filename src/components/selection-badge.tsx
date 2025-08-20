@@ -3,11 +3,13 @@ import { cva, VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-const badgeVariant = cva("inline-flex items-center shrink max-w-full min-w-0 h-5 rounded-xs px-1.5 leading-[120%] text-sm whitespace-nowrap overflow-hidden text-ellipsis", 
+export const badgeVariant = cva("inline-flex items-center shrink max-w-full min-w-0 h-5 rounded-xs px-1.5 leading-[120%] text-sm whitespace-nowrap overflow-hidden text-ellipsis", 
   {
     variants: {
       color: {
         default: "bg-gray-foreground text-gray-muted",
+        red: "bg-red-foreground text-red-muted",
+        orange: "bg-orange-foreground text-orange-muted",
       },
     },
     defaultVariants: {

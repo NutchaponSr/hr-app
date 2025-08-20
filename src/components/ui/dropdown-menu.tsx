@@ -144,6 +144,7 @@ function DropdownMenuRadioItem({
 }
 
 function DropdownMenuLabel({
+  children,
   className,
   inset,
   ...props
@@ -155,11 +156,19 @@ function DropdownMenuLabel({
       data-slot="dropdown-menu-label"
       data-inset={inset}
       className={cn(
-        "px-2 py-1.5 text-sm font-medium data-[inset]:pl-8",
+        "text-sm data-[inset]:pl-8 select-none flex items-center min-h-7",
         className
       )}
       {...props}
-    />
+    >
+      <div className="whitespace-nowrap overflow-hidden text-ellipsis">
+        <div className="flex items-center font-medium text-tertiary px-2">
+          <div className="whitespace-nowrap overflow-hidden text-ellipsis">
+            {children}
+          </div>
+        </div>
+      </div>
+    </DropdownMenuPrimitive.Label>
   )
 }
 

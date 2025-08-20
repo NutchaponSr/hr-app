@@ -124,7 +124,8 @@ model Employee {
   department String
 
   user User?
-  records KpiRecord[]
+  kpiRecords KpiRecord[]
+  meritRecords MeritRecord[]
 
   @@map("employee")
 }
@@ -224,13 +225,16 @@ model Approval {
 model MeritRecord {
   id String @id @default(uuid())
   kpiRecordId String @unique
-  competencyRecordId String @unique
-  cultureRecordId String @unique
+  employeeId String
   year Int
+
   kpiRecord KpiRecord @relation(fields: [kpiRecordId], references: [id]) 
-  competencyRecord CompetencyRecord @relation(fields: [competencyRecordId], references: [id], onDelete: Cascade)
-  cultureRecord CultureRecord @relation(fields: [cultureRecordId], references: [id], onDelete: Cascade)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   meritEvaluations MeritEvaluation[]
+  competencyRecord CompetencyRecord?
+  cultureRecord CultureRecord?
+  
+  @@unique([employeeId, kpiRecordId, year])
   @@map("meritRecords")
 }
 
@@ -259,24 +263,27 @@ model MeritEvaluation {
 model CompetencyRecord {
   id String @id @default(uuid())
   createdAt DateTime @default(now())
+  meritRecordId String @unique
+  meritRecord MeritRecord @relation(fields: [meritRecordId], references: [id], onDelete: Cascade)
   
-  meritRecord MeritRecord?
   competencyItem CompetencyItem[]
   @@map("competencyRecords")
 }
 
 model CompetencyItem {
   id String @id @default(cuid())
-  competencyId String
+  competencyId String?
   competencyRecordId String
-  weight Int
-  input String
-  output String
+  weight Int @default(0)
+  input String? @db.Text
+  output String? @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   competencyEvaluation CompetencyEvaluation[]
   competencyRecord CompetencyRecord @relation(fields: [competencyRecordId], references: [id], onDelete: Cascade)
-  competency Competency @relation(fields: [competencyId], references: [id])
+  competency Competency? @relation(fields: [competencyId], references: [id])
+  
   @@map("competencyItems")
 }
 
@@ -305,21 +312,44 @@ model Competency {
   id String @id
   name String
   definition String
-  level Json
+  t5 String?
+  t4 String?
+  t3 String?
+  t2 String?
+  t1 String?
   type CompetencyType
   competency CompetencyItem[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@map("competency")
 }
 
 model CultureRecord {
   id String @id @default(uuid())
-  competencyItemId String
   period Int
-  levelBehavior Int
-  meritRecord MeritRecord?
+  meritRecordId String @unique
+  meritRecord MeritRecord @relation(fields: [meritRecordId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  cultureItems CultureItem[]
+
   @@map("cultureRecord")
+}
+
+model CultureItem {
+  id String @id @default(cuid())
+  code String @db.VarChar(1)
+  levelBehavior Int @default(0)
+  evidence String? @db.Text
+
+  cultureRecordId String
+  cultureRecord CultureRecord @relation(fields: [cultureRecordId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cultureItem")
 }

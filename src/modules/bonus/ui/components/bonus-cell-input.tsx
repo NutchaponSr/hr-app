@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Kpi, Strategy, Project } from "@/generated/prisma";
 import { InputVariants } from "@/types/inputs";
@@ -7,6 +7,7 @@ import { useTRPC } from "@/trpc/client";
 import { useYear } from "@/hooks/use-year";
 import toast from "react-hot-toast";
 import { FIELD_PROCESSORS, SelectOption } from "../../constants";
+import { useElementHeight } from "@/hooks/use-height";
 
 interface Props {
   id: string;
@@ -32,6 +33,15 @@ export const BonusCellInput = ({
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const { year } = useYear();
+
+  // TODO: Refactor
+
+  const isUpdatingRef = useRef(false);
+
+  const { ref: childrenRef, height: childrenHeight } = useElementHeight({
+    debounceMs: 50,
+    includeMargin: true
+  });
 
   const initialValue = useMemo(() => {
     const stringValue = String(data || "");
@@ -137,6 +147,12 @@ export const BonusCellInput = ({
     year,
   ]);
 
+  useEffect(() => {
+    return () => {
+      isUpdatingRef.current = false;
+    };
+  }, []);
+
   return (
     <RowInput
       variant={variant}
@@ -147,8 +163,15 @@ export const BonusCellInput = ({
       onOpenChange={handleOpenChange}
       onSelect={handleSelect}
       width={width}
+      height={childrenHeight}
     >
-      {children(displayValue)}
+      <div
+        ref={childrenRef}
+        role="button"
+        className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap min-h-9 p-2"
+      >
+        {children(displayValue)}
+      </div>
     </RowInput>
   );
 };

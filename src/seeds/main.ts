@@ -1,13 +1,16 @@
 import { cleanUpDatabase } from "@/seeds/clear-up";
 import { seedApprovals } from "@/seeds/seed-approval";
 import { seedEmployees } from "@/seeds/seed-employee";
+import { seedCompetencies } from "@/seeds/seed-competency";
 
 const seed = async () => {
-  await cleanUpDatabase();
+  // await cleanUpDatabase();
 
-  const employees = await seedEmployees();
+  // const employees = await seedEmployees();
 
-  await seedApprovals(new Set(employees.map((e) => e.id)));
+  // await seedApprovals(new Set(employees.map((e) => e.id)));
+
+  await seedCompetencies();
 }
 
 (async () => {

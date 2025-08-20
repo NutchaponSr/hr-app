@@ -1,7 +1,13 @@
 "use client";
 
+import toast from "react-hot-toast";
+
+import { 
+  useMutation, 
+  useQueryClient, 
+  useSuspenseQuery 
+} from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 
 import { useYear } from "@/hooks/use-year";
 import { useTable } from "@/hooks/use-table";
@@ -13,11 +19,11 @@ import { LayoutProvider } from "@/layouts/layout-provider";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 
+import { Toolbar } from "@/components/toolbar";
+
 import { columns } from "@/modules/bonus/ui/components/columns";
 
-import { Toolbar } from "@/components/toolbar";
 import { useCreateSheetStore } from "@/modules/performance/store/use-create-sheet-store";
-import toast from "react-hot-toast";
 
 interface Props {
   year: number;
@@ -40,11 +46,13 @@ export const BonusView = ({
 
   const { table } = useTable({ data: data.record?.kpis || [], columns });
 
-  const create = useMutation(trpc.kpiBonus.instantCreate.mutationOptions());
+  const createKpi = useMutation(trpc.kpiBonus.instantCreate.mutationOptions());
+  const createKpiRecord = useMutation(trpc.kpiBonus.createRecord.mutationOptions());
 
   return (
     <Tabs defaultValue={String(year)} className="contents">
       <Toolbar
+        className="px-24 sticky left-0"
         onClick={() => onOpen("kpi-bonus")}
         tabTriggers={data.years.map((year) => ({
           value: year.toString(),
@@ -57,31 +65,44 @@ export const BonusView = ({
             {!data.record ? (
               <div className="text-primary text-xs relative float-left min-w-full select-none pb-[180px] px-24">
                 <div className="flex flex-wrap items-center justify-center gap-3 sticky start-24 h-36 -mx-24">
-                  <Button variant="outline" onClick={() => onOpen("kpi-bonus")}>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      createKpiRecord.mutate({ year }, {
+                        onSuccess: () => {
+                          queryClient.invalidateQueries(
+                            trpc.kpiBonus.getByEmployeeId.queryOptions({ year }),
+                          );
+                        }
+                      })
+                    }}
+                  >
                     <PlusIcon />
                     New KPI
                   </Button>
                 </div>
               </div>
             ) : (
-              <LayoutProvider 
-                table={table}
-                variant="table" 
-                onCreate={() => {
-                  create.mutate({ year }, {
-                    onSuccess: () => {
-                      queryClient.invalidateQueries(
-                        trpc.kpiBonus.getByEmployeeId.queryOptions({
-                          year,
-                        }),
-                      );
-                    },
-                    onError: (error) => {
-                      toast.error(error.message);
-                    },
-                  });
-                }}
-              />
+              <div className="relative float-left min-w-full select-none pb-[180px] px-24">
+                <div className="relative">
+                  <LayoutProvider 
+                    table={table}
+                    variant="table" 
+                    onCreate={() => {
+                      createKpi.mutate({ year }, {
+                        onSuccess: () => {
+                          queryClient.invalidateQueries(
+                            trpc.kpiBonus.getByEmployeeId.queryOptions({ year }),
+                          );
+                        },
+                        onError: (error) => {
+                          toast.error(error.message);
+                        },
+                      });
+                    }}
+                  />
+                </div>
+              </div>
             )}
           </div>
         </div>

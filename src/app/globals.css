@@ -51,6 +51,35 @@
   }
 }
 
+@layer utilities {
+  .layout {
+    --content-width: minmax(auto, 708px);
+    --margin-width: minmax(96px, 1fr);
+    grid-template-columns: [full-start] var(--margin-left-width, var(--margin-width)) [content-start] var(--content-width) [content-end] var(--margin-right-width, var(--margin-width)) [full-end];
+  }
+
+  .layout-wide {
+    --content-width: 1fr;
+    --margin-width: 96px;
+  }
+
+  .grid-content {
+    grid-column: content;
+  }
+
+  .grid-full {
+    grid-column: full;
+  }
+
+  .grid-content-start {
+    grid-column: content-start;
+  }
+
+  .grid-content-end {
+    grid-column: content-end;
+  }
+}
+
 @theme inline {
   --breakpoint-xs: 375px;
   --breakpoint-s: 600px;
@@ -154,7 +183,6 @@
 
 :root {
   --radius: 0.625rem;
-  
   --input: oklch(0.9581 0.0041 91.45 / 60%);
   --popover: oklch(1 0 0);
   --background: oklch(1 0 0);
