@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { GoProject } from "react-icons/go";
 import type { SearchParams } from "nuqs/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
@@ -7,9 +6,8 @@ import { loadSearchParams } from "@/search-params";
 
 import { getQueryClient, trpc } from "@/trpc/server";
 
-import { BonusView } from "@/modules/bonus/ui/views/bonus-view";
 
-import { Hero } from "../../_components/hero";
+import { BonusView } from "@/modules/bonus/ui/views/bonus-view";
 
 interface Props {
   searchParams: Promise<SearchParams>
@@ -28,18 +26,7 @@ const Page = async ({ searchParams }: Props) => {
 
   return (
     <main className="flex flex-col grow-0 shrink bg-background z-1 h-[calc(-44px+100vh)] max-h-full relative">
-      <div className="z-[1] flex flex-col grow relative overflow-auto me-0 mb-0">
-        <div className="w-full flex flex-col items-center shrink-0 grow-0 sticky top-0 left-0">
-          <div className="max-w-full ps-24 w-full">
-            <div className="h-6 w-full flex" />
-            <Hero 
-              title="KPI Bonus" 
-              description="Reward employees with performance-based bonuses tied to goals and business impact."
-              icon={GoProject} 
-            />
-          </div>
-        </div>
-          
+      <div className="contents">
         <HydrationBoundary state={dehydrate(queryClient)}>
           <Suspense fallback={<p>Loading...</p>}> {/* TODO: Loading Skeleton */}
             <BonusView year={year} />

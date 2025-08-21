@@ -172,5 +172,22 @@ export const bonusProcedure = createTRPCRouter({
       });
 
       return res;
+    }),
+  deleteBulk: protectedProcedure
+    .input(
+      z.object({
+        ids: z.array(z.string()),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const res = await prisma.kpi.deleteMany({
+        where: {
+          id: {
+            in: input.ids,
+          },
+        },
+      });
+
+      return res;
     })
 });

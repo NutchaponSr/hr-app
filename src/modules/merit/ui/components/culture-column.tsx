@@ -118,7 +118,7 @@ export const columns: ColumnDef<OrganizationCulture>[] = [
     ),
     meta: {
       width: "100px",
-      variant: "numeric"
+      variant: "numeric",
     },
   },
 ]

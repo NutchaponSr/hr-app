@@ -1,3 +1,4 @@
+import { GripVerticalIcon } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { cn, convertAmountFromUnit } from "@/lib/utils";
@@ -13,7 +14,8 @@ import { BonusCellInput } from "./bonus-cell-input";
 
 import { projectTypes, strategies } from "@/modules/bonus/constants";
 
-export const columns: ColumnDef<Kpi>[] = [
+
+export const createColumns = (isScrolled: boolean):ColumnDef<Kpi>[] => [
   {
     id: "action",
     header: ({ table }) => (
@@ -37,24 +39,46 @@ export const columns: ColumnDef<Kpi>[] = [
       </div>
     ),
     cell: ({ row }) => (
-      <div className="absolute left-0 top-0 h-full">
-        <div className="sticky -left-9 flex">
-          <div className="absolute -left-9">
-            <Label className="h-full items-start justify-center flex cursor-pointer">
-              <div className={cn(
-                "size-9 flex items-center justify-center opacity-0 group-hover/row:opacity-50 hover:opacity-100 transition-opacity",
-                row.getIsSelected() && "opacity-100 group-hover/row:opacity-100"
-              )}>
-                <Checkbox
-                  checked={row.getIsSelected()}
-                  onCheckedChange={(value) => row.toggleSelected(!!value)}
-                  aria-label="Select row"
-                />
+      <>
+        <div className="sticky start-9 z-85 flex">
+          <div className="opacity-100 transition-opacity">
+            <div className="absolute -start-9">
+              <div className="h-full bg-background">
+                <div className="h-full">
+                  <Label className="h-full items-start justify-center flex cursor-pointer">
+                    <div className={cn(
+                      "size-9 flex items-center justify-center opacity-0 group-hover/row:opacity-50 hover:opacity-100 transition-opacity",
+                      row.getIsSelected() && "opacity-100 group-hover/row:opacity-100"
+                    )}>
+                      <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                      />
+                    </div>
+                  </Label>
+                </div>
+                {isScrolled && (
+                  <div className="flex flex-row h-full">
+                    <div className="transition-opacity opacity-100">
+                      <div className="absolute top-0 -end-[3px] w-[3px] h-full bg-gradient-to-r from-[rgba(135,131,120,0.4)] via-[rgba(135,131,120,0.1)] to-transparent" />
+                    </div>
+                  </div>
+                )}
               </div>
-            </Label>
+            </div>
+          </div>
+          <div className="sticky -left-[56px] flex">
+            <div className="absolute -left-[56px]">
+              <div className="w-5 h-9 flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-opacity">
+                <button className="transition flex items-center justify-center w-[18px] h-6 rounded hover:bg-accent cursor-pointer">
+                  <GripVerticalIcon className="size-4.5 stroke-[1.7] shrink-0 text-muted" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     )
   },
   {
@@ -189,6 +213,7 @@ export const columns: ColumnDef<Kpi>[] = [
     meta: {
       width: "100px",
       variant: "numeric",
+      calculateType: "sum",
     },
   },
   {

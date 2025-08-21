@@ -1,19 +1,22 @@
+import { cn } from "@/lib/utils";
 import { IconType } from "react-icons";
 
 interface Props {
   title: string;
   description?: string;
   icon: IconType;
+  className?: string;
 }
 
 export const Banner = ({
   icon: Icon,
   title,
-  description
+  description,
+  className
 }: Props) => {
   return (
-    <section className="w-full flex flex-col items-center shrink-0 grow-0">
-      <div className="max-w-full w-full">
+    <section className="w-full flex flex-col items-center shrink-0 grow-0 sticky start-0">
+      <div className={cn("max-w-full w-full", className)}>
         <div className="h-6 w-full flex" />
           <div className="w-full relative md:text-left">
             <div className="mb-2 w-full pr-24">

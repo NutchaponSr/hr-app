@@ -3,6 +3,7 @@ import {
   BsFiletypeCsv, 
   BsFilterCircle 
 } from "react-icons/bs";
+import { Table } from "@tanstack/react-table";
 import { ChevronDownIcon } from "lucide-react";
 
 import { 
@@ -17,21 +18,24 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
-interface Props {
+import { MenuBar } from "@/components/menu-bar";
+
+interface Props<T> {
   tabTriggers?: {
     value: string;
     onChange: () => void;
   }[];
-  className?: string;
+  table: Table<T>;
   onClick: () => void;
+  onDelete: () => void;
 } 
 
-export const Toolbar = ({ className, tabTriggers, onClick }: Props) => {
+export const Toolbar = <T,>({ tabTriggers, onClick, ...props }: Props<T>) => {
   return (
-    <div className={cn("min-h-9 relative shrink-0 z-86", className)}>
+    <div className="min-h-9 shrink-0 z-86 start-0 sticky px-24">
       <div className="relative">
+        <MenuBar {...props} />
         <div className="flex items-center h-9 start-24 border-b-[1.25px] border-border">
           {!!tabTriggers && (
             <TabsList role="tablist" className="flex items-center h-full grow-10 overflow-hidden -ms-1">

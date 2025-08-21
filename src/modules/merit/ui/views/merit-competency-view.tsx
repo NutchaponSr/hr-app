@@ -13,11 +13,11 @@ interface Props {
 
 export const MeritCompetencyView = ({ width, data }: Props) => {
   const competencyItems: CompetencyItemWithInfo[] = data?.competencyItem || [];
-
+  
   const { table } = useTable({
     data: competencyItems,
     columns
-  })
+  });
 
   return (
     <div
