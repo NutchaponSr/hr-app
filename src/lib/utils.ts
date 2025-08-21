@@ -44,13 +44,13 @@ export function getFirstNameFromFullName(fullName: string): string {
 };
 
 export function convertAmountFromUnit(amount: number | null, decimal: number) {
-  if (!amount) return null;
+  if (amount === null) return null;
   
   return amount / Math.pow(10, decimal);
 }
 
 export function convertAmountToUnit(amount: number | null, decimal: number) {
-  if (!amount) return null;
+  if (amount === null) return null;
 
   return Math.round(amount * Math.pow(10, decimal));
 }

@@ -2,12 +2,13 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { CompetencyItemWithInfo } from "@/types/kpi";
 import { SelectCompetencyPopover } from "./select-competency-popover";
-import { CompetencyCellInput } from "./competency-cell-input";
 import { convertAmountFromUnit } from "@/lib/utils";
+import { CompetencyCellInput } from "./competency-cell-input";
 
 export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
   {
-    id: "action"
+    id: "action",
+    cell: () => {}
   },
   {
     id: "name",
@@ -121,6 +122,7 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     meta: {
       width: "100px",
       variant: "numeric",
+      calculateType: "sum",
     },
   },
 ]

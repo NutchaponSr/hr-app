@@ -1,14 +1,17 @@
+import React from "react";
+
 import { PlusIcon } from "lucide-react";
 import { flexRender, Table as TB } from "@tanstack/react-table";
 
 import { inputIcons } from "@/types/inputs";
+import { Calculation } from "@/components/calculation";
 
 interface Props<T> {
   table: TB<T>;
   onCreate?: () => void;
 }
 
-export const Table = <T,>({ table, onCreate }: Props<T>) => {
+export const Table = <T,>({table, onCreate }: Props<T>) => {
   return (
     <div className="relative mb-3">
       <div className="h-9 relative">
@@ -54,65 +57,61 @@ export const Table = <T,>({ table, onCreate }: Props<T>) => {
       </div>
       <div className="relative min-w-[calc(100%-192px)] isolation-auto">
         {table.getRowModel().rows.map((row, indexRow) => (
-            // <div
-            //   key={row.id}
-            //   data-index={indexRow}
-            //   style={{ transform: `translateY(${indexRow * 37}px)` }}
-            //   className="absolute top-0 start-0 w-full group/row"
-            // >
-            //   <div className="flex relative h-[calc(100%+2px)]">
-            //     <div className="flex w-full border-b-[1.25px] border-[#2a1c0012]">
-            //       <div className="flex">
-            //         {row.getVisibleCells().map((cell, indexCell) => (
-            //           <div
-            //             key={cell.id}
-            //             data-row-index={indexRow}
-            //             data-row-cell={indexCell}
-            //             style={{ width: cell.column.columnDef.meta?.width }}
-            //             className="flex h-full relative first:border-e-0 last:border-e-0 border-e-[1.25px] border-[#2a1c0012]"
-            //           >
-            //             <div
-            //               style={{ width: cell.column.columnDef.meta?.width }}
-            //               className="flex overflow-x-clip h-full"
-            //             >
-            //               {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            //             </div>
-            //           </div>
-            //         ))}
-            //       </div>
-            //     </div>
-            //   </div>
-            // </div>
           <div
             key={row.id}
             data-index={indexRow}
-            className="flex h-[cal(100%+2px)]"
+            className="flex h-[cal(100%+2px)] group/row"
           >
             <div className="flex w-full border-b-[1.25px] border-[#2a1c0012]">
               <div className="flex">
                 {row.getVisibleCells().map((cell, indexCell) => (
-                  <div
-                    key={indexCell}
-                    style={{ width: cell.column.columnDef.meta?.width }}
-                    className="flex h-full relative first:border-e-0 last:border-e-0 border-e-[1.25px] border-[#2a1c0012]"
-                  >
-                    <div style={{ width: cell.column.columnDef.meta?.width }} className="flex overflow-x-clip h-full">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </div>
-                  </div>
+                  <React.Fragment key={indexCell}>
+                    {cell.column.id === "action" ? (
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    ) : (
+                      <div
+                        key={indexCell}
+                        style={{ width: cell.column.columnDef.meta?.width }}
+                        className="flex h-full relative first:border-e-0 last:border-e-0 border-e-[1.25px] border-[#2a1c0012]"
+                      >
+                        <div style={{ width: cell.column.columnDef.meta?.width }} className="flex overflow-x-clip h-full">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </div>
+                      </div>
+                    )}
+                  </React.Fragment>
                 ))}
               </div>
             </div>
           </div>
         ))}
       </div>
-      <div data-create={!!onCreate} className="data-[create=true]:flex hidden items-center h-9 w-full leading-5 sticky gap-1 start-24.5">
+      <div data-create={!!onCreate} className="data-[create=true]:flex hidden items-center h-9 w-full leading-5 sticky gap-1 start-24.5  border-b-[1.25px] border-border">
         <button onClick={onCreate} className="hover:bg-primary/6 transition inline-flex h-full w-full">
           <span className="text-sm text-foreground inline-flex items-center sticky start-24 px-2">
             <PlusIcon className="size-4 mr-1.5" />
             New
           </span> 
         </button>
+      </div>
+      <div className="h-[50px]">
+        <div className="relative">
+          <div className="select-none flex text-sm min-h-full start-0">
+            <div className="flex pe-8">
+              <div className="flex">
+                {table.getVisibleFlatColumns().slice(1).map((col) => (
+                  <div 
+                    key={col.id}
+                    className="flex"
+                    style={{ width: col.columnDef.meta?.width }}
+                  >
+                    <Calculation column={col} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
