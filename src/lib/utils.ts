@@ -54,3 +54,12 @@ export function convertAmountToUnit(amount: number | null, decimal: number) {
 
   return Math.round(amount * Math.pow(10, decimal));
 }
+
+export function findKeyByValue<T extends Record<string, string>>(
+  record: T,
+  value: T[keyof T] | null | undefined,
+) {
+  if (!value) return null;
+
+  return (Object.keys(record) as (keyof T)[]).find((key) => record[key] === value);
+}

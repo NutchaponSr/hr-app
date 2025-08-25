@@ -92,6 +92,7 @@ enum Division {
   SDS
   ICP1
   SBM_NON_AUTO
+  COMMERCIAL
 }
 
 enum Position {
@@ -274,7 +275,7 @@ model CompetencyItem {
   id String @id @default(cuid())
   competencyId String?
   competencyRecordId String
-  weight Int @default(0)
+  weight Int?
   input String? @db.Text
   output String? @db.Text
   createdAt DateTime @default(now())

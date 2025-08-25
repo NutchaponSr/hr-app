@@ -1,13 +1,10 @@
-import cultures from "@/modules/merit/json/culture.json";
-
 import { BsBuildingsFill } from "react-icons/bs";
 
 import { Banner } from "@/components/banner";
 import { useTable } from "@/hooks/use-table";
 import { columns } from "../components/culture-column";
 import { LayoutProvider } from "@/layouts/layout-provider";
-import { CultureRecordWithItem, OrganizationCulture } from "@/types/kpi";
-import { useMemo } from "react";
+import { CultureRecordWithItem } from "@/types/kpi";
 
 interface Props {
   width: number;
@@ -15,26 +12,8 @@ interface Props {
 }
 
 export const MeritCultureView = ({ width, data }: Props) => {
-  // Combine database culture items with static culture definitions
-  const combinedData: OrganizationCulture[] = useMemo(() => {
-    return cultures.map((culture) => {
-      const dbItem = data?.cultureItems.find(item => item.code === culture.cultureCode);
-      return {
-        ...culture,
-        // CultureItem properties
-        id: dbItem?.id || '',
-        code: dbItem?.code || culture.cultureCode,
-        levelBehavior: dbItem?.levelBehavior || 0,
-        evidence: dbItem?.evidence || "",
-        cultureRecordId: dbItem?.cultureRecordId || '',
-        createdAt: dbItem?.createdAt || new Date(),
-        updatedAt: dbItem?.updatedAt || new Date(),
-      };
-    });
-  }, [data?.cultureItems]);
-
   const t = useTable({
-    data: combinedData,
+    data: data?.cultureItems || [],
     columns,
   });
 

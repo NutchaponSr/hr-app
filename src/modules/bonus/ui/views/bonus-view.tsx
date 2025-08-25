@@ -22,7 +22,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 
 import { Toolbar } from "@/components/toolbar";
 
-import { createColumns } from "@/modules/bonus/ui/components/columns";
+import { createColumns } from "@/modules/bonus/ui/components/bonus-columns";
 
 import { useCreateSheetStore } from "@/modules/performance/store/use-create-sheet-store";
 import { Banner } from "@/components/banner";
