@@ -32,7 +32,11 @@ export const meritProcedure = createTRPCRouter({
         include: {
           cultureRecord: {
             include: {
-              cultureItems: true,
+              cultureItems: {
+                orderBy: {
+                  id: "asc",
+                },
+              },
             },
           },
           competencyRecord: {
@@ -40,6 +44,9 @@ export const meritProcedure = createTRPCRouter({
               competencyItem: {
                 include: {
                   competency: true,
+                },
+                orderBy: {
+                  id: "asc",
                 }
               },
             },
@@ -47,9 +54,48 @@ export const meritProcedure = createTRPCRouter({
         },
       });
 
+      const populatedData = res.map((merit) => ({
+        ...merit,
+        competencyRecord: merit.competencyRecord
+          ? {
+              ...merit.competencyRecord,
+              competencyItem: merit.competencyRecord.competencyItem.map(
+                (item, index) => ({
+                  ...item,
+                  number: index + 1, 
+                  order: (index + 1) * 100,
+                }),
+              ),
+            }
+          : null,
+        cultureRecord: merit.cultureRecord 
+          ? {
+            ...merit.cultureRecord,
+            cultureItems: merit.cultureRecord.cultureItems.map((item, index) => {
+              const culture = cultures.find((f) => f.cultureCode === item.code) || cultures[index] || {};
+
+              const weight = merit.cultureRecord!.cultureItems.length > 0
+                    ? (30 / merit.cultureRecord!.cultureItems.length) * 100
+                    : 0;
+
+              return {
+                ...item,
+                name: culture.cultureName,
+                cultureCode: culture.cultureCode || item.code,
+                description: culture.description,
+                beliefs: culture.beliefs,
+                number: index + 1, 
+                order: (index + 1) * 100,
+                weight,
+              }
+            })
+          } 
+        : null,
+      }));
+
       return {
         years: res.map((merit) => merit.year),
-        record: res.find((f) => f.year === input.year),
+        record: populatedData.find((f) => f.year === input.year),
         warning: !bonusRec ? "KPI Bonus record not found. you must create KPI Bonus at first" : null
       };
     }),
@@ -90,9 +136,7 @@ export const meritProcedure = createTRPCRouter({
             meritRecordId: res.id,
             competencyItem: {
               createMany: {
-                data: Array.from({ length: 4 }).map(() => ({
-                  weight: 0,
-                }))
+                data: Array.from({ length: 4 })
               }
             }
           },
@@ -145,23 +189,30 @@ export const meritProcedure = createTRPCRouter({
         competencyId: z.string().nullable().optional(),
         output: z.string().nullable().optional(),
         input: z.string().nullable().optional(),
-        weight: z.number().nullable().optional(),
+        weight: z.string().nullable().optional(),
       })
     )
     .mutation(async ({ input }) => {
+      const { id, ...updateFields } = input;
+
+      const fieldsToUpdate = Object.fromEntries(
+        Object.entries(updateFields).filter(([, value]) => value !== undefined && value !== null)
+      );
+
+      const transformedData: Record<string, unknown> = {
+        ...fieldsToUpdate,
+        ...(fieldsToUpdate.weight !== undefined && {
+          weight: fieldsToUpdate.weight !== null ? convertAmountToUnit(Number(fieldsToUpdate.weight), 2) : null
+        }),
+      };
+
       const res = await prisma.competencyItem.update({
         where: {
-          id: input.id,
+          id,
         },
-        data: {
-          ...input,
-          weight: convertAmountToUnit(
-            input.weight === undefined || input.weight === null ? null : input.weight,
-            2
-          ) ?? 0,
-        },
+        data: transformedData,
       });
 
       return res;
-    })
+    }),
 }); 

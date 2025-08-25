@@ -1,6 +1,5 @@
 [
   {
-    "order": 1,
     "cultureCode": "S",
     "cultureName": "Spirit of Commitment, Integrity & Ethics",
     "description": "การปฏิบัติหน้าที่ด้วยความซื่อสัตย์และส่งมอบงานตามข้อตกลงหรือสัญญาที่ได้ตกลงกันไว้ ด้วยความโปร่งใส",
@@ -11,7 +10,6 @@
     ]
   },
   {
-    "order": 2,
     "cultureCode": "M",
     "cultureName": "Mastery of Learning & Applying Technology",
     "description": "การตั้งใจเรียนรู้สิ่งใหม่ๆ รวมถึงเทคโนโลยี และนำมาใช้ปรับปรุง พัฒนา การทำงาน บริการ หรือผลิตภัณฑ์ ให้ดีขึ้นอย่างต่อเนื่อง",
@@ -22,7 +20,6 @@
     ]
   },
   {
-    "order": 3,
     "cultureCode": "A",
     "cultureName": "Agility",
     "description": "การเปิดรับสิ่งใหม่ วางแผนปรับตัว เตรียมความพร้อมสำหรับการเปลี่ยนแปลงอย่างรวดเร็ว",
@@ -33,7 +30,6 @@
     ]
   },
   {
-    "order": 4,
     "cultureCode": "R",
     "cultureName": "Respect Others & Value Diversity",
     "description": "การยอมรับความแตกต่าง และเปิดใจรับฟังความคิดเห็นของทุกคนในทีมเพื่อหาแนวทางที่ดีที่สุดในการแก้ไขปัญหา",
@@ -44,7 +40,6 @@
     ]
   },
   {
-    "order": 5,
     "cultureCode": "T",
     "cultureName": "Think Customers & Think Value",
     "description": "การทำความเข้าใจความคาดหวังของลูกค้า (ทั้งภายในและภายนอก) อย่างต่อเนื่อง และใส่ใจในคุณค่าของงานและบริการที่ส่งมอบให้ลูกค้า",

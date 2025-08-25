@@ -2,20 +2,26 @@ import toast from "react-hot-toast";
 
 import { useState } from "react";
 import { IoTriangle } from "react-icons/io5";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { cn } from "@/lib/utils";
+
+import { Project, Strategy } from "@/generated/prisma";
+
+import { useTRPC } from "@/trpc/client";
+import { useYear } from "@/hooks/use-year";
+import { useZodForm } from "@/hooks/use-zod-form";
 
 import { Button } from "@/components/ui/button";
 
-import { AutoResizeTextarea } from "@/components/auto-resize-textarea";
-import { cn } from "@/lib/utils";
-import { useZodForm } from "@/hooks/use-zod-form";
-import { kpiBonusSchema, type KpiBonusSchema } from "@/modules/bonus/schema";
-import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCreateSheetStore } from "@/modules/performance/store/use-create-sheet-store";
-import { useYear } from "@/hooks/use-year";
-import { projectTypes, strategies } from "../../constants";
-import { Project, Strategy } from "@/generated/prisma";
 import { FormFieldRow } from "@/components/form-field-row";
+import { AutoResizeTextarea } from "@/components/auto-resize-textarea";
+
+import { useCreateSheetStore } from "@/modules/performance/store/use-create-sheet-store";
+
+import { projectTypes, strategies } from "@/modules/bonus/constants";
+import { kpiBonusSchema, type KpiBonusSchema } from "@/modules/bonus/schema";
+
 
 const values = [100, 90, 80, 70] as const;
 
@@ -30,11 +36,11 @@ export const BonusCreateForm = () => {
   const [openIndexs, setOpenIndexs] = useState<number[]>(values.map((_, index) => index));
 
   const {
+    errors,
+    watch,
     register,
     handleSubmit,
     setValue,
-    watch,
-    errors
   } = useZodForm<KpiBonusSchema, typeof kpiBonusSchema>(
     kpiBonusSchema,
     {
@@ -45,6 +51,7 @@ export const BonusCreateForm = () => {
       target90: "",
       target80: "",
       target70: "",
+      definition: "",
     },
   );
 
@@ -108,44 +115,44 @@ export const BonusCreateForm = () => {
               variant="numeric"
               label="Weight"
               name="weight"
-              register={register}
-              value={watch("weight")}
               errors={errors}
+              value={watch("weight") as string}
+              register={register("weight")}
             />
             <FormFieldRow
               variant="select"
               label="Strategy"
               name="strategy"
-              register={register}
               errors={errors}
-              value={strategies[watch("strategy")]}
+              value={strategies[watch("strategy")] as string}
+              register={register("strategy")}
               onClear={() => setValue("strategy", "" as Strategy)}
+              onChange={(key) => setValue("strategy", key as Strategy)}
               options={Object.entries(strategies).map(([key, value]) => ({
                 key,
                 label: value,
-                onSelect: (value) => setValue("strategy", value as Strategy, { shouldValidate: true }),
               }))}
             />
             <FormFieldRow
               variant="text"
               label="Objective"
               name="objective"
-              register={register}
-              value={watch("objective")}
               errors={errors}
+              value={watch("objective") as string}
+              register={register("objective")}
             />
             <FormFieldRow
               variant="select"
               label="Type"
               name="type"
-              register={register}
               errors={errors}
-              value={projectTypes[watch("type")]}
+              value={projectTypes[watch("type")] as string}
+              register={register("type")}
               onClear={() => setValue("type", "" as Project)}
+              onChange={(key) => setValue("type", key as Project)}
               options={Object.entries(projectTypes).map(([key, value]) => ({
                 key,
                 label: value,
-                onSelect: (value) => setValue("type", value as Project, { shouldValidate: true }),
               }))}
             />
           </div>
@@ -191,6 +198,10 @@ export const BonusCreateForm = () => {
             );
           })}
           <div className="flex h-7.5 w-full" />
+          <h3 className="font-semibold max-w-full w-full whitespace-break-spaces break-words text-primary text-[1.2em] leading-[1.3] my-px">
+            Definition
+          </h3>
+          <AutoResizeTextarea {...register("definition")} />
         </div>
       </div>
 

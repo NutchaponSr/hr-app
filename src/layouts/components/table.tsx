@@ -72,7 +72,7 @@ export const Table = <T,>({table, onCreate }: Props<T>) => {
                       <div
                         key={indexCell}
                         style={{ width: cell.column.columnDef.meta?.width }}
-                        className="flex h-full relative first:border-e-0 last:border-e-0 border-e-[1.25px] border-[#2a1c0012]"
+                        className="flex h-full relative first:border-e-0 border-e-[1.25px] border-[#2a1c0012]"
                       >
                         <div style={{ width: cell.column.columnDef.meta?.width }} className="flex overflow-x-clip h-full">
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}

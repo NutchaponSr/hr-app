@@ -2,12 +2,12 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
-import { convertAmountToUnit } from "@/lib/utils";
+import { convertAmountToUnit, findKeyByValue } from "@/lib/utils";
 
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { kpiBonusSchema } from "@/modules/bonus/schema";
-import { Project, Strategy } from "@/generated/prisma";
+import { projectTypes, strategies } from "../constants";
 
 export const bonusProcedure = createTRPCRouter({
   getByEmployeeId: protectedProcedure
@@ -90,8 +90,8 @@ export const bonusProcedure = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const res = await prisma.kpiRecord.create({
         data: {
-          employeeId: ctx.user.employee.id, 
-          year: input.year, 
+          employeeId: ctx.user.employee.id,
+          year: input.year,
         },
       });
 
@@ -147,28 +147,40 @@ export const bonusProcedure = createTRPCRouter({
       z.object({
         id: z.string(),
         name: z.string().nullable().optional(),
-        weight: z.number().nullable().optional(),
-        strategy: z.nativeEnum(Strategy).nullable().optional(),
-        type: z.nativeEnum(Project).nullable().optional(),
+        weight: z.string().nullable().optional(),
+        strategy: z.string().nullable().optional(),
+        type: z.string().nullable().optional(),
         target100: z.string().nullable().optional(),
         target90: z.string().nullable().optional(),
         target80: z.string().nullable().optional(),
         target70: z.string().nullable().optional(),
         definition: z.string().nullable().optional(),
+        objective: z.string().nullable().optional(),
       })
     )
     .mutation(async ({ input }) => {
+      const { id, ...updateFields } = input;
+
+      const fieldsToUpdate = Object.fromEntries(
+        Object.entries(updateFields).filter(([, value]) => value !== undefined)
+      );
+
+      const transformedData = {
+        ...fieldsToUpdate,
+        ...(fieldsToUpdate.strategy !== undefined && {
+          strategy: fieldsToUpdate.strategy ? findKeyByValue(strategies, String(fieldsToUpdate.strategy)) : null
+        }),
+        ...(fieldsToUpdate.type !== undefined && {
+          type: fieldsToUpdate.type ? findKeyByValue(projectTypes, String(fieldsToUpdate.type)) : null
+        }),
+        ...(fieldsToUpdate.weight !== undefined && {
+          weight: fieldsToUpdate.weight !== null ? convertAmountToUnit(Number(fieldsToUpdate.weight), 2) : null
+        }),
+      };
+
       const res = await prisma.kpi.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          ...input,
-          weight: convertAmountToUnit(
-            input.weight === undefined ? null : input.weight,
-            2
-          ),
-        },
+        where: { id },
+        data: transformedData,
       });
 
       return res;

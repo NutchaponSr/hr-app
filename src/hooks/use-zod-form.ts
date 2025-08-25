@@ -10,6 +10,7 @@ export const useZodForm = <
   defaultValues?: DefaultValues<TValues>,
 ) => {
   const {
+    control,
     register,
     watch,
     reset,
@@ -23,6 +24,7 @@ export const useZodForm = <
   });
 
   return {
+    control,
     register,
     watch,
     reset,

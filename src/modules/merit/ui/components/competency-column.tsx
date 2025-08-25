@@ -3,25 +3,30 @@ import { ColumnDef } from "@tanstack/react-table";
 import { CompetencyItemWithInfo } from "@/types/kpi";
 import { SelectCompetencyPopover } from "./select-competency-popover";
 import { convertAmountFromUnit } from "@/lib/utils";
-import { CompetencyCellInput } from "./competency-cell-input";
+import { CellInput } from "@/components/cell-input";
+import { InputVariants } from "@/types/inputs";
+import { SelectionBadge } from "@/components/selection-badge";
 
 export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
   {
     id: "action",
-    cell: () => {}
+    cell: () => (
+      <div />
+    )
   },
   {
     id: "name",
     header: "Name",
     cell: ({ row }) => (
       <SelectCompetencyPopover id={row.original.id}>
-        <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2 min-h-9">
-          <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
+        <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2 min-h-9 items-start justify-start">
+          <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start flex items-center gap-2">
+            <SelectionBadge label={String(row.original.number)} />
             <div className="leading-[1.5] whitespace-pre-wrap break-normal inline text-sm text-primary">
               {row.original.competency?.name}
             </div>
           </div>
-        </button>
+        </div>
       </SelectCompetencyPopover>
     ),
     meta: {
@@ -33,13 +38,13 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     id: "definition",
     header: "Definition",
     cell: ({ row }) => (
-      <button className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2 min-h-9">
+      <div className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2 min-h-9">
         <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
           <div className="leading-[1.5] whitespace-pre-wrap break-normal inline text-sm text-primary">
             {row.original.competency?.definition}
           </div>
         </div>
-      </button>
+      </div>
     ),
     meta: {
       width: "400px",
@@ -50,21 +55,23 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     accessorKey: "input",
     header: "Input & Process",
     cell: ({ row, column }) => (
-      <CompetencyCellInput
+      <CellInput
         id={row.original.id}
         width={column.columnDef.meta?.width}
-        variant={column.columnDef.meta!.variant}
+        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
+        modelType="competency"
         data={row.original.input}
+        name="inout"
         fieldName="input"
       >
         {(value) => (
-          <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
-            <div className="leading-[1.5] whitespace-pre-wrap break-normal inline text-sm text-primary">
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
               {value}
             </div>
           </div>
         )}
-      </CompetencyCellInput>
+      </CellInput>
     ),
     meta: {
       width: "240px",
@@ -75,12 +82,14 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     accessorKey: "output",
     header: "Output",
     cell: ({ row, column }) => (
-      <CompetencyCellInput
+      <CellInput
         id={row.original.id}
         width={column.columnDef.meta?.width}
-        variant={column.columnDef.meta!.variant}
+        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
         data={row.original.output}
+        modelType="competency"
         fieldName="output"
+        name="output"
       >
         {(value) => (
           <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
@@ -89,7 +98,7 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
             </div>
           </div>
         )}
-      </CompetencyCellInput>
+      </CellInput>
     ),
     meta: {
       width: "240px",
@@ -100,12 +109,14 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     accessorKey: "weight",
     header: "Weight",
     cell: ({ row, column }) => (
-      <CompetencyCellInput
+      <CellInput
         id={row.original.id}
         width={column.columnDef.meta?.width}
-        variant={column.columnDef.meta!.variant}
+        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
         data={convertAmountFromUnit(row.original.weight, 2)}
+        modelType="competency"
         fieldName="weight"
+        name="weight"
       >
         {(value) => (
           <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
@@ -117,7 +128,7 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
             </div>
           </div>
         )}
-      </CompetencyCellInput>
+      </CellInput>
     ),
     meta: {
       width: "100px",

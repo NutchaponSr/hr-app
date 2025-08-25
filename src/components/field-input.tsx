@@ -1,96 +1,93 @@
-import { FieldValues, Path, UseFormRegister } from "react-hook-form";
+import { useMemo, useState } from "react";
+import { UseFormRegisterReturn } from "react-hook-form";
 
-import { InputVariants, SelectInputProps } from "@/types/inputs";
-import { JSX, useMemo, useState } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
-import { SelectionBadge } from "./selection-badge";
 
-interface Props<T extends FieldValues> {
-  variant: InputVariants;
+import { InputVariants, SelectInput } from "@/types/inputs";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from "@/components/ui/popover";
+
+import { SelectionBadge } from "@/components/selection-badge";
+
+interface Props {
+  variant: Exclude<InputVariants, "action">;
   className?: string;
   children: React.ReactNode;
-  name: Path<T>;
-  register: UseFormRegister<T>;
-  value: string | null;
-  options?: { key: string; label: string; onSelect: (value: string) => void }[];
+  value: string;
+  width?: string;
+  height?: number;
+  register: UseFormRegisterReturn<string>;
+  options?: Array<{ key: string; label: string; }>;
+  onChange?: (value: string) => void;
   onClear?: () => void;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export const FieldInput = <T extends FieldValues>({
+export const FieldInput = ({
+  width,
+  height,
   className,
   children,
   variant,
+  onOpenChange,
   ...props
-}: Props<T>) => {
-  const FieldComponent: Record<Exclude<InputVariants, "action" | "main">, JSX.Element> = {
+}: Props) => {
+  const FieldComponent: Record<Exclude<InputVariants, "action">, React.ReactElement> = {
     numeric: <FieldInput.Numeric {...props} />,
     text: <FieldInput.Text {...props} />,
-    select: <FieldInput.Select {...props as SelectInputProps<T>} />,
+    main: <FieldInput.Text {...props} />,
+    select: <FieldInput.Select {...props as SelectInput} />,
   } 
 
   return (
-    <Popover modal>
+    <Popover modal onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         {children}
       </PopoverTrigger>
-      <PopoverContent className={cn(className, "w-[248px] p-0")} sideOffset={-32}>
+      <PopoverContent 
+        side="bottom"
+        style={{ width }}
+        className={cn(className, "w-[248px] p-0")} 
+        sideOffset={height ? (height * -1) + 0.5 : 0}
+      >
         {variant in FieldComponent ? FieldComponent[variant as keyof typeof FieldComponent] : null}
       </PopoverContent>
     </Popover>
   );
 }
 
-FieldInput.Numeric = function NumericInput<T extends FieldValues>({
-  name,
-  value,
-  register,
-}: {
-  value: string | null;
-  name: Path<T>;
-  register: UseFormRegister<T>;
-}) {
+FieldInput.Numeric = function NumericInput({ register }: { register: UseFormRegisterReturn<string> }) {
   return (
     <input
       type="number"
-      value={String(value)}
       className="w-full focus-visible:outline-none h-8 px-2 text-sm text-primary"
-      {...register(name)}
+      {...register}
     />
   );
 }
 
-FieldInput.Text = function TextInput<T extends FieldValues>({
-  name,
-  register,
-}: {
-  name: Path<T>
-  register: UseFormRegister<T>;
-}) {
+FieldInput.Text = function TextInput({ register }: { register: UseFormRegisterReturn<string> }) {
   return (
     <div className="p-2 min-h-[38px] flex flex-col justify-between grow text-sm">
       <textarea
-        {...register(name)}
-        className="break-all whitespace-break-spaces max-w-[232px] w-[232px] min-w-[232px] resize-none focus-visible:outline-none field-sizing-content min-h-0 text-primary"
+        {...register}
+        rows={1}
+        className="break-all whitespace-break-spaces resize-none focus-visible:outline-none field-sizing-content min-h-0 text-primary"
       />
     </div>
   );
 }
 
-FieldInput.Select = function SelectInput<T extends FieldValues>({
+FieldInput.Select = function SelectInput({
   value,
   options,
-  onClear,
-}: {
-  name: Path<T>;
-  value: string;
-  options: {
-    key: string;
-    label: string;
-    onSelect: (value: string) => void;
-  }[];
-  onClear: () => void;
-}) {
+  onChange,
+  onClear
+}: SelectInput) {
   const [search, setSearch] = useState("");
 
   const filteredOptions = useMemo(() => {
@@ -128,12 +125,12 @@ FieldInput.Select = function SelectInput<T extends FieldValues>({
               </h4>
             </div>
             <div className="m-0">
-              {filteredOptions.map(({ key, label, onSelect }) => (
+              {filteredOptions.map(({ key, label }) => (
                 <div 
                   key={key}
                   role="option"
                   aria-selected={value === label}
-                  onClick={() => onSelect(key)}
+                  onClick={() => onChange(label)}
                   className="flex transition w-full hover:bg-primary/6 rounded cursor-pointer"
                 > 
                   <div className="flex items-center gap-2 px-2 text-sm min-h-7 w-full">
