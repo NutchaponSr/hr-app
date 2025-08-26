@@ -20,6 +20,7 @@ interface Props {
   value: string;
   width?: string;
   height?: number;
+  open?: boolean;
   register: UseFormRegisterReturn<string>;
   options?: Array<{ key: string; label: string; }>;
   onChange?: (value: string) => void;
@@ -33,6 +34,7 @@ export const FieldInput = ({
   className,
   children,
   variant,
+  open,
   onOpenChange,
   ...props
 }: Props) => {
@@ -44,15 +46,16 @@ export const FieldInput = ({
   } 
 
   return (
-    <Popover modal onOpenChange={onOpenChange}>
+    <Popover modal open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         {children}
       </PopoverTrigger>
-      <PopoverContent 
+      <PopoverContent
+        align="start" 
         side="bottom"
         style={{ width }}
         className={cn(className, "w-[248px] p-0")} 
-        sideOffset={height ? (height * -1) + 0.5 : 0}
+        sideOffset={height ? height * -1 : 0}
       >
         {variant in FieldComponent ? FieldComponent[variant as keyof typeof FieldComponent] : null}
       </PopoverContent>

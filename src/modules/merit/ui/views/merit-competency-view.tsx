@@ -34,6 +34,7 @@ export const MeritCompetencyView = ({ width, data }: Props) => {
             <div className="grow shrink-0 h-full overflow-y-hidden overflow-x-auto">
               <div className="relative float-start min-w-full select-none pb-4 px-24 mt-1">
                 <LayoutProvider
+                  perform
                   variant="table"
                   table={table}
                 />

@@ -7,11 +7,13 @@ import { LayoutVariant } from "@/types/layouts";
 interface Props<T> {
   variant: LayoutVariant;
   table: TB<T>;
+  perform: boolean;
   onCreate?: () => void;
 }
 
 interface ComponentProps<T> {
   table: TB<T>;
+  perform: boolean;
   onCreate?: () => void;
 }
 

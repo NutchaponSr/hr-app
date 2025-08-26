@@ -4,7 +4,7 @@ import { Controller, FieldPath, FieldValues, useForm } from "react-hook-form";
 
 import { CompetencyItem, CultureItem, Kpi } from "@/generated/prisma";
 import { InputVariants } from "@/types/inputs";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { FieldInput } from "./field-input";
 import { useElementHeight } from "@/hooks/use-height";
 import { useTRPC } from "@/trpc/client";
@@ -22,6 +22,7 @@ type ModelFieldMap = {
 interface Props<TFieldValues extends FieldValues, T extends SupportedModels> {
   id: string;
   name: FieldPath<TFieldValues>;
+  perform: boolean;
   variant: Exclude<InputVariants, "action">;
   fieldName: ModelFieldMap[T];
   modelType: T;
@@ -39,6 +40,7 @@ interface Props<TFieldValues extends FieldValues, T extends SupportedModels> {
 export const CellInput = <TFieldValues extends FieldValues, T extends SupportedModels>({
   id,
   name,
+  perform,
   variant,
   width,
   children,
@@ -65,10 +67,12 @@ export const CellInput = <TFieldValues extends FieldValues, T extends SupportedM
     includeMargin: true
   });
 
+  const [isOpen, setIsOpen] = useState(false);
+
   const kpiMutation = useMutation({
     ...trpc.kpiBonus.update.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries(trpc.kpiBonus.getByEmployeeId.queryOptions({ year }));
+      queryClient.invalidateQueries(trpc.kpiBonus.getOne.queryOptions({ year }));
     },
   });
 
@@ -132,10 +136,13 @@ export const CellInput = <TFieldValues extends FieldValues, T extends SupportedM
             width={width}
             register={register(name)}
             onOpenChange={(open) => {
+              setIsOpen((prev) => !prev);
+
               if (!open && value !== data) {
                 handleSave(value);
               }
             }}
+            open={isOpen && perform}
             onChange={onChange}
             options={options}
           >

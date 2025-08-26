@@ -74,7 +74,7 @@ export const BonusCreateForm = () => {
           id: loadingToast,
         });
 
-        queryClient.invalidateQueries(trpc.kpiBonus.getByEmployeeId.queryOptions({ year }))
+        queryClient.invalidateQueries(trpc.kpiBonus.getOne.queryOptions({ year }))
 
         onClose();
       },

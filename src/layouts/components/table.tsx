@@ -8,10 +8,15 @@ import { Calculation } from "@/components/calculation";
 
 interface Props<T> {
   table: TB<T>;
+  perform: boolean;
   onCreate?: () => void;
 }
 
-export const Table = <T,>({table, onCreate }: Props<T>) => {
+export const Table = <T,>({
+  table, 
+  perform,
+  onCreate 
+}: Props<T>) => {
   return (
     <div className="relative mb-3">
       <div className="h-9 relative">
@@ -86,7 +91,10 @@ export const Table = <T,>({table, onCreate }: Props<T>) => {
           </div>
         ))}
       </div>
-      <div data-create={!!onCreate} className="data-[create=true]:flex hidden items-center h-9 w-full leading-5 sticky gap-1 start-24.5  border-b-[1.25px] border-border">
+      <div 
+        data-create={perform && !!onCreate} 
+        className="data-[create=true]:flex hidden items-center h-9 w-full leading-5 sticky gap-1 start-24.5  border-b-[1.25px] border-border"
+      >
         <button onClick={onCreate} className="hover:bg-primary/6 transition inline-flex h-full w-full">
           <span className="text-sm text-foreground inline-flex items-center sticky start-24 px-2">
             <PlusIcon className="size-4 mr-1.5" />
