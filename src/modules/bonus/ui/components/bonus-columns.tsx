@@ -10,10 +10,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CellInput } from "@/components/cell-input";
 import { InputVariants } from "@/types/inputs";
 import { SelectionBadge } from "@/components/selection-badge";
-import { strategies } from "../../constants";
+import { projectTypes, strategies } from "../../constants";
 
-
-export const createColumns = (isScrolled: boolean): ColumnDef<Kpi>[] => [
+export const createColumns = (
+  isScrolled: boolean,
+  perform: boolean,
+): ColumnDef<Kpi>[] => [
   {
     id: "action",
     header: ({ table }) => (
@@ -84,6 +86,7 @@ export const createColumns = (isScrolled: boolean): ColumnDef<Kpi>[] => [
     header: () => "Name",
     cell: ({ row, column }) => (
       <CellInput
+        perform={perform}
         id={row.original.id}
         data={row.original.name}
         width={column.columnDef.meta?.width}
@@ -111,6 +114,7 @@ export const createColumns = (isScrolled: boolean): ColumnDef<Kpi>[] => [
     header: () => "Link to Strategy",
     cell: ({ row, column }) => (
       <CellInput
+        perform={perform}
         id={row.original.id}
         data={strategies[row.original.strategy!]}
         variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
@@ -136,64 +140,71 @@ export const createColumns = (isScrolled: boolean): ColumnDef<Kpi>[] => [
       variant: "select",
     },
   },
-  // {
-  //   accessorKey: "objective",
-  //   header: () => "Objective",
-  //   cell: ({ row, column }) => (
-  //     <BonusCellInput
-  //       id={row.original.id}
-  //       width={column.columnDef.meta?.width}
-  //       variant={column.columnDef.meta!.variant}
-  //       data={row.original.objective}
-  //       fieldName="objective"
-  //     >
-  //       {(displayValue) => (
-  //         <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
-  //           <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
-  //             {displayValue}
-  //           </div>
-  //         </div>
-  //       )}
-  //     </BonusCellInput>
-  //   ),
-  //   meta: {
-  //     width: "320px",
-  //     variant: "text",
-  //   },
-  // },
-  // {
-  //   accessorKey: "type",
-  //   header: () => "Type",
-  //   cell: ({ row, column }) => (
-  //     <BonusCellInput
-  //       id={row.original.id}
-  //       variant={column.columnDef.meta!.variant}
-  //       data={row.original.type}
-  //       fieldName="type"
-  //       options={Object.entries(projectTypes).map(([key, item]) => ({
-  //         key,
-  //         label: item,
-  //       }))}
-  //     >
-  //       {(displayValue) => (
-  //         <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
-  //           <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
-  //             {displayValue && <SelectionBadge label={displayValue} />}
-  //           </div>
-  //         </div>
-  //       )}
-  //     </BonusCellInput>
-  //   ),
-  //   meta: {
-  //     width: "160px",
-  //     variant: "select",
-  //   },
-  // },
+  {
+    accessorKey: "objective",
+    header: () => "Objective",
+    cell: ({ row, column }) => (
+      <CellInput
+        perform={perform}
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
+        data={row.original.objective}
+        fieldName="objective"
+        name="objective"
+        modelType="kpi"
+      >
+        {(displayValue) => (
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
+            </div>
+          </div>
+        )}
+      </CellInput>
+    ),
+    meta: {
+      width: "320px",
+      variant: "text",
+    },
+  },
+  {
+    accessorKey: "type",
+    header: () => "Type",
+    cell: ({ row, column }) => (
+      <CellInput
+        perform={perform}
+        id={row.original.id}
+        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
+        data={row.original.type}
+        modelType="kpi"
+        fieldName="type"
+        name="type"
+        options={Object.entries(projectTypes).map(([key, item]) => ({
+          key,
+          label: item,
+        }))}
+      >
+        {(displayValue) => (
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue && <SelectionBadge label={displayValue} />}
+            </div>
+          </div>
+        )}
+      </CellInput>
+    ),
+    meta: {
+      width: "160px",
+      variant: "select",
+    },
+  },
   {
     accessorKey: "weight",
     header: () => "Weight",
     cell: ({ row, column }) => (
       <CellInput
+        perform={perform}
         id={row.original.id}
         data={convertAmountFromUnit(row.original.weight, 2)}
         width={column.columnDef.meta?.width}
@@ -220,129 +231,147 @@ export const createColumns = (isScrolled: boolean): ColumnDef<Kpi>[] => [
       calculateType: "sum",
     },
   },
-  // {
-  //   accessorKey: "definition",
-  //   header: () => "Definition",
-  //   cell: ({ row, column }) => (
-  //     <BonusCellInput
-  //       id={row.original.id}
-  //       width={column.columnDef.meta?.width}
-  //       variant={column.columnDef.meta!.variant}
-  //       data={row.original.definition}
-  //       fieldName="definition"
-  //     >
-  //       {(displayValue) => (
-  //         <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
-  //           <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
-  //             {displayValue}
-  //           </div>
-  //         </div>
-  //       )}
-  //     </BonusCellInput>
-  //   ),
-  //   meta: {
-  //     width: "320px",
-  //     variant: "text",
-  //   },
-  // },
-  // {
-  //   id: "target-70",
-  //   header: () => "Target 70%",
-  //   cell: ({ row, column }) => (
-  //     <BonusCellInput
-  //       id={row.original.id}
-  //       width={column.columnDef.meta?.width}
-  //       variant={column.columnDef.meta!.variant}
-  //       data={row.original.target70}
-  //       fieldName="target70"
-  //       >
-  //       {(displayValue) => (
-  //         <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
-  //           <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
-  //             {displayValue}
-  //           </div>
-  //         </div>
-  //       )}
-  //     </BonusCellInput>
-  //   ),
-  //   meta: {
-  //     width: "270px",
-  //     variant: "text",
-  //   },
-  // },
-  // {
-  //   id: "target-80",
-  //   header: () => "Target 80%",
-  //   cell: ({ row, column }) => (
-  //     <BonusCellInput
-  //       id={row.original.id}
-  //       width={column.columnDef.meta?.width}
-  //       variant={column.columnDef.meta!.variant}
-  //       data={row.original.target80}
-  //       fieldName="target80"
-  //       >
-  //       {(displayValue) => (
-  //         <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
-  //           <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
-  //             {displayValue}
-  //           </div>
-  //         </div>
-  //       )}
-  //     </BonusCellInput>
-  //   ),
-  //   meta: {
-  //     width: "270px",
-  //     variant: "text",
-  //   },
-  // },
-  // {
-  //   id: "target-90",
-  //   header: () => "Target 90%",
-  //   cell: ({ row, column }) => (
-  //     <BonusCellInput
-  //     id={row.original.id}
-  //     width={column.columnDef.meta?.width}
-  //       variant={column.columnDef.meta!.variant}
-  //       data={row.original.target90}
-  //       fieldName="target90"
-  //       >
-  //       {(displayValue) => (
-  //         <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
-  //           <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
-  //             {displayValue}
-  //           </div>
-  //         </div>
-  //       )}
-  //     </BonusCellInput>
-  //   ),
-  //   meta: {
-  //     width: "270px",
-  //     variant: "text",
-  //   },
-  // },
-  // {
-  //   id: "target-100",
-  //   header: () => "Target 100%",
-  //   cell: ({ row, column }) => (
-  //     <BonusCellInput
-  //       id={row.original.id}
-  //       width={column.columnDef.meta?.width}
-  //       variant={column.columnDef.meta!.variant}
-  //       data={row.original.target100}
-  //       fieldName="target100"
-  //     >
-  //       {(displayValue) => (
-  //         <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
-  //           <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
-  //             {displayValue}
-  //           </div>
-  //         </div>
-  //       )}
-  //     </BonusCellInput>
-  //   ),
-  //   meta: {
-  //     width: "270px",
-  //     variant: "text",
-  //   },
-  // },
+  {
+    accessorKey: "definition",
+    header: () => "Definition",
+    cell: ({ row, column }) => (
+      <CellInput
+        perform={perform}
+        id={row.original.id}
+        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
+        data={row.original.definition}
+        modelType="kpi"
+        fieldName="definition"
+        name="definition"
+        options={Object.entries(projectTypes).map(([key, item]) => ({
+          key,
+          label: item,
+        }))}
+      >
+        {(displayValue) => (
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
+            </div>
+          </div>
+        )}
+      </CellInput>
+    ),
+    meta: {
+      width: "320px",
+      variant: "text",
+    },
+  },
+  {
+    id: "target-70",
+    header: () => "Target 70%",
+    cell: ({ row, column }) => (
+      <CellInput
+        perform={perform}
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
+        data={row.original.target70}
+        modelType="kpi"
+        fieldName="target70"
+        name="target70"
+      >
+        {(displayValue) => (
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
+            </div>
+          </div>
+        )}
+      </CellInput>
+    ),
+    meta: {
+      width: "270px",
+      variant: "text",
+    },
+  },
+  {
+    id: "target-80",
+    header: () => "Target 80%",
+    cell: ({ row, column }) => (
+      <CellInput
+        perform={perform}
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
+        data={row.original.target80}
+        modelType="kpi"
+        fieldName="target80"
+        name="target80"
+      >
+        {(displayValue) => (
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
+            </div>
+          </div>
+        )}
+      </CellInput>
+    ),
+    meta: {
+      width: "270px",
+      variant: "text",
+    },
+  },
+  {
+    id: "target-90",
+    header: () => "Target 90%",
+    cell: ({ row, column }) => (
+      <CellInput
+        perform={perform}
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
+        data={row.original.target90}
+        modelType="kpi"
+        fieldName="target90"
+        name="target90"
+      >
+        {(displayValue) => (
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
+            </div>
+          </div>
+        )}
+      </CellInput>
+    ),
+    meta: {
+      width: "270px",
+      variant: "text",
+    },
+  },
+  {
+    id: "target-100",
+    header: () => "Target 100%",
+    cell: ({ row, column }) => (
+      <CellInput
+        perform={perform}
+        id={row.original.id}
+        width={column.columnDef.meta?.width}
+        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
+        data={row.original.target100}
+        modelType="kpi"
+        fieldName="target100"
+        name="target100"
+      >
+        {(displayValue) => (
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
+              {displayValue}
+            </div>
+          </div>
+        )}
+      </CellInput>
+    ),
+    meta: {
+      width: "270px",
+      variant: "text",
+    },
+  },
 ]

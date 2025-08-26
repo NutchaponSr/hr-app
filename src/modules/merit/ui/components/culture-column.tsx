@@ -86,6 +86,7 @@ export const columns: ColumnDef<OrganizationCulture>[] = [
     header: "Evidence",
     cell: ({ row, column }) => (
       <CellInput
+        perform
         id={row.original.id}
         width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}

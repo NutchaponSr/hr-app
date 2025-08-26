@@ -1,105 +1,93 @@
 "use client";
 
-import { useIsMutating, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { BsArrowClockwise, BsCloudCheck, BsCloudSlash } from "react-icons/bs";
+import { useIsMutating, useQueryClient } from "@tanstack/react-query";
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
-export const SavingIndicator = () => {
+interface Props {
+  label: string;
+  autoResetDelay?: number; 
+}
+
+const SAVE_STATE_CONFIG = {
+  idle: { icon: null, text: (label: string) => label },
+  saving: { 
+    icon: BsArrowClockwise, 
+    text: () => "Saving...",
+    iconClass: "animate-spin"
+  },
+  saved: { 
+    icon: BsCloudCheck, 
+    text: () => "Saved to database"
+  },
+  error: { 
+    icon: BsCloudSlash, 
+    text: () => "Save failed"
+  }
+} as const;
+
+export const SavingIndicator = ({ label, autoResetDelay = 3000 }: Props) => {
   const isMutating = useIsMutating();
   const queryClient = useQueryClient();
-  const [saveState, setSaveState] = useState<SaveState>('idle');
+  
+  const [saveState, setSaveState] = useState<SaveState>("idle");
   const [lastError, setLastError] = useState<string | null>(null);
 
+  // Handle mutation state changes
   useEffect(() => {
     if (isMutating > 0) {
-      setSaveState('saving');
+      setSaveState("saving");
       setLastError(null);
-    } else if (saveState === 'saving') {
-      // Check if there were any recent errors
+    } else if (saveState === "saving") {
+      // Check for recent errors in mutation cache
       const mutationCache = queryClient.getMutationCache();
-      const recentMutations = mutationCache.getAll().slice(-5); // Check last 5 mutations
-      const hasError = recentMutations.some(mutation =>
+      const recentMutations = mutationCache.getAll().slice(-5);
+      
+      const recentError = recentMutations.find(mutation => 
         mutation.state.status === 'error' &&
-        Date.now() - (mutation.state.submittedAt || 0) < 5000 // Within last 5 seconds
+        Date.now() - (mutation.state.submittedAt || 0) < 5000
       );
 
-      if (hasError) {
-        const errorMutation = recentMutations.find(m => m.state.status === 'error');
+      if (recentError) {
         setSaveState('error');
-        setLastError(errorMutation?.state.error?.message || 'Save failed');
+        setLastError(recentError.state.error?.message || 'Unknown error');
       } else {
         setSaveState('saved');
       }
     }
   }, [isMutating, queryClient, saveState]);
 
-  // Auto-hide saved/error states after 3 seconds
+  // Auto-reset after delay
   useEffect(() => {
     if (saveState === 'saved' || saveState === 'error') {
       const timer = setTimeout(() => {
         setSaveState('idle');
         setLastError(null);
-      }, 3000);
+      }, autoResetDelay);
+      
       return () => clearTimeout(timer);
     }
-  }, [saveState]);
+  }, [saveState, autoResetDelay]);
 
-  if (saveState === 'idle') return null;
-
-  const getStateConfig = () => {
-    switch (saveState) {
-      case 'saving':
-        return {
-          bgColor: 'bg-blue-50 border-blue-200',
-          dotColor: 'bg-blue-500 animate-pulse',
-          textColor: 'text-blue-700',
-          text: 'Saving...',
-          icon: null
-        };
-      case 'saved':
-        return {
-          bgColor: 'bg-green-50 border-green-200',
-          dotColor: 'bg-green-500',
-          textColor: 'text-green-700',
-          text: 'Saved',
-          icon: '✓'
-        };
-      case 'error':
-        return {
-          bgColor: 'bg-red-50 border-red-200',
-          dotColor: 'bg-red-500',
-          textColor: 'text-red-700',
-          text: lastError || 'Save failed',
-          icon: '✕'
-        };
-      default:
-        return null;
-    }
-  };
-
-  const config = getStateConfig();
-  
-  if (!config) return null;
+  const config = SAVE_STATE_CONFIG[saveState];
+  const IconComponent = config.icon;
+  const text = config.text(label);
 
   return (
-    <div className={cn(
-      "flex items-center gap-2 px-2 py-1 rounded-md transition-all duration-200",
-      config.bgColor
-    )}>
-      <div className="flex items-center gap-1">
-        {config.icon ? (
-          <span className={cn("text-xs font-bold", config.textColor)}>
-            {config.icon}
-          </span>
-        ) : (
-          <div className={cn("size-2 rounded-full", config.dotColor)} />
-        )}
-      </div>
-      <span className={cn("text-xs font-medium", config.textColor)}>
-        {config.text}
-      </span>
+    <div className="flex items-center gap-1 text-xs text-[#a8a49c] font-normal select-none whitespace-nowrap me-2 transition-opacity">
+      {IconComponent && (
+        <IconComponent 
+          className={`size-4 stroke-[0.2] ${'iconClass' in config ? config.iconClass : ''}`}
+        />
+      )}
+      <span>{text}</span>
+      {lastError && saveState === 'error' && (
+        <span className="text-red-400 ml-1" title={lastError}>
+          - {lastError.length > 20 ? `${lastError.slice(0, 20)}...` : lastError}
+        </span>
+      )}
     </div>
   );
 };

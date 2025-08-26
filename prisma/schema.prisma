@@ -127,6 +127,9 @@ model Employee {
   user User?
   kpiRecords KpiRecord[]
   meritRecords MeritRecord[]
+  preparedApprovals Approval[] @relation("PreparedBy")
+  checkedApprovals Approval[] @relation("CheckedBy")
+  approvedApprovals Approval[] @relation("ApprovedBy")
 
   @@map("employee")
 }
@@ -141,6 +144,17 @@ enum Strategy {
   POEPLE_CONTINUITY
   POEPLE_EFFICIENCY
   OTHER
+}
+
+enum Status {
+  NOT_STARTED
+  IN_DRAFT
+  PENDING_CHECKER
+  REJECTED_BY_CHECKER
+  PENDING_APPROVER
+  REJECTED_BY_APPROVER
+  APPROVED
+  REVISION
 }
 
 model Kpi {
@@ -176,6 +190,7 @@ model KpiRecord {
   KpiEvaluations KpiEvaluation[]
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   merit MeritRecord?    
+  status Status @default(IN_DRAFT)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -199,15 +214,14 @@ model KpiResult {
 model KpiEvaluation {
   id String @id @default(uuid())
   kpiRecordId String 
+  approvalId String @unique
   period Int
-  preparedBy String
-  checkedBy String?
-  approvedBy String?
-  preparedAt DateTime @default(now())
-  checkedAt DateTime?
-  approvedAt DateTime?
+
   kpiRecord KpiRecord @relation(fields: [kpiRecordId], references: [id], onDelete: Cascade)
+  approval Approval @relation(fields: [approvalId], references: [id], onDelete: Cascade)
+
   @@unique([kpiRecordId, period])
+  @@map("kpiEvaluation")
 }
 
 model Approval {
@@ -216,9 +230,19 @@ model Approval {
   preparedBy String
   checkedBy String?
   approvedBy String
+
+  prepareComment String? @db.Text
+  approvComment String? @db.Text
+
   preparedAt DateTime @default(now())
   checkedAt DateTime?
   approvedAt DateTime?
+
+  preparer Employee @relation("PreparedBy", fields: [preparedBy], references: [id], onDelete: Cascade)
+  checker Employee? @relation("CheckedBy", fields: [checkedBy], references: [id], onDelete: SetNull)
+  approver Employee @relation("ApprovedBy", fields: [approvedBy], references: [id], onDelete: Cascade)
+
+  kpiEvaluation KpiEvaluation?
 
   @@map("approval")
 }

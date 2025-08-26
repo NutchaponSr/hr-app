@@ -29,9 +29,10 @@ interface Props<T> {
   table: Table<T>;
   onClick: () => void;
   onDelete: () => void;
+  perform: boolean;
 } 
 
-export const Toolbar = <T,>({ tabTriggers, onClick, ...props }: Props<T>) => {
+export const Toolbar = <T,>({ tabTriggers, onClick, perform, ...props }: Props<T>) => {
   return (
     <div className="min-h-9 shrink-0 z-86 start-0 sticky px-24">
       <div className="relative">
@@ -72,7 +73,10 @@ export const Toolbar = <T,>({ tabTriggers, onClick, ...props }: Props<T>) => {
                 <BsArrowDownUp className="stroke-[0.25]" />
               </Button>
               
-              <div className="relative inline-flex shrink-0 rounded overflow-hidden h-7 ml-1">
+              <div 
+                data-show={perform}
+                className="relative shrink-0 rounded overflow-hidden h-7 ml-1 data-[show=true]:inline-flex hidden"
+              >
                 <button onClick={onClick} className="transition flex items-center justify-center whitespace-nowrap rounded-l px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted">
                   New
                 </button>

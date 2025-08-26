@@ -56,6 +56,7 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     header: "Input & Process",
     cell: ({ row, column }) => (
       <CellInput
+        perform
         id={row.original.id}
         width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
@@ -83,6 +84,7 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     header: "Output",
     cell: ({ row, column }) => (
       <CellInput
+        perform
         id={row.original.id}
         width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
@@ -110,6 +112,7 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     header: "Weight",
     cell: ({ row, column }) => (
       <CellInput
+        perform
         id={row.original.id}
         width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}

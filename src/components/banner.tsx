@@ -1,5 +1,6 @@
-import { cn } from "@/lib/utils";
 import { IconType } from "react-icons";
+
+import { cn } from "@/lib/utils";
 
 interface Props {
   title: string;

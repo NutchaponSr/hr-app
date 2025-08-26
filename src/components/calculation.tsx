@@ -45,7 +45,7 @@ export const Calculation = <T,>({ column }: Props<T>) => {
             <span className="font-medium text-[10px] text-foreground uppercase tracking-wide me-1 select-none">
               {currentType?.label}
             </span>
-            <span data-select={!!selectedCalculation} className="text-tertiary h-full  data-[select=false]:text-foreground">
+            <span data-select={!!selectedCalculation} className="text-tertiary h-full data-[select=false]:text-foreground">
               {displayValue}
             </span>
           </div>

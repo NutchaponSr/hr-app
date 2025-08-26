@@ -28,7 +28,7 @@ export const UserButton = () => {
 
   const [open, setOpen] = useState(false);
 
-  if (isPending || !session) {
+  if (isPending) {
     return <div className="rounded h-8 w-full bg-accent animate-pulse" />
   }
 
@@ -90,10 +90,10 @@ export const UserButton = () => {
             />
             <div className="flex flex-col whitespace-nowrap overflow-hidden text-ellipsis">
               <h4 className="text-sm leading-4 text-primary whitespace-nowrap text-ellipsis overflow-hidden font-semibold">
-                {session.user.name}
+                {session!.user.name}
               </h4>
               <p className="text-xs text-tertiary whitespace-nowrap text-ellipsis overflow-hidden">
-                Role · {session.user.role}
+                Role · {session!.user.role}
               </p>
             </div>
           </div>
