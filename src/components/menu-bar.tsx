@@ -4,7 +4,7 @@ import { Table } from "@tanstack/react-table";
 
 interface Props<T> {
   table: Table<T>;
-  onDelete: () => void;
+  onDelete?: () => void;
 }
 
 export const MenuBar = <T,>({ table, onDelete }: Props<T>) => {

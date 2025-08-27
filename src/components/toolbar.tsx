@@ -27,8 +27,8 @@ interface Props<T> {
     onChange: () => void;
   }[];
   table: Table<T>;
-  onClick: () => void;
-  onDelete: () => void;
+  onClick?: () => void;
+  onDelete?: () => void;
   perform: boolean;
 } 
 

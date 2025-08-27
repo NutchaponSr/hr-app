@@ -94,6 +94,68 @@ export const bonusProcedure = createTRPCRouter({
 
       return res;
     }),
+  getById: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const res = await prisma.kpiRecord.findUnique({
+        where: {
+          id: input.id,
+        },
+        include: {
+          kpis: {
+            orderBy: {
+              createdAt: "asc",
+            },
+          },
+          KpiEvaluations: {
+            include: {
+              approval: {
+                include: {
+                  preparer: true,
+                  checker: true,
+                  approver: true,
+                }
+              },
+            }
+          },
+        },
+      });
+
+      if (!res) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      let permissionContext: PermissionContext | null = null;
+      let userRole: string | null = null;
+
+      const latestEvaluation = res.KpiEvaluations.sort((a, b) => b.period - a.period)[0];
+
+      if (latestEvaluation?.approval) {
+        const approval = latestEvaluation.approval;
+
+        permissionContext = {
+          currentEmployeeId: ctx.user.employee.id,
+          documentOwnerId: approval.preparedBy,
+          checkerId: approval.checkedBy || undefined,
+          approverId: approval.approvedBy,
+          status: res.status
+        };
+
+        userRole = getUserRole(permissionContext);
+      }
+
+      return {
+        record: res,
+        permission: {
+          context: permissionContext,
+          userRole,
+        },
+      };
+    }),
   instantCreate: protectedProcedure
     .input(
       z.object({
@@ -347,5 +409,93 @@ export const bonusProcedure = createTRPCRouter({
       }
 
       return res;
-    })
+    }),
+  approveChecker: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const res = await prisma.kpiRecord.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: Status.PENDING_APPROVER
+        }
+      });
+
+      if (!res) { 
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return res;
+    }),
+  declineChecker: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const res = await prisma.kpiRecord.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: Status.REJECTED_BY_CHECKER
+        }
+      });
+
+      if (!res) { 
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return res;
+    }),
+  approveApprover: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const res = await prisma.kpiRecord.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: Status.APPROVED
+        }
+      });
+
+      if (!res) { 
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return res;
+    }),
+  declineApprover: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const res = await prisma.kpiRecord.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: Status.REJECTED_BY_APPROVER
+        }
+      });
+
+      if (!res) { 
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return res;
+    }),
 });

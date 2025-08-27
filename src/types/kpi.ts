@@ -1,7 +1,7 @@
 import { Competency, CompetencyItem, CompetencyRecord, CultureItem, CultureRecord, Status } from "@/generated/prisma";
 
 export type TargetPercent = "100" | "90" | "80" | "70";
-export type StatusVariant = "default" | "red" | "orange" | "purple";
+export type StatusVariant = "default" | "red" | "orange" | "purple" | "green";
 
 export type KpiTargetMap = Record<TargetPercent, string | null>;
 
@@ -40,6 +40,6 @@ export const STATUS_RECORD: Record<Status, { label: string; variant: StatusVaria
   [Status.REJECTED_BY_CHECKER]: { label: "Rejected by Checker", variant: "red" },
   [Status.PENDING_APPROVER]: { label: "Pending Approver", variant: "default" },
   [Status.REJECTED_BY_APPROVER]: { label: "Rejected by Approver", variant: "red" },
-  [Status.APPROVED]: { label: "Approved", variant: "default" },
-  [Status.REVISION]: { label: "Revision", variant: "orange" },
+  [Status.APPROVED]: { label: "Approved", variant: "green" },
+  [Status.REVISION]: { label: "Revision", variant: "default" },
 };

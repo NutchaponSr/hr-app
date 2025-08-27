@@ -9,7 +9,7 @@ import { getQueryClient, trpc } from "@/trpc/server";
 import { Banner } from "@/components/banner";
 import { Header } from "@/components/header";
 
-import { Tasks } from "@/modules/performance/ui/components/tasks";
+import { Tasks } from "@/modules/tasks/ui/components/tasks";
 import { BonusScreen } from "@/modules/bonus/ui/components/bonus-screen";
 import { MeritScreen } from "@/modules/performance/ui/components/merit-screen";
 
@@ -28,7 +28,7 @@ const Page = async ({ searchParams }: Props) => {
   return (
     <>
       <Header />
-      <main className="grid [grid-template-columns:minmax(96px,1fr)_minmax(auto,1248px)_minmax(96px,1fr)] w-full overflow-auto relative">
+      <main className="grid grid-cols-[96px_1fr_96px] w-full overflow-auto relative">
         <div className="col-start-2">
           <Banner 
             title="Performance" 

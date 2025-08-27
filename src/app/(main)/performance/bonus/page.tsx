@@ -9,7 +9,7 @@ import { getQueryClient, trpc } from "@/trpc/server";
 import { BonusView } from "@/modules/bonus/ui/views/bonus-view";
 
 interface Props {
-  searchParams: Promise<SearchParams>
+  searchParams: Promise<SearchParams>;
 }
 
 const Page = async ({ searchParams }: Props) => {

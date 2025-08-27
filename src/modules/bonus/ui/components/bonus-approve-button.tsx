@@ -32,6 +32,8 @@ export const ApproveButton = ({ id, canElevate }: Props) => {
     if (ok) {
       start.mutate({ id }, {
         onSuccess: () => {
+          queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id }));
+          queryClient.invalidateQueries(trpc.kpiBonus.getOne.queryOptions({ year }));
           queryClient.invalidateQueries(trpc.kpiBonus.getInfo.queryOptions({ year }));
         },
       });
