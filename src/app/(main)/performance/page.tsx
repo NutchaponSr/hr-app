@@ -1,5 +1,9 @@
+import { Suspense } from "react";
+import type { SearchParams } from "nuqs/server";
 import { BsArrowUpSquareFill } from "react-icons/bs";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import { loadSearchParams } from "@/search-params";
 import { getQueryClient, trpc } from "@/trpc/server";
 
 import { Banner } from "@/components/banner";
@@ -9,8 +13,17 @@ import { Tasks } from "@/modules/performance/ui/components/tasks";
 import { BonusScreen } from "@/modules/bonus/ui/components/bonus-screen";
 import { MeritScreen } from "@/modules/performance/ui/components/merit-screen";
 
-const Page = async () => {
+interface Props {
+  searchParams: Promise<SearchParams>;
+}
+
+const Page = async ({ searchParams }: Props) => {
+  const { year } = await loadSearchParams(searchParams);
+
   const queryClient = getQueryClient();
+
+  void queryClient.prefetchQuery(trpc.task.getMany.queryOptions());
+  void queryClient.prefetchQuery(trpc.kpiBonus.getOne.queryOptions({ year }));
 
   return (
     <>
@@ -26,9 +39,13 @@ const Page = async () => {
         </div>
         <div className="col-start-2 my-5">
           <section className="grid grid-cols-1 gap-10 md:grid-cols-2">
-            <BonusScreen />
-            <MeritScreen />
-            <Tasks />
+            <HydrationBoundary state={dehydrate(queryClient)}>
+              <Suspense fallback={<p>Loading</p>}>
+                <BonusScreen year={year} />
+                <MeritScreen />
+                <Tasks />
+              </Suspense>
+            </HydrationBoundary>
           </section>
         </div>
       </main>

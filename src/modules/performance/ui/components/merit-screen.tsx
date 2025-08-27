@@ -35,7 +35,6 @@ export const MeritScreen = () => {
             date="Jan - Mar" 
             title="KPI Definition"
             description="Define measurable goals aligned with team and company priorities"
-            status="Drafting"
           />
           <Stepper 
             date="Jan - Jun" 

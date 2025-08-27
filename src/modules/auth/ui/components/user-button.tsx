@@ -28,7 +28,7 @@ export const UserButton = () => {
 
   const [open, setOpen] = useState(false);
 
-  if (isPending) {
+  if (isPending || !session) {
     return <div className="rounded h-8 w-full bg-accent animate-pulse" />
   }
 

@@ -72,7 +72,7 @@ export const CellInput = <TFieldValues extends FieldValues, T extends SupportedM
   const kpiMutation = useMutation({
     ...trpc.kpiBonus.update.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries(trpc.kpiBonus.getOne.queryOptions({ year }));
+      queryClient.invalidateQueries(trpc.kpiBonus.getInfo.queryOptions({ year }));
     },
   });
 

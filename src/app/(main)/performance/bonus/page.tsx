@@ -18,7 +18,7 @@ const Page = async ({ searchParams }: Props) => {
   const queryClient = getQueryClient();
 
   void queryClient.prefetchQuery(
-    trpc.kpiBonus.getOne.queryOptions({ 
+    trpc.kpiBonus.getInfo.queryOptions({ 
       year
     }),
   );

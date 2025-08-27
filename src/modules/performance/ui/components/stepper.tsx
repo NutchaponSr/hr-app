@@ -1,8 +1,15 @@
+import { cn } from "@/lib/utils";
+import { colorVariant } from "@/types/color";
+import { StatusVariant } from "@/types/kpi";
+
 interface Props {
   date: string;
   title: string;
   description: string;
-  status?: string;
+  status?: {
+    label: string;
+    variant: StatusVariant;
+  };
   action?: React.ReactNode;
 }
 
@@ -25,8 +32,14 @@ export const Stepper = ({
             <div className="flex flex-col flex-1 ps-2.5 overflow-hidden">
               <div className="flex flex-row items-center space-x-2">
                 <h4 className="font-medium whitespace-nowrap text-ellipsis overflow-hidden">{title}</h4>
-                <div data-has={!!status} className="data-[has=true]:block hidden self-center py-0.5 px-1 bg-purple-foreground text-purple uppercase text-[10px] tracking-wide font-semibold whitespace-nowrap w-fit rounded">
-                  {status}
+                <div 
+                  data-has={!!status} 
+                  className={cn(
+                    "data-[has=true]:block hidden self-center py-0.5 px-1 bg-purple-foreground text-purple uppercase text-[10px] tracking-wide font-semibold whitespace-nowrap w-fit rounded",
+                    colorVariant({ background: status?.variant, text: status?.variant })
+                  )}
+                >
+                  {status?.label}
                 </div>
               </div>
               <p className="text-xs leading-4 mt-0.5">{description}</p>

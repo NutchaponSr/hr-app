@@ -13,7 +13,7 @@ import { projectTypes, strategies } from "@/modules/bonus/constants";
 import { getUserRole, PermissionContext } from "../permission";
 
 export const bonusProcedure = createTRPCRouter({
-  getOne: protectedProcedure
+  getInfo: protectedProcedure
     .input(
       z.object({
         year: z.number(),
@@ -75,6 +75,24 @@ export const bonusProcedure = createTRPCRouter({
           userRole,
         },
       };
+    }),
+  getOne: protectedProcedure
+    .input(
+      z.object({
+        year: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const res = await prisma.kpiRecord.findUnique({
+        where: {
+          employeeId_year: {
+            employeeId: ctx.user.employee.id,
+            year: input.year,
+          },
+        },
+      });
+
+      return res;
     }),
   instantCreate: protectedProcedure
     .input(
@@ -276,6 +294,15 @@ export const bonusProcedure = createTRPCRouter({
       const res = await prisma.kpi.update({
         where: { id },
         data: transformedData,
+      });
+
+      await prisma.kpiRecord.update({
+        where: { 
+          id: res.kpiRecordId, 
+        },
+        data: { 
+          updatedAt: new Date(), 
+        },
       });
 
       return res;

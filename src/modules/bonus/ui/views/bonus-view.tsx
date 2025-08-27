@@ -55,13 +55,13 @@ export const BonusView = ({
   const { onOpen } = useCreateSheetStore();  
 
   const { data } = useSuspenseQuery(
-    trpc.kpiBonus.getOne.queryOptions({
+    trpc.kpiBonus.getInfo.queryOptions({
       year,
     }),
   );
 
   const status = STATUS_RECORD[data.permission.context?.status || Status.NOT_STARTED];
-  const perform = canPerform(data.permission.userRole as Role, "write", data.permission.context!.status);
+  const perform = canPerform(data.permission.userRole as Role, "write", data.permission.context?.status || Status.NOT_STARTED);
 
   const { table } = useTable({ 
     data: data.record?.kpis || [], 
@@ -122,7 +122,7 @@ export const BonusView = ({
                   deleteBulk.mutate({ ids }, {
                     onSuccess: () => {
                       queryClient.invalidateQueries(
-                        trpc.kpiBonus.getOne.queryOptions({ year }),
+                        trpc.kpiBonus.getInfo.queryOptions({ year }),
                       );
                     },
                     onError: (error) => {
@@ -143,7 +143,7 @@ export const BonusView = ({
                               createKpiRecord.mutate({ year }, {
                                 onSuccess: () => {
                                   queryClient.invalidateQueries(
-                                    trpc.kpiBonus.getOne.queryOptions({ year }),
+                                    trpc.kpiBonus.getInfo.queryOptions({ year }),
                                   );
                                 }
                               })
@@ -165,7 +165,7 @@ export const BonusView = ({
                               createKpi.mutate({ year }, {
                                 onSuccess: () => {
                                   queryClient.invalidateQueries(
-                                    trpc.kpiBonus.getOne.queryOptions({ year }),
+                                    trpc.kpiBonus.getInfo.queryOptions({ year }),
                                   );
                                 },
                                 onError: (error) => {
