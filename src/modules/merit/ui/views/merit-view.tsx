@@ -14,6 +14,7 @@ import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { MeritCompetencyView } from "./merit-competency-view";
+import Link from "next/link";
 
 interface Props {
   year: number;
@@ -38,7 +39,14 @@ export const MeritView = ({ year }: Props) => {
 
   return (
     <>
-      <WarnningBanner message={data.warning} />
+      <WarnningBanner message={data.warning} variant="warnning">
+        <Button size="sm" variant="outlineWarnning" asChild>
+          <Link href="/performance/bonus">
+            <PlusIcon className="stroke-[2.5]" />
+            KPI Bonus
+          </Link>
+        </Button>
+      </WarnningBanner>
       <div className="z-[1] flex flex-col grow relative overflow-y-auto overflow-x-hidden">
         <div className="grid grid-cols-[96px_1fr_96px] pb-[30vh]">
           <div className="min-w-0 col-start-2 col-end-2">

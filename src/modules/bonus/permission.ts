@@ -61,9 +61,9 @@ export interface PermissionContext {
   status: Status;
 }
 
-export function canPerform(role: Role, action: Action, status: Status ): boolean {
+export function canPerform(role: Role, action: Action[], status: Status ): boolean {
   const permissions = statusPermissions[status]?.[role] || [];
-  return permissions.includes(action);
+  return action.every(action => permissions.includes(action));
 }
 
 export function getUserRole(context: PermissionContext): Role | null {
@@ -82,17 +82,4 @@ export function getUserRole(context: PermissionContext): Role | null {
   }
   
   return null;
-}
-
-export function canPerformAction(
-  context: PermissionContext,
-  action: Action
-): boolean {
-  const role = getUserRole(context);
-  
-  if (!role) {
-    return action === "read";
-  }
-  
-  return canPerform(role, action, context.status);
 }

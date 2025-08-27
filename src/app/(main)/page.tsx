@@ -7,7 +7,7 @@ import { ApplicationSection } from "./_components/application-section";
 
 const Page = () => {
   return (
-    <main className="grid [grid-template-columns:minmax(96px,1fr)_minmax(auto,1248px)_minmax(96px,1fr)] w-full overflow-auto relative">
+    <main className="grid grid-cols-[96px_1fr_96px] w-full overflow-auto relative">
       <div className="col-start-2 mt-1">
         <SearchHero />
       </div>

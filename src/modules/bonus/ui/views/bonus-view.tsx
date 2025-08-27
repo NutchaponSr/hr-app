@@ -61,7 +61,7 @@ export const BonusView = ({
   );
 
   const status = STATUS_RECORD[data.permission.context?.status || Status.NOT_STARTED];
-  const perform = canPerform(data.permission.userRole as Role, "write", data.permission.context?.status || Status.NOT_STARTED);
+  const perform = canPerform(data.permission.userRole as Role, ["write"], data.permission.context?.status || Status.NOT_STARTED);
 
   const { table } = useTable({ 
     data: data.record?.kpis || [], 
@@ -95,7 +95,7 @@ export const BonusView = ({
         <StatusBadge {...status} />
         <ApproveButton 
           id={data.record?.id}
-          canElevate={data.record?.status === Status.IN_DRAFT} 
+          canElevate={perform} 
         />
       </Header>
       <main className="flex flex-col grow-0 shrink bg-background z-1 h-[calc(-44px+100vh)] max-h-full relative">
