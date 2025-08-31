@@ -27,8 +27,8 @@ export const Tasks = () => {
         </div>
       </div>
 
-      <TaskList hasSomeTask={tasks.length > 0}>
-        {tasks.map((task, index) => (
+      <TaskList hasSomeTask={tasks.data.length > 0}>
+        {tasks.data.map((task, index) => (
           <TaskItem key={index} task={task} />
         ))}
       </TaskList>

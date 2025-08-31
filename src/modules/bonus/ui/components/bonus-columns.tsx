@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CellInput } from "@/components/cell-input";
 import { InputVariants } from "@/types/inputs";
 import { SelectionBadge } from "@/components/selection-badge";
-import { projectTypes, strategies } from "../../constants";
+import { projectTypes } from "../../constants";
 
 export const createColumns = (
   isScrolled: boolean,
@@ -83,7 +83,7 @@ export const createColumns = (
   },
   {
     accessorKey: "name",
-    header: () => "Name",
+    header: () => "KPI Name (ชื่อ KPI)",
     cell: ({ row, column }) => (
       <CellInput
         perform={perform}
@@ -116,20 +116,16 @@ export const createColumns = (
       <CellInput
         perform={perform}
         id={row.original.id}
-        data={strategies[row.original.strategy!]}
+        data={row.original.strategy}
         variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
         fieldName="strategy"
         name="strategy"
         modelType="kpi"
-        options={Object.entries(strategies).map(([key, item]) => ({
-          key,
-          label: item,
-        }))}
       >
         {(displayValue) => (
           <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
             <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
-              {(displayValue || row.original.strategy) && <SelectionBadge label={displayValue || strategies[row.original.strategy!]} />}
+              {displayValue}
             </div>
           </div>
         )}
@@ -137,12 +133,12 @@ export const createColumns = (
     ),
     meta: {
       width: "160px",
-      variant: "select",
+      variant: "text",
     },
   },
   {
     accessorKey: "objective",
-    header: () => "Objective",
+    header: () => "Objective (วัตถุประสงค์) ของ KPI",
     cell: ({ row, column }) => (
       <CellInput
         perform={perform}
@@ -213,10 +209,10 @@ export const createColumns = (
         name="weight"
         fieldName="weight"
       >
-        {(displayValue) => (
+        {(value) => (
           <div className="leading-[1.5] whitespace-pre-wrap break-all text-left flex justify-end">
             <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
-              {(displayValue || row.original.weight) && Number(displayValue || convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+              {value && Number(value).toLocaleString("en-US", {
                 maximumFractionDigits: 2,
                 minimumFractionDigits: 2,
               })}
@@ -233,7 +229,7 @@ export const createColumns = (
   },
   {
     accessorKey: "definition",
-    header: () => "Definition",
+    header: () => "Measure (หน่วยวัดความสำเร็จ)",
     cell: ({ row, column }) => (
       <CellInput
         perform={perform}

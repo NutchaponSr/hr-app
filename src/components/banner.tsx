@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 interface Props {
   title: string;
   description?: string;
-  icon: IconType;
   className?: string;
+  icon: IconType;
 }
 
 export const Banner = ({
@@ -17,8 +17,8 @@ export const Banner = ({
 }: Props) => {
   return (
     <section className="w-full flex flex-col items-center shrink-0 grow-0 sticky start-0">
+      <div className="flex w-full h-6" />
       <div className={cn("max-w-full w-full", className)}>
-        <div className="h-6 w-full flex" />
           <div className="w-full relative md:text-left">
             <div className="mb-2 w-full pr-24">
             <div className="flex justify-start">

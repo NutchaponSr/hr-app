@@ -1,22 +1,23 @@
+"use client";
+
 import { BsFolderFill } from "react-icons/bs";
 
 import { Banner } from "@/components/banner";
 import { useTable } from "@/hooks/use-table";
-import { CompetencyItemWithInfo, CompetencyRecordWithItem } from "@/types/kpi";
-import { columns } from "../components/competency-column";
+import { createColumns } from "../components/competency-column";
 import { LayoutProvider } from "@/layouts/layout-provider";
+import { CompetencyRecordWithInfo } from "@/types/kpi";
 
 interface Props {
   width: number;
-  data: CompetencyRecordWithItem | null;
+  perform: boolean;
+  data: CompetencyRecordWithInfo[];
 }
 
-export const MeritCompetencyView = ({ width, data }: Props) => {
-  const competencyItems: CompetencyItemWithInfo[] = data?.competencyItem || [];
-  
+export const MeritCompetencyView = ({ width, perform, data }: Props) => {
   const { table } = useTable({
-    data: competencyItems,
-    columns
+    data,
+    columns: createColumns(perform),
   });
 
   return (

@@ -113,7 +113,7 @@ export const UserButton = () => {
             onClick={() => authClient.signOut({
               fetchOptions: {
                 onSuccess: () => {
-                  router.refresh();
+                  router.push("/auth/sign-in");
                 },
               },
             })} 

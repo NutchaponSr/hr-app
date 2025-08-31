@@ -1,36 +1,41 @@
-import { Competency, CompetencyItem, CompetencyRecord, CultureItem, CultureRecord, Status } from "@/generated/prisma";
+import { 
+  Comment,
+  Competency, 
+  CompetencyRecord, 
+  Culture, 
+  CultureRecord, 
+  Employee, 
+  Status 
+} from "@/generated/prisma";
 
 export type TargetPercent = "100" | "90" | "80" | "70";
 export type StatusVariant = "default" | "red" | "orange" | "purple" | "green";
 
 export type KpiTargetMap = Record<TargetPercent, string | null>;
 
-export interface OrganizationCulture extends CultureItem {
-  name: string;
-  cultureCode: string;
-  description: string;
-  beliefs: string[];
-  number: number;
-  order: number;
-  weight: number;
-} 
 
-export interface CultureRecordWithItem extends CultureRecord {
-  cultureItems: OrganizationCulture[];
+export interface CultureRecordWithInfo extends CultureRecord {
+  culture: Culture;
 }
 
-export interface CompetencyRecordWithItem extends CompetencyRecord {
-  competencyItem: (CompetencyItem & {
-    competency: Competency | null;
-    order: number;
-    number: number;
-  })[];
-}
-
-export interface CompetencyItemWithInfo extends CompetencyItem {
+export interface CompetencyRecordWithInfo extends CompetencyRecord {
   competency: Competency | null;
-  order: number;
   number: number;
+  order: number;
+}
+
+// export interface KpiEvalucationWithInfo extends KpiRecord {
+//   kpiEvaluations: (KpiEvaluation & {
+//     approval: Approval & {
+//       preparer: Employee;
+//       checker: Employee | null;
+//       approver: Employee;
+//     };
+//   })[];
+// }
+
+export interface CommentWithOwner extends Comment {
+  employee: Employee;
 }
 
 export const STATUS_RECORD: Record<Status, { label: string; variant: StatusVariant }> = {
@@ -41,5 +46,4 @@ export const STATUS_RECORD: Record<Status, { label: string; variant: StatusVaria
   [Status.PENDING_APPROVER]: { label: "Pending Approver", variant: "default" },
   [Status.REJECTED_BY_APPROVER]: { label: "Rejected by Approver", variant: "red" },
   [Status.APPROVED]: { label: "Approved", variant: "green" },
-  [Status.REVISION]: { label: "Revision", variant: "default" },
 };

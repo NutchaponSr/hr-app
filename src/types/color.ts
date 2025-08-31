@@ -16,7 +16,7 @@ export const colorVariant = cva("",
         orange: "bg-orange-foreground",
         purple: "bg-purple-foreground",
         danger: "bg-destructive",
-        warnning: "bg-warnning",
+        warning: "bg-warning",
         green: "bg-green-foreground",
       },
       dot: {

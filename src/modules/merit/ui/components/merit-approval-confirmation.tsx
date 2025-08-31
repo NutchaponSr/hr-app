@@ -10,14 +10,14 @@ interface Props {
   id: string;
 }
 
-export const BonusApprovalConfirmation = ({ id }: Props) => {
+export const MeritApprovalConfirmation = ({ id }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const { data } = authClient.useSession();
 
   const [comment, setComment] = useState("");
 
-  const confirm = useMutation(trpc.kpiBonus.confirm.mutationOptions());
+  const confirm = useMutation(trpc.kpiMerit.confirm.mutationOptions());
 
   const handleConfirmation = (approve: boolean) => {
     confirm.mutate({
@@ -26,8 +26,8 @@ export const BonusApprovalConfirmation = ({ id }: Props) => {
       comment,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id }));
-        setComment(""); // Clear comment after successful submission
+        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id }));
+        setComment("");
       },
     });
   };
@@ -51,7 +51,7 @@ export const BonusApprovalConfirmation = ({ id }: Props) => {
             onClick={() => handleConfirmation(true)}
             disabled={isLoading}
           >
-            {isLoading ? "Processing..." : "Approve"}
+            Approve
           </Button>
           <Button
             variant="secondary"
@@ -59,7 +59,7 @@ export const BonusApprovalConfirmation = ({ id }: Props) => {
             onClick={() => handleConfirmation(false)}
             disabled={isLoading}
           >
-            {isLoading ? "Processing..." : "Decline"}
+            Decline
           </Button>
         </div>
 

@@ -1,19 +1,21 @@
+"use client";
+
 import { BsBuildingsFill } from "react-icons/bs";
 
 import { Banner } from "@/components/banner";
 import { useTable } from "@/hooks/use-table";
 import { columns } from "../components/culture-column";
 import { LayoutProvider } from "@/layouts/layout-provider";
-import { CultureRecordWithItem } from "@/types/kpi";
+import { CultureRecordWithInfo } from "@/types/kpi";
 
 interface Props {
   width: number;
-  data: CultureRecordWithItem | null;
+  data: CultureRecordWithInfo[];
 }
 
 export const MeritCultureView = ({ width, data }: Props) => {
   const t = useTable({
-    data: data?.cultureItems || [],
+    data,
     columns,
   });
 

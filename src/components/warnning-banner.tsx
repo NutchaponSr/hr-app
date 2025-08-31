@@ -4,7 +4,7 @@ import { colorVariant } from "@/types/color";
 interface Props {
   message: string | null;
   children?: React.ReactNode;
-  variant: "danger" | "warnning";
+  variant: "danger" | "warning";
 }
 
 export const WarnningBanner = ({ 
@@ -15,10 +15,10 @@ export const WarnningBanner = ({
   if (!message) return null;
 
   return (
-    <div data-error={!!message} className="w-full select-none data-[error=true]:block hidden sticky left-0">
+    <div data-error={!!message} className="w-full select-none data-[error=true]:block hidden sticky top-0 z-89">
       <div className={cn(
-        "flex items-center justify-center whitespace-nowrap px-3 text-sm text-white font-medium bg-warning min-h-11",
-        colorVariant({ background: variant })
+        "flex items-center justify-center whitespace-nowrap px-3 text-sm text-white font-medium min-h-11",
+        colorVariant({ background: variant }),
       )}>
         <div className="flex items-center justify-center overflow-visible whitespace-normal py-2 px-1">
           {message}

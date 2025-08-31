@@ -25,15 +25,19 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { SelectionBadge } from "@/components/selection-badge";
+import { useParams } from "next/navigation";
 
 interface Props {
   id: string;
+  perform: boolean;
   children: React.ReactNode;
 }
 
-export const SelectCompetencyPopover = ({ id, children }: Props) => {
+export const SelectCompetencyPopover = ({ id, perform, children }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const params = useParams<{ id: string; }>();
+
   const { year } = useYear();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -50,9 +54,8 @@ export const SelectCompetencyPopover = ({ id, children }: Props) => {
   const updateCompetencyMutation = useMutation({
     ...trpc.kpiMerit.updateCompetency.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries(
-        trpc.kpiMerit.getOne.queryOptions({ year })
-      );
+      queryClient.invalidateQueries(trpc.kpiMerit.getInfo.queryOptions({ year }));
+      queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: params.id }));
       toast.success("Competency updated successfully");
       setIsOpen(false);
     },
@@ -95,7 +98,7 @@ export const SelectCompetencyPopover = ({ id, children }: Props) => {
   };
 
   return (
-    <Popover modal open={isOpen} onOpenChange={handleOpenChange}>
+    <Popover modal open={isOpen && perform} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         {children}
       </PopoverTrigger>
