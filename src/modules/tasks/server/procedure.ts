@@ -7,81 +7,73 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 export const taskProcedure = createTRPCRouter({
   getMany: protectedProcedure
     .query(async ({ ctx }) => {
-      const matchStatuses = [
-        Status.PENDING_APPROVER, 
-        Status.PENDING_CHECKER,
-        Status.REJECTED_BY_CHECKER,
-        Status.REJECTED_BY_APPROVER,
-      ];
-
-      const res = await prisma.kpiRecord.findMany({
+      const tasks = await prisma.task.findMany({
         where: {
           AND: [
             {
               status: {
-                in: matchStatuses,
+                in: [
+                  Status.PENDING_APPROVER,
+                  Status.PENDING_CHECKER,
+                  Status.REJECTED_BY_APPROVER,
+                  Status.REJECTED_BY_CHECKER,
+                ],
               },
             },
             {
               OR: [
                 {
                   status: Status.PENDING_CHECKER,
-                  KpiEvaluations: {
-                    some: {
-                      approval: {
-                        checkedBy: ctx.user.employee.id,
-                      },
-                    },
-                  },
+                  checkedBy: ctx.user.employee.id,
                 },
                 {
                   status: Status.REJECTED_BY_CHECKER,
-                  KpiEvaluations: {
-                    some: {
-                      approval: {
-                        preparedBy: ctx.user.employee.id,
-                      },
-                    },
-                  },
+                  checkedBy: ctx.user.employee.id,
+                },
+                {
+                  status: Status.REJECTED_BY_CHECKER,
+                  preparedBy: ctx.user.employee.id,
                 },
                 {
                   status: Status.PENDING_APPROVER,
-                  KpiEvaluations: {
-                    some: {
-                      approval: {
-                        approvedBy: ctx.user.employee.id,
-                      },
-                    },
-                  },
-                },
-                {
-                  status: Status.REJECTED_BY_APPROVER,
-                  KpiEvaluations: {
-                    some: {
-                      approval: {
-                        preparedBy: ctx.user.employee.id,
-                      },
-                    },
-                  },
+                  approvedBy: ctx.user.employee.id,
                 },
               ],
             },
           ],
         },
         include: {
-          KpiEvaluations: {
-            orderBy: {
-              period: "desc",
+          preparer: true,
+          kpiRecord: {
+            include: {
+              kpiForm: true,
             },
           },
-          employee: true,
+          meritRecord: {
+            include: {
+              meritForm: true,
+            },
+          },
         },
-        orderBy: [
-          { status: "asc" },
-          { updatedAt: "desc" },
-        ],
+        orderBy: {
+          updatedAt: "desc",
+        }
       });
 
-      return res;
+      return {
+        data: tasks.map((task) => ({
+          task: {
+            id: task.id,
+            type: task.type,
+            status: task.status,
+            updatedAt: task.updatedAt,
+          },
+          info: {
+            assignedBy: task.preparer.fullName, 
+            period: task.kpiRecord?.period || task.meritRecord?.period,
+            year: task.kpiRecord?.kpiForm?.year || task.meritRecord?.meritForm?.year,
+          },
+        })),
+      };
     })
 });

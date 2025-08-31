@@ -67,7 +67,7 @@ FieldInput.Numeric = function NumericInput({ register }: { register: UseFormRegi
   return (
     <input
       type="number"
-      className="w-full focus-visible:outline-none h-8 px-2 text-sm text-primary"
+      className="w-full focus-visible:outline-none h-9 px-2 text-sm text-primary"
       {...register}
     />
   );

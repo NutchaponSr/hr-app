@@ -45,12 +45,6 @@ const statusPermissions: Record<Status, Record<Role, Action[]>> = {
     checker: ["read"],
     approver: ["read"]
   },
-  
-  [Status.REVISION]: {
-    preparer: ["read", "write", "submit"],
-    checker: ["read"],
-    approver: ["read"]
-  }
 }
 
 export interface PermissionContext {

@@ -1,13 +1,13 @@
 import { ColumnDef } from "@tanstack/react-table";
 
-import { CompetencyItemWithInfo } from "@/types/kpi";
 import { SelectCompetencyPopover } from "./select-competency-popover";
 import { convertAmountFromUnit } from "@/lib/utils";
 import { CellInput } from "@/components/cell-input";
 import { InputVariants } from "@/types/inputs";
 import { SelectionBadge } from "@/components/selection-badge";
+import { CompetencyRecordWithInfo } from "@/types/kpi";
 
-export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
+export const createColumns = (perform: boolean):ColumnDef<CompetencyRecordWithInfo>[] => [
   {
     id: "action",
     cell: () => (
@@ -18,7 +18,7 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     id: "name",
     header: "Name",
     cell: ({ row }) => (
-      <SelectCompetencyPopover id={row.original.id}>
+      <SelectCompetencyPopover perform={perform} id={row.original.id}>
         <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2 min-h-9 items-start justify-start">
           <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start flex items-center gap-2">
             <SelectionBadge label={String(row.original.number)} />
@@ -56,7 +56,7 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     header: "Input & Process",
     cell: ({ row, column }) => (
       <CellInput
-        perform
+        perform={perform}
         id={row.original.id}
         width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
@@ -84,7 +84,7 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     header: "Output",
     cell: ({ row, column }) => (
       <CellInput
-        perform
+        perform={perform}
         id={row.original.id}
         width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
@@ -112,7 +112,7 @@ export const columns: ColumnDef<CompetencyItemWithInfo>[] = [
     header: "Weight",
     cell: ({ row, column }) => (
       <CellInput
-        perform
+        perform={perform}
         id={row.original.id}
         width={column.columnDef.meta?.width}
         variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}

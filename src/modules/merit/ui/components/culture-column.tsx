@@ -1,10 +1,10 @@
 import { CellInput } from "@/components/cell-input";
 import { convertAmountFromUnit } from "@/lib/utils";
 import { InputVariants } from "@/types/inputs";
-import { OrganizationCulture } from "@/types/kpi";
+import { CultureRecordWithInfo } from "@/types/kpi";
 import { ColumnDef } from "@tanstack/react-table";
 
-export const columns: ColumnDef<OrganizationCulture>[] = [
+export const columns: ColumnDef<CultureRecordWithInfo>[] = [
   {
     id: "action",
   },
@@ -15,7 +15,7 @@ export const columns: ColumnDef<OrganizationCulture>[] = [
       <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2 min-h-9">
         <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
           <div className="leading-[1.5] whitespace-pre-wrap break-all inline font-medium text-sm text-primary">
-            {row.original.cultureCode}
+            {row.original.culture.code}
           </div>
         </div>
       </div>
@@ -32,7 +32,7 @@ export const columns: ColumnDef<OrganizationCulture>[] = [
       <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2">
         <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
           <div className="leading-[1.5] whitespace-pre-wrap break-normal inline text-sm text-primary">
-            {row.original.name}
+            {row.original.culture.name}
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@ export const columns: ColumnDef<OrganizationCulture>[] = [
       <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2">
         <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
           <div className="leading-[1.5] whitespace-pre-wrap break-normal inline font text-sm text-primary">
-            {row.original.description}
+            {row.original.culture.description}
           </div>
         </div>
       </div>
@@ -66,12 +66,15 @@ export const columns: ColumnDef<OrganizationCulture>[] = [
       <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2">
         <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
           <ul className="leading-[1.5] whitespace-pre-wrap break-normal inline font text-sm text-primary">
-            {row.original.beliefs.map((item, index) => (
-              <li key={index}>
-                {index + 1}.  
-                {" " + item}
-              </li>
-            ))}
+            {row.original.culture.belief && Array.isArray(row.original.culture.belief)
+              ? row.original.culture.belief.map((item, index) => (
+                <li key={index}>
+                  {index + 1}.
+                  {" " + item}
+                </li>
+              ))
+              : <li>No beliefs available</li>
+            }
           </ul>
         </div>
       </div>
@@ -81,53 +84,25 @@ export const columns: ColumnDef<OrganizationCulture>[] = [
       variant: "text"
     },
   },
-  {
-    accessorKey: "evidence",
-    header: "Evidence",
-    cell: ({ row, column }) => (
-      <CellInput
-        perform
-        id={row.original.id}
-        width={column.columnDef.meta?.width}
-        variant={column.columnDef.meta!.variant as Exclude<InputVariants, "action">}
-        data={row.original.evidence}
-        modelType="culture"
-        fieldName="evidence"
-        name="evidence"
-      >
-        {(value) => (
-          <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
-            <div className="leading-[1.5] whitespace-pre-wrap break-normal inline font text-sm text-primary">
-              {value}
-            </div>
-          </div>
-        )}
-      </CellInput>
-    ),
-    meta: {
-      width: "240px",
-      variant: "text"
-    },
-  },
-  {
-    accessorKey: "weight",
-    header: "Weight",
-    cell: ({ row }) => (
-      <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2">
-        <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
-          <div className="leading-[1.5] whitespace-pre-wrap break-normal inline font text-sm text-primary">
-            {Number(convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
-              maximumFractionDigits: 2,
-              minimumFractionDigits: 2,
-            })}
-          </div>
-        </div>
-      </div>
-    ),
-    meta: {
-      width: "100px",
-      variant: "numeric",
-      calculateType: "sum",
-    },
-  },
+  // {
+  //   accessorKey: "weight",
+  //   header: "Weight",
+  //   cell: ({ row }) => (
+  //     <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2">
+  //       <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
+  //         <div className="leading-[1.5] whitespace-pre-wrap break-normal inline font text-sm text-primary">
+  //           {Number(convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+  //             maximumFractionDigits: 2,
+  //             minimumFractionDigits: 2,
+  //           })}
+  //         </div>
+  //       </div>
+  //     </div>
+  //   ),
+  //   meta: {
+  //     width: "100px",
+  //     variant: "numeric",
+  //     calculateType: "sum",
+  //   },
+  // },
 ]

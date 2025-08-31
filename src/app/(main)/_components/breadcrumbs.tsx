@@ -3,31 +3,55 @@
 import React from "react";
 import Link from "next/link";
 
-import { usePathname } from "next/navigation";
+import { IconType } from "react-icons";
+import { HiSlash } from "react-icons/hi2";
+import { BsAppIndicator } from "react-icons/bs";
 
-import { ChevronRightIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export const Breadcrumbs = () => {
-  const pathname = usePathname();
+interface Props {
+  paths: string[];
+  nameMap?: Record<string, string>;
+  iconMap?: Record<string, IconType>;
+}
 
-  const paths: string[] = pathname.split("/").filter(Boolean);
-
-  if (pathname === "/") return null;
+export const Breadcrumbs = ({ paths, nameMap = {}, iconMap = {} }: Props) => {
+  // UUID regex pattern to match UUIDs
+  const isUUID = (str: string) => {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(str);
+  };
 
   return (
-    <div className="flex items-center mb-2 gap-2 select-none">
-      <Link href="/" className="text-[#0006] text-xs hover:text-danger transition">
-        Apps
-      </Link>
-      <ChevronRightIcon className="size-3" />
+    <div className="flex items-center leading-[1.2] text-sm h-full grow-0 me-2 min-w-0">
+      <Button asChild size="xs" variant="ghost">
+        <Link href="/">
+          <BsAppIndicator className="stroke-[0.1]" />
+          Apps
+        </Link>
+      </Button>
+      <span className="w-2 flex items-center justify-center m-0">
+        <HiSlash className="size-5 block shrink-0 text-[#d4d3cf]" />
+      </span>
       {paths.map((path, index) => {
         const href = "/" + paths.slice(0, index + 1).join("/");
+        const displayText = nameMap[path] || (isUUID(path) ? "data" : path);
+        const IconComponent = iconMap[path];
         return (
           <React.Fragment key={index}>
-            <Link href={href} className="first-letter:uppercase text-primary text-xs">
-              {path}
-            </Link>
-            {index < paths.length - 1 && <ChevronRightIcon className="size-3" />}
+            <Button asChild size="xs" variant="ghost">
+              <Link href={href}>
+                {IconComponent && <IconComponent className="size-4" />}
+                <span className="first-letter:uppercase">
+                  {displayText}
+                </span>
+              </Link>
+            </Button>
+            {index < paths.length - 1 && (
+              <span className="w-2 flex items-center justify-center m-0">
+                <HiSlash className="size-5 block shrink-0 text-[#d4d3cf]" />
+              </span>
+            )}
           </React.Fragment>
         );
       })}

@@ -1,14 +1,14 @@
 import { createTRPCRouter } from "@/trpc/init";
 
+import { taskProcedure } from "@/modules/tasks/server/procedure";
 import { bonusProcedure } from "@/modules/bonus/server/procedure";
 import { meritProcedure } from "@/modules/merit/server/procedure";
 import { competencyProcedure } from "@/modules/competencies/server/procedure";
-import { taskProcedure } from "@/modules/tasks/server/procedure";
 
 export const appRouter = createTRPCRouter({
   task: taskProcedure,
-  kpiBonus: bonusProcedure,
   kpiMerit: meritProcedure,
+  kpiBonus: bonusProcedure,
   competency: competencyProcedure,
 });
 

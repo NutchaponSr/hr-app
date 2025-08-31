@@ -1,6 +1,4 @@
 "use client";
-
-import { BonusCreateSheet } from "@/modules/bonus/ui/components/bonus-create-sheet";
 import { useEffect, useState } from "react";
 
 export const SheetProvider = () => {
@@ -14,7 +12,6 @@ export const SheetProvider = () => {
 
   return (
     <>
-      <BonusCreateSheet />
     </>
   );
 }

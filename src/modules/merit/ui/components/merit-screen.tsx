@@ -1,17 +1,15 @@
-"use client";
-
 import Link from "next/link";
 
 import { PlusIcon } from "lucide-react";
 import { GoProject } from "react-icons/go";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
+import { Period, Status } from "@/generated/prisma";
+
 import { useTRPC } from "@/trpc/client";
 
-import { Period, Status } from "@/generated/prisma";
-import { STATUS_RECORD } from "@/types/kpi";
-
 import { Stepper } from "@/modules/performance/ui/components/stepper";
+import { STATUS_RECORD } from "@/types/kpi";
 
 const DEFAULT_STEPPERS = [
   {
@@ -38,15 +36,15 @@ interface Props {
   year: number;
 }
 
-export const BonusScreen = ({ year }: Props) => {
+export const MeritScreen = ({ year }: Props) => {
   const trpc = useTRPC();
 
-  const { data: kpiBonus } = useSuspenseQuery(trpc.kpiBonus.getOne.queryOptions({ year }));
+  const { data: merit } = useSuspenseQuery(trpc.kpiMerit.getOne.queryOptions({ year }));
 
-  const kpiRecords = kpiBonus?.kpiRecords || [];
+  const meritRecords = merit?.meritRecords || [];
 
   const displayRecords = DEFAULT_STEPPERS.map((step, idx) => {
-    const record = kpiRecords.find((r) => r.period === step.period);
+    const record = meritRecords.find((r) => r.period === step.period);
   
     if (record) {
       return {
@@ -67,7 +65,6 @@ export const BonusScreen = ({ year }: Props) => {
       isFallback: true,
     };
   });
-  
 
   return (
     <article className="relative col-span-1">
@@ -77,7 +74,7 @@ export const BonusScreen = ({ year }: Props) => {
             <div className="flex items-center h-8 px-2.5 py-1.5 max-w-[220px] text-tertiary text-xs whitespace-nowrap space-x-1.5">
               <GoProject className="size-3 shrink-0 stroke-[0.5]" />
               <span className="whitespace-nowrap text-ellipsis overflow-hidden font-medium">
-                KPI Bonus
+                KPI Merit
               </span>
             </div>
           </div>
@@ -90,7 +87,7 @@ export const BonusScreen = ({ year }: Props) => {
             const status = STATUS_RECORD[task.status];
             const showAction =
               !isFallback
-                ? (kpiBonus?.isEvaluated
+                ? (merit?.isEvaluated
                     ? period !== Period.IN_DRAFT // ถ้า evaluated → ให้เฉพาะ eval
                     : period === Period.IN_DRAFT) // ถ้ายังไม่ evaluated → ให้เฉพาะ draft
                 : period === Period.IN_DRAFT; // fallback → แสดงแค่ draft
@@ -102,7 +99,7 @@ export const BonusScreen = ({ year }: Props) => {
                 action={
                   showAction && (<div className="mt-1.5 ps-2.5">
                     <Link
-                      href="/performance/bonus"
+                      href="/performance/merit"
                       className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] rounded text-xs"
                     >
                       {task.status === Status.NOT_STARTED && (
@@ -120,7 +117,7 @@ export const BonusScreen = ({ year }: Props) => {
                 status={status}
               />
             );
-          })}         
+          })}       
         </div>
       </div>
     </article>

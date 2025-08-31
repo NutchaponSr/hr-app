@@ -1,15 +1,13 @@
 "use client";
 
-import toast from "react-hot-toast";
-
 import { GoProject } from "react-icons/go";
 import { useRef, useEffect, useState } from "react";
 import { formatDistanceToNowStrict } from "date-fns";
 
-import { 
-  useMutation, 
-  useQueryClient, 
-  useSuspenseQuery 
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery
 } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 
@@ -35,8 +33,12 @@ import { SavingIndicator } from "@/components/saving-indicator";
 import { createColumns } from "@/modules/bonus/ui/components/bonus-columns";
 import { ApproveButton } from "@/modules/bonus/ui/components/bonus-approve-button";
 
-import { useCreateSheetStore } from "@/modules/performance/store/use-create-sheet-store";
-import { canPerform, Role } from "../../permission";
+import { canPerform, Role } from "@/modules/bonus/permission";
+
+import { WarnningBanner } from "@/components/warnning-banner";
+import { Comment } from "@/components/comment";
+import toast from "react-hot-toast";
+import { usePathname } from "next/navigation";
 
 interface Props {
   year: number;
@@ -46,33 +48,54 @@ export const BonusView = ({
   year,
 }: Props) => {
   const trpc = useTRPC();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
+
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const paths: string[] = pathname.split("/").filter(Boolean);
 
   const [isScrolledX, setIsScrolledX] = useState(false);
 
   const { setYear } = useYear();
-  const { onOpen } = useCreateSheetStore();  
 
-  const { data } = useSuspenseQuery(
+  const { data: kpiBonus } = useSuspenseQuery(
     trpc.kpiBonus.getInfo.queryOptions({
       year,
     }),
   );
 
-  const status = STATUS_RECORD[data.permission.context?.status || Status.NOT_STARTED];
-  const perform = canPerform(data.permission.userRole as Role, ["write"], data.permission.context?.status || Status.NOT_STARTED);
+  const createKpi = useMutation(trpc.kpiBonus.createKpi.mutationOptions());
+  const createForm = useMutation(trpc.kpiBonus.createForm.mutationOptions());
 
-  const { table } = useTable({ 
-    data: data.record?.kpis || [], 
-    columns: createColumns(isScrolledX, perform), 
+  const status = STATUS_RECORD[kpiBonus.data?.task.status || Status.NOT_STARTED];
+  const perform = canPerform(
+    kpiBonus.permission.role as Role,
+    ["write"],
+    kpiBonus.permission.ctx?.status || Status.NOT_STARTED
+  );
+
+  const { table } = useTable({
+    data: kpiBonus.data?.kpiForm.kpis || [],
+    columns: createColumns(isScrolledX, perform),
   });
-  
 
-  const deleteBulk = useMutation(trpc.kpiBonus.deleteBulk.mutationOptions());
-  const createKpi = useMutation(trpc.kpiBonus.instantCreate.mutationOptions());
-  const createKpiRecord = useMutation(trpc.kpiBonus.createRecord.mutationOptions());
+  const onCreate = () => {
+    const kpiFormId = kpiBonus.data?.kpiForm?.id;
 
+    if (!kpiFormId) {
+      toast.error("KPI Form not found");
+      return;
+    }
+
+    createKpi.mutate({ kpiFormId }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(
+          trpc.kpiBonus.getInfo.queryOptions({ year }),
+        );
+      },
+    })
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -90,61 +113,60 @@ export const BonusView = ({
 
   return (
     <>
-      <Header>
-        {data.record && <SavingIndicator label={`Edited ${formatDistanceToNowStrict(data.record!.updatedAt, { addSuffix: true })}`} /> }
+      <Header paths={paths}>
+        {kpiBonus.data && (
+          <SavingIndicator label={`Edited ${formatDistanceToNowStrict(kpiBonus.data.kpiForm.updatedAt, { addSuffix: true })}`} />
+        )}
         <StatusBadge {...status} />
-        <ApproveButton 
-          id={data.record?.id}
-          canElevate={perform} 
+        <ApproveButton
+          id={kpiBonus.data?.taskId}
+          canElevate={perform}
         />
       </Header>
       <main className="flex flex-col grow-0 shrink bg-background z-1 h-[calc(-44px+100vh)] max-h-full relative">
         <div className="contents">
+          {(kpiBonus.data?.task.status === Status.REJECTED_BY_CHECKER) && (
+            <WarnningBanner
+              message="This KPI record has been rejected by the Checker. Please review the feedback, make necessary corrections, and resubmit for approval."
+              variant="danger"
+            />
+          )}
           <div ref={scrollRef} className="flex flex-col grow relative overflow-auto me-0 mb-0">
-            <Banner 
-              title="KPI Bonus" 
+            <Banner
+              title="KPI Bonus"
               description="Reward employees with performance-based bonuses tied to goals and business impact."
-              icon={GoProject} 
+              icon={GoProject}
               className="ps-24"
             />
             <Tabs defaultValue={String(year)} className="contents">
               <Toolbar
                 perform={perform}
                 table={table}
-                onClick={() => onOpen("kpi-bonus")}
-                tabTriggers={data.years.map((year) => ({
+                onClick={onCreate}
+                tabTriggers={kpiBonus.years.map((year) => ({
                   value: year.toString(),
                   onChange: () => setYear(year),
                 }))}
-                onDelete={() => {
-                  const ids = table.getSelectedRowModel().rows.map((row) => row.original.id);
-
-                  deleteBulk.mutate({ ids }, {
-                    onSuccess: () => {
-                      queryClient.invalidateQueries(
-                        trpc.kpiBonus.getInfo.queryOptions({ year }),
-                      );
-                    },
-                    onError: (error) => {
-                      toast.error(error.message);
-                    },
-                  })
-                }}
+                // TODO: Delete bulk
+                onDelete={() => {}}
               />
               <TabsContent value={String(year)}>
                 <div className="grow shrink-0 flex flex-col relative">
                   <div className="h-full grow shrink-0">
-                    {!data.record ? (
+                    {!kpiBonus.data ? (
                       <div className="text-primary text-xs relative float-left min-w-full select-none pb-[180px] px-24">
                         <div className="flex flex-wrap items-center justify-center gap-3 sticky start-24 h-36 -mx-24">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             onClick={() => {
-                              createKpiRecord.mutate({ year }, {
+                              createForm.mutate({ year }, {
                                 onSuccess: () => {
                                   queryClient.invalidateQueries(
                                     trpc.kpiBonus.getInfo.queryOptions({ year }),
                                   );
+                                },
+                                onError: (ctx) => {
+                                  toast.error(ctx.message);
                                 }
                               })
                             }}
@@ -155,24 +177,13 @@ export const BonusView = ({
                         </div>
                       </div>
                     ) : (
-                      <div className="relative float-left min-w-full select-none pb-[180px] px-24">
+                      <div className="relative float-left min-w-full select-none px-24">
                         <div className="relative">
-                          <LayoutProvider 
+                          <LayoutProvider
                             perform={perform}
                             table={table}
-                            variant="table" 
-                            onCreate={() => {
-                              createKpi.mutate({ year }, {
-                                onSuccess: () => {
-                                  queryClient.invalidateQueries(
-                                    trpc.kpiBonus.getInfo.queryOptions({ year }),
-                                  );
-                                },
-                                onError: (error) => {
-                                  toast.error(error.message);
-                                },
-                              });
-                            }}
+                            variant="table"
+                            onCreate={onCreate}
                           />
                         </div>
                       </div>
@@ -180,6 +191,9 @@ export const BonusView = ({
                   </div>
                 </div>
               </TabsContent>
+              {kpiBonus.data?.task && (
+                <Comment comments={kpiBonus.data.task.comments} />
+              )}
             </Tabs>
           </div>
         </div>

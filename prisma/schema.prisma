@@ -20,19 +20,19 @@ enum UserRole {
 }
 
 model User {
-  id String @id @default(uuid())
-  name String
-  email String?
-  emailVerified Boolean
-  image String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  role UserRole @default(USER)
-  username String
+  id              String    @id @default(uuid())
+  name            String
+  email           String?
+  emailVerified   Boolean
+  image           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  role            UserRole  @default(USER)
+  username        String
   displayUsername String?
-  banned Boolean? @default(false) 
-  banReason String?
-  banExpires DateTime?
+  banned          Boolean?  @default(false)
+  banReason       String?
+  banExpires      DateTime?
 
   accounts Account[]
   sessions Session[]
@@ -44,38 +44,38 @@ model User {
 }
 
 model Session {
-  id String @id @default(uuid())
-  expiresAt DateTime
-  token String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
+  id             String   @id @default(uuid())
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
   impersonatedBy String?
 
   userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([token])
   @@map("session")
 }
 
 model Account {
-  id String @id @default(uuid())
-  accountId String
-  providerId String
-  accessToken String?
-  refreshToken String?
-  idToken String?
-  accessTokenExpiresAt DateTime?
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
-  scope String?
-  password String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("account")
 }
@@ -111,25 +111,28 @@ enum Position {
 }
 
 enum App {
-  KPI
+  BONUS
+  MERIT
 }
 
 model Employee {
-  id String @id @db.VarChar(10)
-  fullName String
-  email String? @unique
-  position String
-  division Division
-  level Position
-  rank Position
+  id         String   @id @db.VarChar(10)
+  fullName   String
+  email      String?  @unique
+  position   String
+  division   Division
+  level      Position
+  rank       Position
   department String
 
   user User?
-  kpiRecords KpiRecord[]
-  meritRecords MeritRecord[]
-  preparedApprovals Approval[] @relation("PreparedBy")
-  checkedApprovals Approval[] @relation("CheckedBy")
-  approvedApprovals Approval[] @relation("ApprovedBy")
+
+  kpiForms   KpiForm[]
+  meritForms MeritForm[]
+  comments   Comment[]
+  preparer   Task[]      @relation("preparer")
+  checker    Task[]      @relation("checker")
+  approver   Task[]      @relation("approver")
 
   @@map("employee")
 }
@@ -137,13 +140,6 @@ model Employee {
 enum Project {
   PROJECT
   IMPROVEMENT
-}
-
-enum Strategy {
-  POEPLE_CAPABILITY
-  POEPLE_CONTINUITY
-  POEPLE_EFFICIENCY
-  OTHER
 }
 
 enum Status {
@@ -154,176 +150,198 @@ enum Status {
   PENDING_APPROVER
   REJECTED_BY_APPROVER
   APPROVED
-  REVISION
 }
 
-model Kpi {
-  id String @id @default(cuid()) @unique
-  name String?
-  weight Int?
-  objective String? @db.Text
-  strategy Strategy?
+enum Period {
+  IN_DRAFT
+  EVALUATION_1ST
+  EVALUATION_2ND
+}
 
-  target100 String? @db.Text
-  target80 String? @db.Text
-  target90 String? @db.Text
-  target70 String? @db.Text
-  type Project?
-  definition String? @db.Text
-  method String? @db.Text
+model Comment {
+  id      String @id @default(uuid())
+  taskId  String
+  content String
+
+  createdBy String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  kpiRecordId String
-  kpiRecord KpiRecord @relation(fields: [kpiRecordId], references: [id], onDelete: Cascade)
-  kpiResults KpiResult[]
+  task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  employee Employee @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@map("comment")
+}
+
+model Task {
+  id     String @id @default(uuid())
+  type   App
+  status Status @default(NOT_STARTED)
+
+  preparedBy String
+  checkedBy  String?
+  approvedBy String
+
+  preparedAt DateTime  @default(now())
+  checkedAt  DateTime?
+  approvedAt DateTime?
+  updatedAt  DateTime  @updatedAt
+
+  preparer Employee  @relation("preparer", fields: [preparedBy], references: [id], onDelete: Cascade)
+  checker  Employee? @relation("checker", fields: [checkedBy], references: [id], onDelete: Cascade)
+  approver Employee  @relation("approver", fields: [approvedBy], references: [id], onDelete: Cascade)
+
+  kpiRecord   KpiRecord?
+  meritRecord MeritRecord?
+  comments    Comment[]
+
+  @@map("task")
+}
+
+model KpiRecord {
+  id        String   @id @default(uuid())
+  taskId    String   @unique
+  kpiFormId String
+  period    Period
+  createdAt DateTime @default(now())
+
+  task    Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  kpiForm KpiForm @relation(fields: [kpiFormId], references: [id], onDelete: Cascade)
+
+  @@map("kpiRecord")
+}
+
+model KpiForm {
+  id         String @id @default(uuid())
+  employeeId String
+
+  year        Int
+  isEvaluated Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  kpis       Kpi[]
+  kpiRecords KpiRecord[]
+
+  @@unique([year, isEvaluated, employeeId])
+  @@index([year, isEvaluated, employeeId])
+  @@map("kpiForm")
+}
+
+model KpiEvaluation {
+  id     String @id @default(uuid())
+  period Period
+
+  actual      String
+  achievement Int
+
+  kpiId String
+  kpi   Kpi    @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+
+  @@map("kpiEvaluation")
+}
+
+model Kpi {
+  id        String  @id @unique @default(cuid())
+  name      String?
+  weight    Int?
+  objective String? @db.Text
+  strategy  String?
+
+  target100  String?  @db.Text
+  target80   String?  @db.Text
+  target90   String?  @db.Text
+  target70   String?  @db.Text
+  type       Project?
+  definition String?  @db.Text
+  method     String?  @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kpiFormId String
+  kpiForm   KpiForm @relation(fields: [kpiFormId], references: [id], onDelete: Cascade)
+
+  kpiEvaluations KpiEvaluation[]
 
   @@map("kpis")
 }
 
-model KpiRecord {
-  id String @id @default(uuid())
-  employeeId String
-  year Int        
-  kpis Kpi[]
-  KpiEvaluations KpiEvaluation[]
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  merit MeritRecord?    
-  status Status @default(IN_DRAFT)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([employeeId, year]) 
-  @@map("kpiRecord")
-}
-
-model KpiResult {
-  id String @id @default(uuid())
-  kpiId String 
-  kpi Kpi @relation(fields: [kpiId], references: [id], onDelete: Cascade)
-  period Int
-  actual String
-  achievement Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("kpiResult")
-}
-
-model KpiEvaluation {
-  id String @id @default(uuid())
-  kpiRecordId String 
-  approvalId String @unique
-  period Int
-
-  kpiRecord KpiRecord @relation(fields: [kpiRecordId], references: [id], onDelete: Cascade)
-  approval Approval @relation(fields: [approvalId], references: [id], onDelete: Cascade)
-
-  @@unique([kpiRecordId, period])
-  @@map("kpiEvaluation")
-}
-
-model Approval {
-  id String @id @default(cuid())
-  app App
-  preparedBy String
-  checkedBy String?
-  approvedBy String
-
-  prepareComment String? @db.Text
-  approvComment String? @db.Text
-
-  preparedAt DateTime @default(now())
-  checkedAt DateTime?
-  approvedAt DateTime?
-
-  preparer Employee @relation("PreparedBy", fields: [preparedBy], references: [id], onDelete: Cascade)
-  checker Employee? @relation("CheckedBy", fields: [checkedBy], references: [id], onDelete: SetNull)
-  approver Employee @relation("ApprovedBy", fields: [approvedBy], references: [id], onDelete: Cascade)
-
-  kpiEvaluation KpiEvaluation?
-
-  @@map("approval")
-}
-
 model MeritRecord {
-  id String @id @default(uuid())
-  kpiRecordId String @unique
+  id          String   @id @default(uuid())
+  taskId      String   @unique
+  meritFormId String
+  period      Period
+  createdAt   DateTime @default(now())
+
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  meritForm MeritForm @relation(fields: [meritFormId], references: [id], onDelete: Cascade)
+
+  @@map("meritRecord")
+}
+
+model MeritForm {
+  id         String @id @default(uuid())
   employeeId String
-  year Int
 
-  kpiRecord KpiRecord @relation(fields: [kpiRecordId], references: [id]) 
+  year        Int
+  isEvaluated Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  meritEvaluations MeritEvaluation[]
-  competencyRecord CompetencyRecord?
-  cultureRecord CultureRecord?
-  
-  @@unique([employeeId, kpiRecordId, year])
-  @@map("meritRecords")
+
+  meritRecords   MeritRecord[]
+  cultureRecords CultureRecord[]
+  competencyRecords CompetencyRecord[]
+
+  @@unique([year, isEvaluated, employeeId])
+  @@index([year, isEvaluated, employeeId])
+  @@map("meritForm")
 }
 
-model MeritEvaluation {
+model CultureRecord {
   id String @id @default(uuid())
-  meritRecordId String
-  period Int 
-  remarksChecker String?
-  remarksApprover String?
-  preparedBy String
-  checkedBy String?
-  approvedBy String?
-  preparedAt DateTime @default(now())
-  checkedAt DateTime?
-  approvedAt DateTime?
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  meritRecord MeritRecord @relation(fields: [meritRecordId], references: [id], onDelete: Cascade)
-  
-  @@unique([meritRecordId, period])
-  @@map("meritEvaluations")
+  cultureId Int 
+  meritFormId String
+
+  meritForm MeritForm @relation(fields: [meritFormId], references: [id], onDelete: Cascade)
+  culture Culture  @relation(fields: [cultureId], references: [id], onDelete: Cascade)
+
+  cultureEvaluations CultureEvaluation[]
+
+  @@map("cultureRecord")
 }
 
-model CompetencyRecord {
-  id String @id @default(uuid())
-  createdAt DateTime @default(now())
-  meritRecordId String @unique
-  meritRecord MeritRecord @relation(fields: [meritRecordId], references: [id], onDelete: Cascade)
-  
-  competencyItem CompetencyItem[]
-  @@map("competencyRecords")
-}
+model CultureEvaluation {
+  id            String  @id @default(uuid())
+  cultureRecordId String 
+  period        Period
+  levelBehavior Int     @default(0)
+  evidence      String? @db.Text
 
-model CompetencyItem {
-  id String @id @default(cuid())
-  competencyId String?
-  competencyRecordId String
-  weight Int?
-  input String? @db.Text
-  output String? @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  competencyEvaluation CompetencyEvaluation[]
-  competencyRecord CompetencyRecord @relation(fields: [competencyRecordId], references: [id], onDelete: Cascade)
-  competency Competency? @relation(fields: [competencyId], references: [id])
-  
-  @@map("competencyItems")
+  cultureRecord CultureRecord @relation(fields: [cultureRecordId], references: [id], onDelete: Cascade)
+
+  @@map("cultureEvaluation")
 }
 
-model CompetencyEvaluation {
-  id String @id @default(uuid())
-  competencyItemId String
-  inputEvidence String?
-  outputEvidence String?
-  inputLevel Int
-  outputLevel Int
+model Culture {
+  id          Int    @id @default(autoincrement())
+  name        String @db.Text
+  code        String @db.VarChar(1)
+  description String @db.Text
+  belief      Json?
+
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  competencyItem CompetencyItem @relation(fields: [competencyItemId], references: [id], onDelete: Cascade)
-  @@map("competencyEvaluation")
+  cultureRecords CultureRecord[]
+
+  @@map("culture")
 }
 
 enum CompetencyType {
@@ -334,47 +352,53 @@ enum CompetencyType {
 }
 
 model Competency {
-  id String @id
-  name String
-  definition String
-  t5 String?
-  t4 String?
-  t3 String?
-  t2 String?
-  t1 String?
-  type CompetencyType
-  competency CompetencyItem[]
+  id                String             @id @default(cuid())
+  name              String
+  definition        String?
+  t5                String?
+  t4                String?
+  t3                String?
+  t2                String?
+  t1                String?
+  type              CompetencyType
+  competencyRecords CompetencyRecord[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("competency")
 }
 
-model CultureRecord {
-  id String @id @default(uuid())
-  period Int
-  meritRecordId String @unique
-  meritRecord MeritRecord @relation(fields: [meritRecordId], references: [id], onDelete: Cascade)
+model CompetencyRecord {
+  id               String  @id @default(uuid())
+  competencyId     String?
+  meritFormId      String
+  weight           Int?
+  input            String? @db.Text
+  output           String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cultureItems CultureItem[]
+  competency            Competency?  @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+  meritForm MeritForm @relation(fields: [meritFormId], references: [id], onDelete: Cascade)
+  competencyEvaluations CompetencyEvaluation[]
 
-  @@map("cultureRecord")
+  @@map("competencyRecord")
 }
 
-model CultureItem {
-  id String @id @default(cuid())
-  code String @db.VarChar(1)
-  levelBehavior Int @default(0)
-  evidence String? @db.Text
-
-  cultureRecordId String
-  cultureRecord CultureRecord @relation(fields: [cultureRecordId], references: [id], onDelete: Cascade)
+model CompetencyEvaluation {
+  id             String @id @default(uuid())
+  period         Period
+  inputEvidence  String @db.Text
+  outputEvidence String @db.Text
+  inputLevel     Int    @default(0)
+  outputLevel    Int    @default(0)
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  @@map("cultureItem")
+  competencyRecordId String
+  competencyRecord   CompetencyRecord @relation(fields: [competencyRecordId], references: [id], onDelete: Cascade)
+
+  @@map("competencyEvaluation")
 }

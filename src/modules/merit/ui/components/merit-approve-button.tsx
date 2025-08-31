@@ -11,7 +11,7 @@ interface Props {
   canElevate: boolean;
 }
 
-export const ApproveButton = ({ id, canElevate }: Props) => {
+export const MeritApproveButton = ({ id, canElevate }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -22,7 +22,7 @@ export const ApproveButton = ({ id, canElevate }: Props) => {
   });
   
   
-  const start = useMutation(trpc.kpiBonus.startEvaluation.mutationOptions());
+  const start = useMutation(trpc.kpiMerit.startEvaluation.mutationOptions());
   
   if (!canElevate || !id) return null;
 
@@ -32,8 +32,8 @@ export const ApproveButton = ({ id, canElevate }: Props) => {
     if (ok) {
       start.mutate({ id }, {
         onSuccess: () => {
-          queryClient.invalidateQueries(trpc.kpiBonus.getOne.queryOptions({ year }));
-          queryClient.invalidateQueries(trpc.kpiBonus.getInfo.queryOptions({ year }));
+          queryClient.invalidateQueries(trpc.kpiMerit.getOne.queryOptions({ year }));
+          queryClient.invalidateQueries(trpc.kpiMerit.getInfo.queryOptions({ year }));
         },
       });
     }
