@@ -1,6 +1,11 @@
 "use client";
 
 import { IconType } from "react-icons";
+import { MenuIcon } from "lucide-react";
+
+import { useSidebar } from "@/hooks/use-sidebar";
+
+import { Button } from "@/components/ui/button";
 
 import { Breadcrumbs } from "@/app/(main)/_components/breadcrumbs";
 
@@ -12,10 +17,17 @@ interface Props {
 }
 
 export const Header = ({ children, ...props }: Props) => {
+  const { isCollapsed, resetWidth } = useSidebar();
+
   return (
     <header className="max-w-screen z-100 bg-background">
       <div className="w-[calc(100%-0px)] max-w-screen h-11 relative">
         <div className="flex justify-between items-center overflow-hidden h-11 px-3">
+          {isCollapsed && (
+            <Button size="iconSm" variant="ghost" onClick={resetWidth}>
+              <MenuIcon className="size-5 text-primary" />
+            </Button>
+          )}
           <Breadcrumbs {...props} />
 
           <div className="grow shrink" />

@@ -98,7 +98,7 @@ export const createColumns = (
         {(displayValue) => (
           <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
             <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm font-medium text-primary">
-              {displayValue || row.original.name}
+              {displayValue}
             </div>
           </div>
         )}
@@ -370,4 +370,11 @@ export const createColumns = (
       variant: "text",
     },
   },
-]
+  {
+    accessorKey: "createdAt",
+    enableHiding: false,
+    meta: {
+      variant: "text"
+    }
+  },
+];

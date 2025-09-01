@@ -47,7 +47,7 @@ const UserRole = ({
   </div>
 );
 
-export const BonusInfo = ({ data }: Props) => {
+export const MeritInfo = ({ data }: Props) => {
   if (!data) return null;
 
   const roles = [
@@ -71,7 +71,7 @@ export const BonusInfo = ({ data }: Props) => {
   if (roles.length === 0) return null;
 
   return (
-    <div className="w-full max-w-full mx-auto ps-24 sticky start-0 pb-3 mb-3 -ms-1">
+    <div className="w-full max-w-full mx-auto sticky start-0 pb-3 mb-3 -ms-1">
       <div className="flex flex-row gap-2">
         <div className="grid [grid-template-columns:repeat(auto-fit,minmax(80px,max-content))] gap-y-2 gap-x-1 mt-2.5 max-w-full">
           {roles.map((role) => (

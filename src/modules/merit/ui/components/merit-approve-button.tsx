@@ -32,6 +32,7 @@ export const MeritApproveButton = ({ id, canElevate }: Props) => {
     if (ok) {
       start.mutate({ id }, {
         onSuccess: () => {
+          queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id }));
           queryClient.invalidateQueries(trpc.kpiMerit.getOne.queryOptions({ year }));
           queryClient.invalidateQueries(trpc.kpiMerit.getInfo.queryOptions({ year }));
         },
@@ -43,7 +44,7 @@ export const MeritApproveButton = ({ id, canElevate }: Props) => {
     <>
       <ConfirmDialog />
       <Button size="sm" onClick={onClick}>
-        Start Elevation
+        Start Workflow
       </Button>
     </>
   );

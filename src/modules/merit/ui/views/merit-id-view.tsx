@@ -12,8 +12,6 @@ import { STATUS_RECORD } from "@/types/kpi";
 import { useContainerWidth } from "@/hooks/use-container";
 import { GoProject } from "react-icons/go";
 import { Banner } from "@/components/banner";
-import { BullettedList } from "@/components/bulletted-list";
-import { BsBuildingsFill, BsFolderFill } from "react-icons/bs";
 import { MeritCompetencyView } from "./merit-competency-view";
 import { canPerform, Role } from "@/modules/bonus/permission";
 import { Status } from "@/generated/prisma";
@@ -22,6 +20,7 @@ import { Footer } from "@/components/footer";
 import { MeritApprovalConfirmation } from "../components/merit-approval-confirmation";
 import { Comment } from "@/components/comment";
 import { usePathname } from "next/navigation";
+import { MeritInfo } from "../components/merit-info";
 
 interface Props {
   id: string;
@@ -71,29 +70,17 @@ export const MeritIdView = ({ id }: Props) => {
                   description="Evaluate employee achievements and align merit increases with performance outcomes."
                   icon={GoProject}
                 />
-                <BullettedList
-                  scroll={{
-                    icon: BsFolderFill,
-                    label: "Competency",
-                  }}
-                  label="Skills and behaviors needed for effective performance."
-                />
-                <BullettedList
-                  scroll={{
-                    icon: BsBuildingsFill,
-                    label: "Culture",
-                  }}
-                  label="Shared values and ways of working in the organization."
-                />
+                <MeritInfo data={merit.data} />
                 <div className="w-full my-px h-[30px]" />
 
                 <MeritCompetencyView perform={perform} width={width} data={merit.data.competencies!} />
                 <div className="w-full my-px h-[30px]" />
                 <MeritCultureView width={width} data={merit.data.cultures!} />
               </div>
+              <div className="w-full my-px h-[30px]" />
+              <Comment comments={merit.data.comments} />
             </div>
           </div>
-          <Comment comments={merit.data.comments} />
 
           {perform && (
             <Footer>

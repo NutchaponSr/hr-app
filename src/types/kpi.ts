@@ -5,7 +5,8 @@ import {
   Culture, 
   CultureRecord, 
   Employee, 
-  Status 
+  Status, 
+  Task
 } from "@/generated/prisma";
 
 export type TargetPercent = "100" | "90" | "80" | "70";
@@ -16,6 +17,9 @@ export type KpiTargetMap = Record<TargetPercent, string | null>;
 
 export interface CultureRecordWithInfo extends CultureRecord {
   culture: Culture;
+  weight: number;
+  number: number;
+  order: number;
 }
 
 export interface CompetencyRecordWithInfo extends CompetencyRecord {
@@ -24,15 +28,11 @@ export interface CompetencyRecordWithInfo extends CompetencyRecord {
   order: number;
 }
 
-// export interface KpiEvalucationWithInfo extends KpiRecord {
-//   kpiEvaluations: (KpiEvaluation & {
-//     approval: Approval & {
-//       preparer: Employee;
-//       checker: Employee | null;
-//       approver: Employee;
-//     };
-//   })[];
-// }
+export interface KpiBonusWithInfo extends Task {
+  preparer: Employee;
+  checker: Employee | null;
+  approver: Employee;
+}
 
 export interface CommentWithOwner extends Comment {
   employee: Employee;

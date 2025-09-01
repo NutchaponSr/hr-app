@@ -89,7 +89,10 @@ export const bonusProcedure = createTRPCRouter({
                   include: {
                     employee: true,
                   }
-                }
+                },
+                preparer: true,
+                checker: true,
+                approver: true,
               }
             },
           }
@@ -155,6 +158,8 @@ export const bonusProcedure = createTRPCRouter({
             },
           },
           preparer: true,
+          checker: true,
+          approver: true,
         },
       });
 
@@ -290,6 +295,23 @@ export const bonusProcedure = createTRPCRouter({
 
       return res;
     }),
+  deleteBulk: protectedProcedure
+    .input(
+      z.object({
+        ids: z.array(z.string()),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const res = await prisma.kpi.deleteMany({
+        where: {
+          id: {
+            in: input.ids,
+          },
+        },
+      });
+
+      return res;
+    }),
   startEvaluation: protectedProcedure
     .input(
       z.object({
@@ -299,12 +321,22 @@ export const bonusProcedure = createTRPCRouter({
     .mutation(async ({ input }) => {
       // TODO: Validate weight
 
+      const task = await prisma.task.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (!task) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
       const res = await prisma.task.update({
         where: {
           id: input.id,
         },
         data: {
-          status: Status.PENDING_CHECKER,
+          status: task.checkedBy ? Status.PENDING_CHECKER : Status.PENDING_APPROVER,
         },
       });
 

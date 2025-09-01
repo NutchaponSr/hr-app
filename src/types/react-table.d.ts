@@ -10,4 +10,10 @@ declare module "@tanstack/react-table" {
     variant: InputVariants;
     calculateType?: CalculationType;
   }
+
+  interface ColumnSort {
+    desc: boolean;
+    id: string;
+    icon?: LucideIcon;
+  }
 }

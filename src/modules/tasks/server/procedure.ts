@@ -28,10 +28,6 @@ export const taskProcedure = createTRPCRouter({
                 },
                 {
                   status: Status.REJECTED_BY_CHECKER,
-                  checkedBy: ctx.user.employee.id,
-                },
-                {
-                  status: Status.REJECTED_BY_CHECKER,
                   preparedBy: ctx.user.employee.id,
                 },
                 {

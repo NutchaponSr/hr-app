@@ -4,7 +4,6 @@ import { SelectCompetencyPopover } from "./select-competency-popover";
 import { convertAmountFromUnit } from "@/lib/utils";
 import { CellInput } from "@/components/cell-input";
 import { InputVariants } from "@/types/inputs";
-import { SelectionBadge } from "@/components/selection-badge";
 import { CompetencyRecordWithInfo } from "@/types/kpi";
 
 export const createColumns = (perform: boolean):ColumnDef<CompetencyRecordWithInfo>[] => [
@@ -21,7 +20,6 @@ export const createColumns = (perform: boolean):ColumnDef<CompetencyRecordWithIn
       <SelectCompetencyPopover perform={perform} id={row.original.id}>
         <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2 min-h-9 items-start justify-start">
           <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start flex items-center gap-2">
-            <SelectionBadge label={String(row.original.number)} />
             <div className="leading-[1.5] whitespace-pre-wrap break-normal inline text-sm text-primary">
               {row.original.competency?.name}
             </div>
@@ -94,8 +92,8 @@ export const createColumns = (perform: boolean):ColumnDef<CompetencyRecordWithIn
         name="output"
       >
         {(value) => (
-          <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
-            <div className="leading-[1.5] whitespace-pre-wrap break-normal inline text-sm text-primary">
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
               {value}
             </div>
           </div>
@@ -122,8 +120,8 @@ export const createColumns = (perform: boolean):ColumnDef<CompetencyRecordWithIn
         name="weight"
       >
         {(value) => (
-          <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
-            <div className="leading-[1.5] whitespace-pre-wrap break-normal inline text-sm text-primary">
+          <div className="leading-[1.5] whitespace-pre-wrap break-all text-start">
+            <div className="leading-[1.5] whitespace-pre-wrap break-all inline text-sm text-primary">
               {value && Number(value).toLocaleString("en-US", {
                 maximumFractionDigits: 2,
                 minimumFractionDigits: 2,
@@ -138,5 +136,12 @@ export const createColumns = (perform: boolean):ColumnDef<CompetencyRecordWithIn
       variant: "numeric",
       calculateType: "sum",
     },
+  },
+  {
+    accessorKey: "createdAt",
+    enableHiding: true,
+    meta: {
+      variant: "text"
+    }
   },
 ]

@@ -27,6 +27,7 @@ import { SavingIndicator } from "@/components/saving-indicator";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Comment } from "@/components/comment";
 import { usePathname } from "next/navigation";
+import { BonusInfo } from "../components/bonus-info";
 
 interface Props {
   id: string;
@@ -63,7 +64,9 @@ export const BonusIdView = ({ id }: Props) => {
 
   const { table } = useTable({
     data: kpiBonus.data.kpiRecord?.kpiForm.kpis || [],
-    columns: createColumns(isScrolledX, perform),
+    columns: createColumns(isScrolledX, kpiBonus.data.status === "REJECTED_BY_CHECKER" ? revision : perform),
+    initialSorting: [{ id: "createdAt", desc: false }],
+    initialColumnVisibility: { createdAt: false },
   });
 
   useEffect(() => {
@@ -112,21 +115,16 @@ export const BonusIdView = ({ id }: Props) => {
                 message="This KPI record has been rejected by the Approver. Please review the feedback, make necessary corrections, and resubmit for approval."
               />
             )}
-            {(kpiBonus.data.status === Status.REJECTED_BY_CHECKER && perform) && (
-              <WarnningBanner
-                variant="warning"
-                message="Please review the employee's KPI bonus list before starting the evaluation."
-              />
-            )}
             <Banner
               title="KPI Bonus"
               description="Reward employees with performance-based bonuses tied to goals and business impact."
               icon={GoProject}
               className="ps-24"
             />
+            <BonusInfo data={kpiBonus.data} />
             <div className="contents">
               <Toolbar
-                perform={perform}
+                perform={kpiBonus.data.status === "REJECTED_BY_CHECKER" ? revision : perform}
                 table={table}
               />
               <section className="flex flex-col relative">
@@ -154,7 +152,7 @@ export const BonusIdView = ({ id }: Props) => {
                   </div>
                 </div>
               </section>
-              <Comment comments={kpiBonus.data.comments} />
+              <Comment comments={kpiBonus.data.comments} className="ps-24" />
 
               {perform && (
                 <Footer>
