@@ -69,6 +69,7 @@ export const SidebarProvider = ({ children }: Props) => {
     if (sidebarRef.current) {
       setIsCollapsed(false);
       setIsResetting(true);
+      setWidth(240);
 
       sidebarRef.current.style.width = isMobile ? "100%" : "240px";
 

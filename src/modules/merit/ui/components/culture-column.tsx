@@ -1,6 +1,4 @@
-import { CellInput } from "@/components/cell-input";
 import { convertAmountFromUnit } from "@/lib/utils";
-import { InputVariants } from "@/types/inputs";
 import { CultureRecordWithInfo } from "@/types/kpi";
 import { ColumnDef } from "@tanstack/react-table";
 
@@ -84,25 +82,32 @@ export const columns: ColumnDef<CultureRecordWithInfo>[] = [
       variant: "text"
     },
   },
-  // {
-  //   accessorKey: "weight",
-  //   header: "Weight",
-  //   cell: ({ row }) => (
-  //     <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2">
-  //       <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
-  //         <div className="leading-[1.5] whitespace-pre-wrap break-normal inline font text-sm text-primary">
-  //           {Number(convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
-  //             maximumFractionDigits: 2,
-  //             minimumFractionDigits: 2,
-  //           })}
-  //         </div>
-  //       </div>
-  //     </div>
-  //   ),
-  //   meta: {
-  //     width: "100px",
-  //     variant: "numeric",
-  //     calculateType: "sum",
-  //   },
-  // },
+  {
+    accessorKey: "weight",
+    header: "Weight",
+    cell: ({ row }) => (
+      <div role="button" className="select-none transition cursor-pointer relative block text-sm leading-[1.5] overflow-clip w-full whitespace-nowrap p-2">
+        <div className="leading-[1.5] whitespace-pre-wrap break-normal text-start">
+          <div className="leading-[1.5] whitespace-pre-wrap break-normal inline font text-sm text-primary">
+            {Number(convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+              maximumFractionDigits: 2,
+              minimumFractionDigits: 2,
+            })}
+          </div>
+        </div>
+      </div>
+    ),
+    meta: {
+      width: "100px",
+      variant: "numeric",
+      calculateType: "sum",
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    enableHiding: false,
+    meta: {
+      variant: "text"
+    }
+  },
 ]

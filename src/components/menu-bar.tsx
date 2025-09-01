@@ -4,10 +4,11 @@ import { Table } from "@tanstack/react-table";
 
 interface Props<T> {
   table: Table<T>;
+  perform: boolean;
   onDelete?: () => void;
 }
 
-export const MenuBar = <T,>({ table, onDelete }: Props<T>) => {
+export const MenuBar = <T,>({ table, perform, onDelete }: Props<T>) => {
   return (
     <div 
       data-select={(table.getIsAllRowsSelected() || table.getIsSomePageRowsSelected())}
@@ -18,9 +19,17 @@ export const MenuBar = <T,>({ table, onDelete }: Props<T>) => {
           <button className="transition whitespace-nowrap h-full flex text-sm items-center text-marine px-2.5 rounded-s shadow-[1.25px_0_0_rgba(55,53,47,0.09)] hover:bg-primary/6">
             1 Selected
           </button>
-          <button onClick={onDelete} className="transition whitespace-nowrap h-full flex text-sm items-center text-primary shadow-[1.25px_0_0_rgba(55,53,47,0.09)] hover:bg-primary/6 w-7 shrink-0 justify-center hover:text-destructive">
-            <BsTrash3 className="size-4 block shrink-0 stroke-[0.2]" />
-          </button>
+          {perform && (
+            <button 
+              onClick={() => {
+                onDelete?.();
+                table.setRowSelection({});
+              }} 
+              className="transition whitespace-nowrap h-full flex text-sm items-center text-primary shadow-[1.25px_0_0_rgba(55,53,47,0.09)] hover:bg-primary/6 w-7 shrink-0 justify-center hover:text-destructive"
+            >
+              <BsTrash3 className="size-4 block shrink-0 stroke-[0.2]" />
+            </button>
+          )}
           <button className="transition whitespace-nowrap h-full flex text-sm items-center rounded-e hover:bg-primary/6 w-7 shrink-0 justify-center text-primary">
             <MoreHorizontalIcon className="size-4 block shrink-0" />
           </button>

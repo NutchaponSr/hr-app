@@ -13,3 +13,8 @@ export interface TaskWithInfo {
     updatedAt: Date;
   };
 }
+
+export const tasks: Record<App, string> = {
+  [App.BONUS]: "Bonus",
+  [App.MERIT]: "Merit",
+}

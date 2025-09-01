@@ -18,6 +18,8 @@ export const MeritCompetencyView = ({ width, perform, data }: Props) => {
   const { table } = useTable({
     data,
     columns: createColumns(perform),
+    initialSorting: [{ id: "createdAt", desc: false }],
+    initialColumnVisibility: { createdAt: false },
   });
 
   return (

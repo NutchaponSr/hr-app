@@ -51,7 +51,7 @@ export const BonusApprovalConfirmation = ({ id }: Props) => {
             onClick={() => handleConfirmation(true)}
             disabled={isLoading}
           >
-            {isLoading ? "Processing..." : "Approve"}
+            Approve
           </Button>
           <Button
             variant="secondary"
@@ -59,7 +59,7 @@ export const BonusApprovalConfirmation = ({ id }: Props) => {
             onClick={() => handleConfirmation(false)}
             disabled={isLoading}
           >
-            {isLoading ? "Processing..." : "Decline"}
+            Decline
           </Button>
         </div>
 

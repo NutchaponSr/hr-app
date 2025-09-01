@@ -14,9 +14,11 @@ interface Props {
 }
 
 export const MeritCultureView = ({ width, data }: Props) => {
-  const t = useTable({
+  const { table } = useTable({
     data,
     columns,
+    initialSorting: [{ id: "createdAt", desc: false }],
+    initialColumnVisibility: { createdAt: false },
   });
 
   return (
@@ -35,7 +37,7 @@ export const MeritCultureView = ({ width, data }: Props) => {
               <div className="relative float-start min-w-full select-none pb-4 px-24">
                 <LayoutProvider
                   perform
-                  table={t.table}
+                  table={table}
                   variant="table"
                 />
               </div>

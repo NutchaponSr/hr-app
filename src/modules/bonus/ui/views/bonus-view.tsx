@@ -1,5 +1,7 @@
 "use client";
 
+import toast from "react-hot-toast";
+
 import { GoProject } from "react-icons/go";
 import { useRef, useEffect, useState } from "react";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -10,6 +12,7 @@ import {
   useSuspenseQuery
 } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import { Status } from "@/generated/prisma";
 import { STATUS_RECORD } from "@/types/kpi";
@@ -27,18 +30,17 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Banner } from "@/components/banner";
 import { Header } from "@/components/header";
 import { Toolbar } from "@/components/toolbar";
+import { Comment } from "@/components/comment";
 import { StatusBadge } from "@/components/status-badge";
+import { WarnningBanner } from "@/components/warnning-banner";
 import { SavingIndicator } from "@/components/saving-indicator";
 
+import { BonusInfo } from "@/modules/bonus/ui/components/bonus-info";
 import { createColumns } from "@/modules/bonus/ui/components/bonus-columns";
 import { ApproveButton } from "@/modules/bonus/ui/components/bonus-approve-button";
 
 import { canPerform, Role } from "@/modules/bonus/permission";
 
-import { WarnningBanner } from "@/components/warnning-banner";
-import { Comment } from "@/components/comment";
-import toast from "react-hot-toast";
-import { usePathname } from "next/navigation";
 
 interface Props {
   year: number;
@@ -67,6 +69,7 @@ export const BonusView = ({
 
   const createKpi = useMutation(trpc.kpiBonus.createKpi.mutationOptions());
   const createForm = useMutation(trpc.kpiBonus.createForm.mutationOptions());
+  const deleteKpis = useMutation(trpc.kpiBonus.deleteBulk.mutationOptions());
 
   const status = STATUS_RECORD[kpiBonus.data?.task.status || Status.NOT_STARTED];
   const perform = canPerform(
@@ -78,6 +81,8 @@ export const BonusView = ({
   const { table } = useTable({
     data: kpiBonus.data?.kpiForm.kpis || [],
     columns: createColumns(isScrolledX, perform),
+    initialSorting: [{ id: "createdAt", desc: false }],
+    initialColumnVisibility: { createdAt: false },
   });
 
   const onCreate = () => {
@@ -114,7 +119,7 @@ export const BonusView = ({
   return (
     <>
       <Header paths={paths}>
-        {kpiBonus.data?.kpiForm && (
+        {kpiBonus.data?.kpiForm?.updatedAt && (
           <SavingIndicator label={`Edited ${formatDistanceToNowStrict(kpiBonus.data.kpiForm.updatedAt, { addSuffix: true })}`} />
         )}
         <StatusBadge {...status} />
@@ -125,7 +130,7 @@ export const BonusView = ({
       </Header>
       <main className="flex flex-col grow-0 shrink bg-background z-1 h-[calc(-44px+100vh)] max-h-full relative">
         <div className="contents">
-          {(kpiBonus.data?.task.status === Status.REJECTED_BY_CHECKER) && (
+          {(kpiBonus.data?.task?.status === Status.REJECTED_BY_CHECKER) && (
             <WarnningBanner
               message="This KPI record has been rejected by the Checker. Please review the feedback, make necessary corrections, and resubmit for approval."
               variant="danger"
@@ -138,6 +143,9 @@ export const BonusView = ({
               icon={GoProject}
               className="ps-24"
             />
+            {kpiBonus.data?.task && (
+              <BonusInfo data={kpiBonus.data.task} />
+            )}
             <Tabs defaultValue={String(year)} className="contents">
               <Toolbar
                 perform={perform}
@@ -147,8 +155,20 @@ export const BonusView = ({
                   value: year.toString(),
                   onChange: () => setYear(year),
                 }))}
-                // TODO: Delete bulk
-                onDelete={() => {}}
+                onDelete={() => {
+                  const ids = table.getSelectedRowModel().rows.map((row) => row.original.id);
+
+                  deleteKpis.mutate({ ids }, {
+                    onSuccess: () => {
+                      queryClient.invalidateQueries(
+                        trpc.kpiBonus.getInfo.queryOptions({ year }),
+                      );
+                    },
+                    onError: (error) => {
+                      toast.error(error.message);
+                    },
+                  })
+                }}
               />
               <TabsContent value={String(year)}>
                 <div className="grow shrink-0 flex flex-col relative">
@@ -193,7 +213,7 @@ export const BonusView = ({
                 </div>
               </TabsContent>
               {kpiBonus.data?.task && (
-                <Comment comments={kpiBonus.data.task.comments} />
+                <Comment comments={kpiBonus.data.task.comments} className="ps-24" />
               )}
             </Tabs>
           </div>

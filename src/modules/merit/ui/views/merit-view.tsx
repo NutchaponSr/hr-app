@@ -24,6 +24,8 @@ import { STATUS_RECORD } from "@/types/kpi";
 import { Status } from "@/generated/prisma";
 import { MeritApproveButton } from "../components/merit-approve-button";
 import { canPerform, Role } from "@/modules/bonus/permission";
+import { MeritInfo } from "../components/merit-info";
+import { Comment } from "@/components/comment";
 
 interface Props {
   year: number;
@@ -93,7 +95,7 @@ export const MeritView = ({ year }: Props) => {
 
                 {(merit.data.competencies && merit.data.cultures && merit.data) ? (
                   <>
-                    <BullettedList
+                    {/* <BullettedList
                       scroll={{
                         icon: BsFolderFill,
                         label: "Competency",
@@ -106,7 +108,8 @@ export const MeritView = ({ year }: Props) => {
                         label: "Culture",
                       }}
                       label="Shared values and ways of working in the organization."
-                    />
+                    /> */}
+                    {merit.data?.task && <MeritInfo data={merit.data.task} />}
                     <div className="w-full my-px h-[30px]" />
                     <div className="flex items-center h-10 start-24 w-full">
                       <div role="tablist" className="flex items-center h-full grow-10 overflow-hidden -ms-1">
@@ -168,6 +171,10 @@ export const MeritView = ({ year }: Props) => {
                   </div>
                 )}
               </div>
+              <div className="w-full my-px h-[30px]" />
+              {merit.data.task?.comments && (
+                <Comment comments={merit.data.task.comments} />
+              )}
             </div>
           </div>
         </div>

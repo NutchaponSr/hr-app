@@ -92,7 +92,6 @@ export const MeritScreen = ({ year }: Props) => {
                     : period === Period.IN_DRAFT) // ถ้ายังไม่ evaluated → ให้เฉพาะ draft
                 : period === Period.IN_DRAFT; // fallback → แสดงแค่ draft
 
-
             return (
               <Stepper
                 key={task.id}

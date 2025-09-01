@@ -94,6 +94,9 @@ export const meritProcedure = createTRPCRouter({
                     employee: true,
                   },
                 },
+                preparer: true,
+                checker: true,
+                approver: true,
               },
             },
           },
@@ -135,7 +138,19 @@ export const meritProcedure = createTRPCRouter({
             number: idx + 1,
             order: (idx + 1) * 100
           })),
-          cultures: record?.meritForm.cultureRecords,
+          cultures: record?.meritForm.cultureRecords.map((c, idx) => {
+            const cultureRecordsLength = record.meritForm.cultureRecords.length || 0;
+            const weight = cultureRecordsLength > 0
+              ? (30 / cultureRecordsLength) * 100
+              : 0;
+
+            return {
+              ...c,
+              number: idx + 1,
+              order: (idx + 1) * 100,
+              weight
+            };
+          }),
         },
         permission: {
           ctx: permissionContext,
@@ -186,6 +201,8 @@ export const meritProcedure = createTRPCRouter({
             },
           },
           preparer: true,
+          checker: true,
+          approver: true,
         },
       });
 
@@ -213,7 +230,19 @@ export const meritProcedure = createTRPCRouter({
             number: idx + 1,
             order: (idx + 1) * 100
           })),
-          cultures: res.meritRecord?.meritForm.cultureRecords,
+          cultures: res.meritRecord?.meritForm.cultureRecords.map((c, idx) => {
+            const cultureRecordsLength = res.meritRecord?.meritForm.cultureRecords.length || 0;
+            const weight = cultureRecordsLength > 0
+              ? (30 / cultureRecordsLength) * 100
+              : 0;
+
+            return {
+              ...c,
+              number: idx + 1,
+              order: (idx + 1) * 100,
+              weight
+            };
+          }),
         },
         permission: {
           ctx: permissionContext,
@@ -340,12 +369,22 @@ export const meritProcedure = createTRPCRouter({
     .mutation(async ({ input }) => {
       // TODO: Validate weight
 
+      const task = await prisma.task.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (!task) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
       const res = await prisma.task.update({
         where: {
           id: input.id,
         },
         data: {
-          status: Status.PENDING_CHECKER,
+          status: task.checkedBy ? Status.PENDING_CHECKER : Status.PENDING_APPROVER,
         },
       });
 

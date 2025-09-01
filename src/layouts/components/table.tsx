@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { PlusIcon } from "lucide-react";
 import { flexRender, Table as TB } from "@tanstack/react-table";
 
 import { inputIcons } from "@/types/inputs";
+
 import { Calculation } from "@/components/calculation";
+import { Row } from "../ui/row";
 
 interface Props<T> {
   table: TB<T>;
@@ -17,6 +19,28 @@ export const Table = <T,>({
   perform,
   onCreate 
 }: Props<T>) => {
+  const [rowHeights, setRowHeights] = useState<Record<string, number>>({})
+
+  useEffect(() => {
+    const currentRowIds = new Set(table.getRowModel().rows.map((row) => row.id))
+
+    setRowHeights((prev) => {
+      const cleaned = Object.fromEntries(Object.entries(prev).filter(([rowId]) => currentRowIds.has(rowId)))
+
+      // Only update if there were stale entries
+      return Object.keys(cleaned).length !== Object.keys(prev).length ? cleaned : prev
+    })
+  }, [table.getRowModel().rows]);
+
+  const handleHeightChange = useCallback((rowId: string, h: number) => {
+    setRowHeights((prev) => {
+      if (prev[rowId] === h) return prev
+      return { ...prev, [rowId]: h }
+    })
+  }, [])
+
+  const totalHeight = table.getRowModel().rows.reduce((sum, r) => sum + (rowHeights[r.id] ?? 37), 0)
+
   return (
     <div className="relative mb-3">
       <div className="h-9 relative">
@@ -61,39 +85,24 @@ export const Table = <T,>({
         ))}
       </div>
       <div className="relative min-w-[calc(100%-192px)] isolation-auto">
-        {table.getRowModel().rows.map((row, indexRow) => (
-          <div
-            key={row.id}
-            data-index={indexRow}
-            className="flex h-[cal(100%+2px)] group/row"
-          >
-            <div className="flex w-full border-b-[1.25px] border-[#2a1c0012]">
-              <div className="flex">
-                {row.getVisibleCells().map((cell, indexCell) => (
-                  <React.Fragment key={indexCell}>
-                    {cell.column.id === "action" ? (
-                      flexRender(cell.column.columnDef.cell, cell.getContext())
-                    ) : (
-                      <div
-                        key={indexCell}
-                        style={{ width: cell.column.columnDef.meta?.width }}
-                        className="flex h-full relative first:border-e-0 border-e-[1.25px] border-[#2a1c0012]"
-                      >
-                        <div style={{ width: cell.column.columnDef.meta?.width }} className="flex overflow-x-clip h-full">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </div>
-                      </div>
-                    )}
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
-          </div>
-        ))}
+        <div style={{ height: `${totalHeight}px` }} className="w-full relative">
+          {table.getRowModel().rows.map((row, indexRow) => (
+            <Row 
+              key={indexRow}
+              row={row}
+              onHeightChange={(h) => handleHeightChange(row.id, h)}
+              offset={table
+                .getRowModel()
+                .rows.slice(0, indexRow)
+                .reduce((sum, r) => sum + (rowHeights[r.id] ?? 37), 0)
+              }
+            />
+          ))}
+        </div>
       </div>
       <div 
         data-create={perform && !!onCreate} 
-        className="data-[create=true]:flex hidden items-center h-9 w-full leading-5 sticky gap-1 start-24.5  border-b-[1.25px] border-border"
+        className="data-[create=true]:flex hidden items-center h-9 w-full leading-5 sticky gap-1 start-24.5 border-b-[1.25px] border-border"
       >
         <button onClick={onCreate} className="hover:bg-primary/6 transition inline-flex h-full w-full">
           <span className="text-sm text-foreground inline-flex items-center sticky start-24 px-2">
@@ -124,3 +133,4 @@ export const Table = <T,>({
     </div>
   );
 }
+

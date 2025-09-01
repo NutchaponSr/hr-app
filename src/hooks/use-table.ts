@@ -1,4 +1,12 @@
-import { ColumnDef, getCoreRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { 
+  ColumnDef, 
+  getCoreRowModel,
+  getSortedRowModel,
+  SortingState, 
+  useReactTable, 
+  VisibilityState 
+} from "@tanstack/react-table";
+import { useState } from "react";
 
 interface Props<T> {
   data: T[];
@@ -17,10 +25,20 @@ export const useTable = <T,>({
   initialColumnVisibility = {},
   initialSorting = [],
 }: Props<T>) => {
+  const [sorting, setSorting] = useState<SortingState>(initialSorting);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialColumnVisibility);
+
   const table = useReactTable({
     data,
     columns,
+    state: {
+      sorting,
+      columnVisibility,
+    },
+    getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    onColumnVisibilityChange: setColumnVisibility,
   });
 
   return { table };

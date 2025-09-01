@@ -1,7 +1,7 @@
 import { Status } from "@/generated/prisma";
 
 export type Role = "preparer" | "checker" | "approver";
-type Action = "read" | "write" | "submit" | "approve" | "reject" | "request_correction";
+export type Action = "read" | "write" | "submit" | "approve" | "reject" | "request_correction";
 
 const statusPermissions: Record<Status, Record<Role, Action[]>> = {
   [Status.NOT_STARTED]: {
@@ -18,7 +18,7 @@ const statusPermissions: Record<Status, Record<Role, Action[]>> = {
   
   [Status.PENDING_CHECKER]: {
     preparer: ["read"],
-    checker: ["read", "approve", "reject", "request_correction"],
+    checker: ["read", "approve", "reject"],
     approver: ["read"]
   },
   

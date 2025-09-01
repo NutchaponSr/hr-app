@@ -36,7 +36,7 @@ export const Toolbar = <T,>({ tabTriggers, onClick, perform, ...props }: Props<T
   return (
     <div className="min-h-9 shrink-0 z-86 start-0 sticky px-24">
       <div className="relative">
-        <MenuBar {...props} />
+        <MenuBar perform={perform} {...props} />
         <div className="flex items-center h-9 start-24 border-b-[1.25px] border-border">
           {!!tabTriggers && (
             <TabsList role="tablist" className="flex items-center h-full grow-10 overflow-hidden -ms-1">

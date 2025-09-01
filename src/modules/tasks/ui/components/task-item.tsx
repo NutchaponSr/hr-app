@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { TaskWithInfo } from "../../type";
+import { tasks, TaskWithInfo } from "../../type";
 import { GoProject } from "react-icons/go";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -56,7 +56,7 @@ export const TaskItem = ({ task }: Props) => {
               <GoProject className="size-4" />
             </div>
             <div className="leading-1 font-medium whitespace-nowrap underline underline-offset-2 decoration-primary/16">
-              {task.task.type}
+              {tasks[task.task.type]}
             </div>
           </div>
         </div>
