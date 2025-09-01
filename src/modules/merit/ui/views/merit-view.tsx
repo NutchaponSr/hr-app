@@ -60,7 +60,9 @@ export const MeritView = ({ year }: Props) => {
   return (
     <>
       <Header paths={paths}>
-        <SavingIndicator label={`Edited ${formatDistanceToNowStrict(merit.data.meritForm!.updatedAt, { addSuffix: true })}`} />
+        {merit.data.meritForm && (
+          <SavingIndicator label={`Edited ${formatDistanceToNowStrict(merit.data.meritForm.updatedAt, { addSuffix: true })}`} />
+        )}
         <StatusBadge {...status} />
         <MeritApproveButton id={merit.data.taskId} canElevate={perform} />
       </Header>

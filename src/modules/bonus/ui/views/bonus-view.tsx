@@ -114,7 +114,7 @@ export const BonusView = ({
   return (
     <>
       <Header paths={paths}>
-        {kpiBonus.data && (
+        {kpiBonus.data?.kpiForm && (
           <SavingIndicator label={`Edited ${formatDistanceToNowStrict(kpiBonus.data.kpiForm.updatedAt, { addSuffix: true })}`} />
         )}
         <StatusBadge {...status} />
@@ -170,6 +170,7 @@ export const BonusView = ({
                                 }
                               })
                             }}
+                            disabled={createForm.isPending}
                           >
                             <PlusIcon />
                             New KPI
