@@ -82,13 +82,13 @@ export const SavingIndicator = ({ label, autoResetDelay = 3000 }: Props) => {
   const text = config.text(label)
 
   return (
-    <div className="flex items-center gap-1 text-xs text-[#a8a49c] font-normal select-none whitespace-nowrap me-2 transition-opacity">
+    <div className="flex items-center gap-1 text-xs text-tertiary font-normal select-none whitespace-nowrap me-2 transition-opacity">
       {mounted && IconComponent && (
         <IconComponent className={`size-4 stroke-[0.2] ${"iconClass" in config ? config.iconClass : ""}`} />
       )}
       <span>{text}</span>
       {mounted && lastError && saveState === "error" && (
-        <span className="text-red-400 ml-1" title={lastError}>
+        <span className="text-destructive ml-1" title={lastError}>
           - {lastError.length > 20 ? `${lastError.slice(0, 20)}...` : lastError}
         </span>
       )}

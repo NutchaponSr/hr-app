@@ -45,7 +45,7 @@ export const Table = <T,>({
     <div className="relative mb-3">
       <div className="h-9 relative">
         {table.getHeaderGroups().map((headerGroup) => (
-          <div key={headerGroup.id} className="flex bg-background z-87 h-9 text-tertiary shadow-[-3px_0_0_rgba(255,255,255,1),inset_0_-1px_0_rgb(233,233,231)] min-w-[calc(100%-192px)] inset-x-0 relative box-border">
+          <div key={headerGroup.id} className="flex bg-background z-87 h-9 text-tertiary shadow-[-3px_0_0_rgba(255,255,255,1),inset_0_-1px_0_rgb(233,233,231)] dark:shadow-[3px_0_0_rgb(25,25,25),inset_0_-1px_0_rgb(47,47,47)] min-w-[calc(100%-192px)] inset-x-0 relative box-border">
             <div className="inline-flex m-0">
               {headerGroup.headers.map((header) => {
                 const variant = header.column.columnDef.meta?.variant

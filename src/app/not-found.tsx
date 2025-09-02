@@ -14,7 +14,7 @@ export default function NotFound() {
       <p className="text-tertiary text-sm">
         This link might be currupted or the page may have been removed.
       </p>
-      <Button variant="outline" size="lg" className="mt-4">
+      <Button variant="outline" size="lg" className="mt-4" asChild>
         <Link href="/">
           Go back
         </Link>

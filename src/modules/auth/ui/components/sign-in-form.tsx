@@ -65,7 +65,7 @@ export const SignInForm = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </Label>
-        <Button size="lg" disabled={isPending}>
+        <Button size="lg" variant="primary" disabled={isPending}>
           Continue
         </Button>
       </form>

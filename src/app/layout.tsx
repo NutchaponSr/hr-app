@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { TRPCReactProvider } from "@/trpc/client";
 
 import { SheetProvider } from "@/providers/sheet-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 
 import "./globals.css";
 
@@ -26,15 +27,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={cn(font.className, "antialiased")}>
-        <TRPCReactProvider>
-          <NuqsAdapter>
-            {children}
-            <SheetProvider />
-            <Toaster position="top-center" />
-          </NuqsAdapter>
-        </TRPCReactProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          storageKey="hr-app-theme"
+        >
+          <TRPCReactProvider>
+            <NuqsAdapter>
+              {children}
+              <SheetProvider />
+              <Toaster position="top-center" />
+            </NuqsAdapter>
+          </TRPCReactProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -13,22 +13,22 @@ import {
 import { IconType } from "react-icons";
 import { GoPersonFill } from "react-icons/go";
 import { LucideIcon, TrendingUpIcon } from "lucide-react";
-import { IoBarChartSharp, IoBriefcase, IoBuild } from "react-icons/io5";
 import { cva, VariantProps } from "class-variance-authority";
+import { IoBarChartSharp, IoBriefcase, IoBuild } from "react-icons/io5";
 
 export const appVariants = cva("", {
   variants: {
     border: {
-      danger: "border-[#fdd3cd]",
-      marine: "border-[#e6f1fa]",
-      warning: "border-[#ffe4af]",
-      sunset: "border-[#ffdec4]",
+      danger: "border-[#fdd3cd] dark:border-[#362422]",
+      marine: "border-[#e6f1fa] dark:border-[#2383e212]",
+      warning: "border-[#ffe4af] dark:border-[#98663026]",
+      sunset: "border-[#ffdec4] dark:border-[#d95f0d26]",
     },
     background: {
-      danger: "bg-[#fef3f1]",
-      marine: "bg-[#f2f9ff]",
-      warning: "bg-[#fff5e0]",
-      sunset: "bg-[#fff5ed]",
+      danger: "bg-[#fef3f1] dark:bg-[#de55581a]",
+      marine: "bg-[#f2f9ff] dark:bg-[#337ea914]",
+      warning: "bg-[#fff5e0] dark:bg-[#a269321a]",
+      sunset: "bg-[#fff5ed] dark:bg-[#d95f0d1a]",
     },
     icon: {
       danger: "text-[#cd3c3a]",

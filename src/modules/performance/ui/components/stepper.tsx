@@ -27,7 +27,7 @@ export const Stepper = ({
       </div>
       <div className="w-3/4 flex mb-3.5">
         <div className="flex w-full gap-1 overflow-hidden">
-          <div className="w-1 bg-[#54483114] rounded shrink-0" />
+          <div className="w-1 bg-[#54483114] dark:bg-[#2f2f2f] rounded shrink-0" />
           <div className="flex flex-col">
             <div className="flex flex-col flex-1 ps-2.5 overflow-hidden">
               <div className="flex flex-row items-center space-x-2">
@@ -35,7 +35,7 @@ export const Stepper = ({
                 <div 
                   data-has={!!status} 
                   className={cn(
-                    "data-[has=true]:block hidden self-center py-0.5 px-1 bg-purple-foreground text-purple uppercase text-[10px] tracking-wide font-semibold whitespace-nowrap w-fit rounded",
+                    "data-[has=true]:block hidden self-center py-0.5 px-1 bg-purple-foreground uppercase text-[10px] font-semibold whitespace-nowrap w-fit rounded tracking-wider",
                     colorVariant({ background: status?.variant, text: status?.variant })
                   )}
                 >

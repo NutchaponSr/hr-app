@@ -5,7 +5,10 @@ const nextConfig: NextConfig = {
   experimental: {
     browserDebugInfoInTerminal: true,
     devtoolSegmentExplorer: true,
-  }
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
 };
 
 export default nextConfig;

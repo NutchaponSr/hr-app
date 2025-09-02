@@ -99,7 +99,7 @@ export const MeritScreen = ({ year }: Props) => {
                   showAction && (<div className="mt-1.5 ps-2.5">
                     <Link
                       href="/performance/merit"
-                      className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] rounded text-xs"
+                      className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] rounded dark:bg-[#252525] dark:hover:bg-[#2f2f2f] text-xs"
                     >
                       {task.status === Status.NOT_STARTED && (
                         <PlusIcon className="size-4 stroke-[1.75] mr-1" />
