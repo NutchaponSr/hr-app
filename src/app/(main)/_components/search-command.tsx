@@ -129,7 +129,7 @@ export const SearchCommand = () => {
       ref={containerRef}
       onClick={handleContainerClick}
       className={cn(
-        "relative h-9 outline-none cursor-text transition-all duration-300 rounded flex items-center shadow-[0_0_0_1.25px_rgba(0,0,0,0.1),0_12px_32px_0_rgba(0,0,0,0.02)]",
+        "relative h-9 outline-none cursor-text transition-all duration-300 rounded flex items-center shadow-[0_0_0_1.25px_rgba(0,0,0,0.1),0_12px_32px_0_rgba(0,0,0,0.02)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.1)]",
         focused || value ? "w-96" : "w-72"
       )}
     >
@@ -142,7 +142,7 @@ export const SearchCommand = () => {
           onChange={handleChange}
           onFocus={() => setFocused(true)}
           onBlur={() => { if (!value) setFocused(false) }}
-          className="w-full border-none bg-none resize-none focus-visible:outline-none font-normal placeholder:text-foreground"
+          className="w-full text-primary border-none bg-none resize-none focus-visible:outline-none font-normal placeholder:text-foreground"
         />
       </div>
 

@@ -4,14 +4,14 @@ export const colorVariant = cva("",
   {
     variants: {
       text: {
-        default: "text-default-muted",
+        default: "text-gray-muted dark:text-gray-neutral",
         red: "text-red-muted",
-        orange: "text-orange-muted",
-        purple: "text-purple-muted",
+        orange: "text-orange-muted dark:text-orange-neutral",
+        purple: "text-purple-muted dark:text-purple-neutral",
         green: "text-green-muted",
       },
       background: {
-        default: "bg-default-foreground",
+        default: "bg-gray-foreground",
         red: "bg-red-foreground",
         orange: "bg-orange-foreground",
         purple: "bg-purple-foreground",
@@ -20,7 +20,7 @@ export const colorVariant = cva("",
         green: "bg-green-foreground",
       },
       dot: {
-        default: "bg-default",
+        default: "bg-gray",
         red: "bg-red",
         orange: "bg-orange",
         purple: "bg-purple",

@@ -31,7 +31,7 @@ export const Breadcrumbs = ({ paths, nameMap = {}, iconMap = {} }: Props) => {
         </Link>
       </Button>
       <span className="w-2 flex items-center justify-center m-0">
-        <HiSlash className="size-5 block shrink-0 text-[#d4d3cf]" />
+        <HiSlash className="size-5 block shrink-0 text-[#d4d3cf] dark:text-[#494846]" />
       </span>
       {paths.map((path, index) => {
         const href = "/" + paths.slice(0, index + 1).join("/");
@@ -49,7 +49,7 @@ export const Breadcrumbs = ({ paths, nameMap = {}, iconMap = {} }: Props) => {
             </Button>
             {index < paths.length - 1 && (
               <span className="w-2 flex items-center justify-center m-0">
-                <HiSlash className="size-5 block shrink-0 text-[#d4d3cf]" />
+                <HiSlash className="size-5 block shrink-0 text-[#d4d3cf] dark:text-[#494846]" />
               </span>
             )}
           </React.Fragment>

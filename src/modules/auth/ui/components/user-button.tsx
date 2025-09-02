@@ -42,7 +42,7 @@ export const UserButton = () => {
             e.stopPropagation()
             setOpen(!open)
           }}
-          className="transition flex items-center min-w-0 h-8 w-auto rounded hover:bg-black/3"
+          className="transition flex items-center min-w-0 h-8 w-auto rounded hover:bg-primary/6"
         >
           <div className="flex items-center w-full text-sm min-h-7 h-[30px] py-1 px-2 overflow-hidden">
             <div className="shrink-0 grow-0 rounded text-tertiary size-6 flex items-center justify-center mr-2">

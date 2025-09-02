@@ -18,19 +18,19 @@ const DEFAULT_STEPPERS = [
     date: "Jan - Mar",
     title: "KPI Definition",
     description: "Define measurable goals aligned with team and company priorities",
-    period: Period.IN_DRAFT, // 👈 กำหนด period ให้ fallback
+    period: Period.IN_DRAFT,
   },
   {
     date: "Jan - Jun",
     title: "Evaluation 1st",
     description: "Mid-year assessment of progress towards defined KPIs",
-    period: Period.EVALUATION_1ST, // สมมติว่ามี enum แบบนี้
+    period: Period.EVALUATION_1ST,
   },
   {
     date: "Jul - Dec",
     title: "Evaluation 2nd",
     description: "Final review of KPI performance and eligibility for bonus",
-    period: Period.EVALUATION_2ND, // สมมติว่ามี enum แบบนี้
+    period: Period.EVALUATION_2ND,
   },
 ];
 
@@ -103,7 +103,7 @@ export const BonusScreen = ({ year }: Props) => {
                   showAction && (<div className="mt-1.5 ps-2.5">
                     <Link
                       href="/performance/bonus"
-                      className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] rounded text-xs"
+                      className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs"
                     >
                       {task.status === Status.NOT_STARTED && (
                         <PlusIcon className="size-4 stroke-[1.75] mr-1" />

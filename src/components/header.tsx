@@ -7,6 +7,8 @@ import { useSidebar } from "@/hooks/use-sidebar";
 
 import { Button } from "@/components/ui/button";
 
+import { ModeToggle } from "@/components/toggle-mode";
+
 import { Breadcrumbs } from "@/app/(main)/_components/breadcrumbs";
 
 interface Props {
@@ -36,6 +38,8 @@ export const Header = ({ children, ...props }: Props) => {
               {children}
             </div>
           </div>
+
+          <ModeToggle /> 
         </div>
       </div>
     </header>

@@ -7,7 +7,7 @@ import { BsArrowRight } from "react-icons/bs";
 export const ReferenceSection = () => {
   return (
     <section className="grid grid-cols-2 gap-5 mb-3">
-      <Link href="/docs" className="grid col-span-1 select-none cursor-pointer w-full min-w-[300px] h-[300px] [grid-auto-columns:minmax(0px,1fr)] box-border rounded border-[1.25px] border-[#fdebec] hover:border-[#f4ab9f66] bg-[#f3887612] hover:bg-[#fdebec] transition group no-underline duration-150 ease-in-out">
+      <Link href="/docs" className="grid col-span-1 select-none cursor-pointer w-full min-w-[300px] h-[300px] [grid-auto-columns:minmax(0px,1fr)] box-border rounded border-[1.25px] border-[#fdebec] hover:border-[#f4ab9f66] bg-[#f3887612] hover:bg-[#fdebec] dark:bg-[#de555540] dark:border-[#ffffff08] dark:hover:bg-[#522e2a] transition group no-underline duration-150 ease-in-out">
         <div className="col-start-1 flex items-start flex-col p-7 gap-3">
           <div className="text-tertiary flex items-center gap-1.5">
             <ImBook className="text-[#f64932] size-3.5" />

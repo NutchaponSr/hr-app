@@ -19,7 +19,7 @@ export const Sidebar = () => {
     <aside 
       ref={sidebarRef}
       aria-label="Sidebar"
-      className="order-1 grow-0 shrink-0 relative z-111 bg-sidebar shadow-[inset_-1.25px_0_0_0_rgb(238,238,236)] w-60 hover:shadow-[inset_-2.5px_0_0_0_rgba(0,0,0,0.1)] group"
+      className="order-1 grow-0 shrink-0 relative z-111 bg-sidebar shadow-[inset_-1.25px_0_0_0_rgb(238,238,236)] w-60 hover:shadow-[inset_-2.5px_0_0_0_rgba(0,0,0,0.1)] dark:shadow-[inset_-1.25px_0_0_0_rgb(42,42,42)] dark:hover:shadow-[inset_-2.5px_0_0_0_rgba(255,255,255,0.1)] group"
     >
       <div className="h-full text-secondary font-medium">
         <div className="absolute top-0 bottom-0 flex flex-col w-0 overflow-visible z-9 [inset-inline-start:0px]">
@@ -41,11 +41,11 @@ export const Sidebar = () => {
                               <Link 
                                 key={item.href} 
                                 href={item.href} 
-                                className="flex transition hover:bg-black/3 rounded w-full"
+                                className="flex transition hover:bg-primary/6 rounded w-full"
                               >
-                                <div className="flex items-center text-sm min-h-7 h-[30px] px-2 py-1 rounded text-primary">
+                                <div className="flex items-center text-sm min-h-7 h-[30px] px-2 py-1 rounded text-secondary">
                                   <div className="flex items-center justify-center shrink-0 grow-0 w-6 h-4.5 mr-2 relative">
-                                    <IoTriangle className="size-3 text-[#0003] rotate-90" />
+                                    <IoTriangle className="size-3 text-[#0003] dark:text-muted rotate-90" />
                                   </div>
                                   <div className="flex-1 whitespace-nowrap min-w-0 overflow-hidden text-clip flex items-center">
                                     <div className="whitespace-nowrap overflow-hidden text-ellipsis font-medium">
