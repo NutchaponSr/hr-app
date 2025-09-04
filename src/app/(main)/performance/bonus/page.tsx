@@ -7,6 +7,7 @@ import { loadSearchParams } from "@/search-params";
 import { getQueryClient, trpc } from "@/trpc/server";
 
 import { BonusView } from "@/modules/bonus/ui/views/bonus-view";
+import { redirect } from 'next/navigation';
 
 interface Props {
   searchParams: Promise<SearchParams>;
@@ -17,11 +18,18 @@ const Page = async ({ searchParams }: Props) => {
 
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchQuery(
-    trpc.kpiBonus.getInfo.queryOptions({ 
-      year
-    }),
-  );
+  try {
+    await queryClient.prefetchQuery(
+      trpc.kpiBonus.getInfo.queryOptions({
+        year,
+      }),
+    );
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('UNAUTHORIZED')) {
+      redirect('/auth/sign-in?callbackUrl=/performance/bonus');
+    }
+    throw error;
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

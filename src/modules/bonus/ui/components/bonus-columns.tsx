@@ -3,14 +3,16 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { cn, convertAmountFromUnit } from "@/lib/utils";
 
+import { InputVariants } from "@/types/inputs";
 import { Kpi } from "@/generated/prisma";
 
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+
 import { CellInput } from "@/components/cell-input";
-import { InputVariants } from "@/types/inputs";
 import { SelectionBadge } from "@/components/selection-badge";
-import { projectTypes } from "../../constants";
+
+import { projectTypes } from "@/modules/bonus/constants";
 
 export const createColumns = (
   isScrolled: boolean,

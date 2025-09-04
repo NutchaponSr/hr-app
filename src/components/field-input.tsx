@@ -103,10 +103,10 @@ FieldInput.Select = function SelectInput({
     <>
       <div className="flex flex-col min-w-[180px] max-w-[calc(-24px+100vw)] h-full max-h-[70vh]">
         <div className="shrink-0 max-h-60 shadow-[inset_0_-1.25px_rgba(55,53,47,0.16)] overflow-y-auto overflow-x-hidden">
-          <div className="flex whitespace-nowrap items-start bg-[#f2f1ee99] overflow-auto text-sm min-h-7 p-1">
+          <div className="flex whitespace-nowrap items-start bg-[#f2f1ee99] dark:bg-white/3 overflow-auto text-sm min-h-7 p-1">
             <div className="flex flex-wrap grow py-1 px-2 gap-1.5">
               {value ? (
-                <SelectionBadge label={value} onClick={onClear} />
+                <SelectionBadge label={(options.find(o => o.key === value)?.label) ?? value} onClick={onClear} />
               ) : (
                 <input 
                   value={search}
@@ -132,13 +132,13 @@ FieldInput.Select = function SelectInput({
                 <div 
                   key={key}
                   role="option"
-                  aria-selected={value === label}
-                  onClick={() => onChange(label)}
+                  aria-selected={value === key}
+                  onClick={() => onChange(key)}
                   className="flex transition w-full hover:bg-primary/6 rounded cursor-pointer"
                 > 
                   <div className="flex items-center gap-2 px-2 text-sm min-h-7 w-full">
                     <div className="flex-1">
-                      <div className="inline-flex items-center shrink max-w-full min-w-0 h-5 rounded-xs px-1.5 leading-[120%] text-sm bg-gray-foreground text-gray-muted whitespace-nowrap overflow-hidden text-ellipsis">
+                      <div className="inline-flex items-center shrink max-w-full min-w-0 h-5 rounded-xs px-1.5 leading-[120%] text-sm bg-gray-foreground text-gray-muted dark:text-gray-neutral whitespace-nowrap overflow-hidden text-ellipsis">
                         <span className="whitespace-nowrap overflow-hidden text-ellipsis inline-flex items-center h-5 leading-5">
                           {label}
                         </span>

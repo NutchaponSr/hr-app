@@ -28,6 +28,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { Comment } from "@/components/comment";
 import { usePathname } from "next/navigation";
 import { BonusInfo } from "../components/bonus-info";
+import { useUploadStore } from "@/store/use-upload-modal-store";
 
 interface Props {
   id: string;
@@ -38,6 +39,8 @@ export const BonusIdView = ({ id }: Props) => {
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
+  const { openModal } = useUploadStore();
+
   const [isScrolledX, setIsScrolledX] = useState(false);
 
   const paths: string[] = pathname.split("/").filter(Boolean);
@@ -47,6 +50,7 @@ export const BonusIdView = ({ id }: Props) => {
   const { data: kpiBonus } = useSuspenseQuery(trpc.kpiBonus.getById.queryOptions({ id }));
 
   const create = useMutation(trpc.kpiBonus.createKpi.mutationOptions());
+  const deleteBulk = useMutation(trpc.kpiBonus.deleteBulk.mutationOptions());
 
   const status = STATUS_RECORD[kpiBonus.permission.ctx?.status || Status.NOT_STARTED];
 
@@ -126,6 +130,33 @@ export const BonusIdView = ({ id }: Props) => {
               <Toolbar
                 perform={kpiBonus.data.status === "REJECTED_BY_CHECKER" ? revision : perform}
                 table={table}
+                onClick={() => {
+                  create.mutate({ kpiFormId: kpiBonus.data.kpiRecord!.kpiFormId }, {
+                    onSuccess: () => {
+                      queryClient.invalidateQueries(
+                        trpc.kpiBonus.getById.queryOptions({ id }),
+                      );
+                    },
+                    onError: (error) => {
+                      toast.error(error.message);
+                    },
+                  })
+                }}
+                onDelete={() => {
+                  const ids = table.getSelectedRowModel().rows.map((row) => row.original.id);
+
+                  deleteBulk.mutate({ ids }, {
+                    onSuccess: () => {
+                      queryClient.invalidateQueries(
+                        trpc.kpiBonus.getById.queryOptions({ id }),
+                      );
+                    },
+                    onError: (error) => {
+                      toast.error(error.message);
+                    },
+                  })
+                }}
+                onUpload={() => openModal("kpi", kpiBonus.data.kpiRecord?.kpiFormId)}
               />
               <section className="flex flex-col relative">
                 <div className="h-full grow shrink-0">

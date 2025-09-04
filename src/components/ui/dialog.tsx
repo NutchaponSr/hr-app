@@ -60,7 +60,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-9999 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded p-4 duration-200 shadow-[0_14px_28px_-6px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06),0_0_0_1.25px_rgba(84,72,49,0.08)] dark:shadow-[0_0_0_1.25px_rgb(48,48,46),0_14px_28px_-6px_rgba(0,0,0,0.02),0_2px_4px_-1px_rgba(0,0,0,0.12)]",
+          "bg-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-9999 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded p-4 duration-200 shadow-[0_14px_28px_-6px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06),0_0_0_1px_rgba(84,72,49,0.08)] dark:shadow-[0_0_0_1px_rgb(48,48,46),0_14px_28px_-6px_rgba(0,0,0,0.02),0_2px_4px_-1px_rgba(0,0,0,0.12)] focus-visible:outline-none",
           className
         )}
         {...props}
@@ -129,6 +129,15 @@ function DialogDescription({
   )
 }
 
+function DialogHidden() {
+  return (
+    <DialogHeader className="sr-only">
+      <DialogTitle></DialogTitle>
+      <DialogDescription></DialogDescription>
+    </DialogHeader>
+  );
+}
+
 export {
   Dialog,
   DialogClose,
@@ -136,6 +145,7 @@ export {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogHidden,
   DialogOverlay,
   DialogPortal,
   DialogTitle,

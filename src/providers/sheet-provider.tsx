@@ -1,4 +1,5 @@
 "use client";
+import { ImportCsvModal } from "@/components/import-csv-modal";
 import { useEffect, useState } from "react";
 
 export const SheetProvider = () => {
@@ -12,6 +13,7 @@ export const SheetProvider = () => {
 
   return (
     <>
+      <ImportCsvModal />
     </>
   );
 }

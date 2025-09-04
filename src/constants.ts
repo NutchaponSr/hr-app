@@ -11,10 +11,12 @@ import {
   BsPersonSquare 
 } from "react-icons/bs";
 import { IconType } from "react-icons";
-import { GoPersonFill } from "react-icons/go";
+import { GoPersonFill, GoProject } from "react-icons/go";
 import { LucideIcon, TrendingUpIcon } from "lucide-react";
 import { cva, VariantProps } from "class-variance-authority";
 import { IoBarChartSharp, IoBriefcase, IoBuild } from "react-icons/io5";
+
+import { Database } from "@/types/upload";
 
 export const appVariants = cva("", {
   variants: {
@@ -168,3 +170,20 @@ export const prefixes = [
   "นางสาว",
   "นาง",
 ] as const;
+
+export const databases: Record<Database, {
+  title: string;
+  description: string;
+  icon: IconType;
+}> = {
+  kpi: {
+    title: "KPI Bonus",
+    description: "Reward employees with performance-based bonuses tied to goals and business impact.",
+    icon: GoProject,
+  },
+  // competency: {
+  //   title: "Competency",
+  //   description: "Skills and behaviors needed for effective performance.",
+  //   icon: BsFolderFill,
+  // },
+}

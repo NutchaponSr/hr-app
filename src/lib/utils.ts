@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 import { prefixes } from "@/constants";
+import { UploadStep } from "@/types/upload";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -62,4 +63,18 @@ export function findKeyByValue<T extends Record<string, string>>(
   if (!value) return null;
 
   return (Object.keys(record) as (keyof T)[]).find((key) => record[key] === value);
+}
+
+export function getStepMessage(step: UploadStep): string {
+  const messages: Record<UploadStep, string> = {
+    SELECT_FILE: "Select a file to upload",
+    PARSING: "Parsing file...",
+    PREVIEW: "Preview your data",
+    MAPPING: "Map columns to database fields",
+    IMPORTING: "Importing data...",
+    SUCCESS: "Import completed successfully!",
+    ERROR: "An error occurred",
+  };
+  
+  return messages[step];
 }

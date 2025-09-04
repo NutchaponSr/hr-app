@@ -15,14 +15,15 @@ interface Props<T> {
 }
 
 export const Table = <T,>({
-  table, 
+  table,
   perform,
-  onCreate 
+  onCreate
 }: Props<T>) => {
   const [rowHeights, setRowHeights] = useState<Record<string, number>>({})
 
   useEffect(() => {
-    const currentRowIds = new Set(table.getRowModel().rows.map((row) => row.id))
+    const rows = table.getRowModel().rows;
+    const currentRowIds = new Set(rows.map((row) => row.id))
 
     setRowHeights((prev) => {
       const cleaned = Object.fromEntries(Object.entries(prev).filter(([rowId]) => currentRowIds.has(rowId)))
@@ -30,7 +31,7 @@ export const Table = <T,>({
       // Only update if there were stale entries
       return Object.keys(cleaned).length !== Object.keys(prev).length ? cleaned : prev
     })
-  }, [table.getRowModel().rows]);
+  }, [table]);
 
   const handleHeightChange = useCallback((rowId: string, h: number) => {
     setRowHeights((prev) => {
@@ -55,13 +56,13 @@ export const Table = <T,>({
                   <div key={header.id} className="flex flex-row cursor-grab">
                     <div className="flex relative">
                       <div
-                        style={{ width: header.column.columnDef.meta?.width }} 
+                        style={{ width: header.column.columnDef.meta?.width }}
                         className="flex"
                       >
                         {header.id === "action" ? (
                           header.isPlaceholder
                             ? null
-                            : flexRender(header.column.columnDef.header,header.getContext())
+                            : flexRender(header.column.columnDef.header, header.getContext())
                         ) : (
                           <button className="transition select-none cursor-pointer flex items-center w-full h-full px-2 hover:bg-primary/4">
                             <div className="flex items-center leading-[120%] text-sm flex-1">
@@ -70,7 +71,7 @@ export const Table = <T,>({
                               </div>
                               {header.isPlaceholder
                                 ? null
-                                : flexRender(header.column.columnDef.header,header.getContext())
+                                : flexRender(header.column.columnDef.header, header.getContext())
                               }
                             </div>
                           </button>
@@ -87,7 +88,7 @@ export const Table = <T,>({
       <div className="relative min-w-[calc(100%-192px)] isolation-auto">
         <div style={{ height: `${totalHeight}px` }} className="w-full relative">
           {table.getRowModel().rows.map((row, indexRow) => (
-            <Row 
+            <Row
               key={indexRow}
               row={row}
               onHeightChange={(h) => handleHeightChange(row.id, h)}
@@ -100,15 +101,15 @@ export const Table = <T,>({
           ))}
         </div>
       </div>
-      <div 
-        data-create={perform && !!onCreate} 
+      <div
+        data-create={perform && !!onCreate}
         className="data-[create=true]:flex hidden items-center h-9 w-full leading-5 sticky gap-1 start-24.5 border-b-[1.25px] border-border"
       >
         <button onClick={onCreate} className="hover:bg-primary/6 transition inline-flex h-full w-full">
           <span className="text-sm text-foreground inline-flex items-center sticky start-24 px-2">
             <PlusIcon className="size-4 mr-1.5" />
             New
-          </span> 
+          </span>
         </button>
       </div>
       <div className="h-[50px]">
@@ -117,7 +118,7 @@ export const Table = <T,>({
             <div className="flex pe-8">
               <div className="flex">
                 {table.getVisibleFlatColumns().slice(1).map((col) => (
-                  <div 
+                  <div
                     key={col.id}
                     className="flex"
                     style={{ width: col.columnDef.meta?.width }}
