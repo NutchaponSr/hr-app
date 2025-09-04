@@ -6,20 +6,21 @@ import {
 import { Table } from "@tanstack/react-table";
 import { ChevronDownIcon } from "lucide-react";
 
+import { Database } from "@/types/upload";
+
 import { 
   TabsList, 
   TabsTrigger 
 } from "@/components/ui/tabs";
 import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 
 import { MenuBar } from "@/components/menu-bar";
+
 
 interface Props<T> {
   tabTriggers?: {
@@ -29,10 +30,17 @@ interface Props<T> {
   table: Table<T>;
   onClick?: () => void;
   onDelete?: () => void;
+  onUpload?: () => void;
   perform: boolean;
 } 
 
-export const Toolbar = <T,>({ tabTriggers, onClick, perform, ...props }: Props<T>) => {
+export const Toolbar = <T,>({ 
+  perform, 
+  tabTriggers,
+  onClick, 
+  onUpload,
+  ...props 
+}: Props<T>) => {
   return (
     <div className="min-h-9 shrink-0 z-86 start-0 sticky px-24">
       <div className="relative">
@@ -80,25 +88,25 @@ export const Toolbar = <T,>({ tabTriggers, onClick, perform, ...props }: Props<T
                 <button onClick={onClick} className="transition flex items-center justify-center whitespace-nowrap rounded-l px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted">
                   New
                 </button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                <Popover>
+                  <PopoverTrigger asChild>
                     <button className="transition flex items-center justify-center whitespace-nowrap rounded-r bg-marine shadow-[inset_1px_0_0_rgba(55,53,47,0.16)] text-white text-sm w-6 hover:bg-marine-muted focus-visible:outline-none">
                       <ChevronDownIcon className="size-4" />
                     </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-[260px]">
-                    <DropdownMenuLabel>Import</DropdownMenuLabel>
-                    <DropdownMenuItem className="h-auto">
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-[260px] p-1">
+                    <h3 className="text-sm data-[inset]:pl-8 select-none flex items-center min-h-7 ps-1 font-medium">Import</h3>
+                    <Button variant="ghost" className="h-auto px-2 w-full" onClick={onUpload}>
                       <div className="flex items-center justify-center min-w-5 min-h-5 self-start">
                         <BsFiletypeCsv className="!stroke-[0.15] size-5 mt-0.5" />
                       </div>
                       <div className="grow shrink basis-auto">
-                        <h5 className="whitespace-nowrap overflow-hidden text-ellipsis font-medium">CSV</h5>
-                        <p className="text-xs text-tertiary break-words">Upload and process a CSV file</p>
+                        <h5 className="whitespace-nowrap overflow-hidden text-ellipsis font-medium text-start">CSV</h5>
+                        <p className="text-xs text-tertiary break-words text-start">Upload and process a CSV file</p>
                       </div>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    </Button>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
           </div>

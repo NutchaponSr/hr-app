@@ -21,6 +21,7 @@ import { useYear } from "@/hooks/use-year";
 import { useTable } from "@/hooks/use-table";
 
 import { useTRPC } from "@/trpc/client";
+import { useUploadStore } from "@/store/use-upload-modal-store";
 
 import { LayoutProvider } from "@/layouts/layout-provider";
 
@@ -52,6 +53,8 @@ export const BonusView = ({
   const trpc = useTRPC();
   const pathname = usePathname();
   const queryClient = useQueryClient();
+
+  const { openModal } = useUploadStore();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -169,6 +172,7 @@ export const BonusView = ({
                     },
                   })
                 }}
+                onUpload={() => openModal("kpi", kpiBonus.data?.kpiFormId)}
               />
               <TabsContent value={String(year)}>
                 <div className="grow shrink-0 flex flex-col relative">

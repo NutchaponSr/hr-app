@@ -1,16 +1,16 @@
 import { z } from "zod";
 
 export const kpiBonusSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  weight: z.string().min(1, "Weight is required"),
-  objective: z.string().min(1, "Objective is required"),
-  definition: z.string().min(1, "Definition is required"),
-  strategy: z.enum(["POEPLE_CAPABILITY", "POEPLE_CONTINUITY", "POEPLE_EFFICIENCY", "OTHER"], "Link to Strategy is required"),
-  type: z.enum(["PROJECT", "IMPROVEMENT"], "Type is required"),
-  target100: z.string().min(1),
-  target90: z.string().min(1),
-  target80: z.string().min(1),
-  target70: z.string().min(1),
+  name: z.string().optional().nullable(),
+  weight: z.coerce.string().optional().nullable(),
+  objective: z.string().optional().nullable(),
+  definition: z.string().optional().nullable(),
+  strategy: z.string().optional().nullable(),
+  type: z.enum(["PROJECT", "IMPROVEMENT"]).optional().nullable(),
+  target100: z.string().optional().nullable(),
+  target90: z.string().optional().nullable(),
+  target80: z.string().optional().nullable(),
+  target70: z.string().optional().nullable(),
 });
 
 export type KpiBonusSchema = z.infer<typeof kpiBonusSchema>;

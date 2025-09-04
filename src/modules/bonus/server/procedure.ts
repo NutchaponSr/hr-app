@@ -10,10 +10,11 @@ import { readCSV } from "@/seeds/utils/csv";
 
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
-import { App, Period, Status } from "@/generated/prisma";
+import { App, Period, Status, Project } from "@/generated/prisma";
 
 import { projectTypes } from "../constants";
 import { getUserRole, PermissionContext } from "../permission";
+import { kpiBonusSchema } from "../schema";
 
 interface ApprovalCSVProps {
   order: string;
@@ -242,6 +243,64 @@ export const bonusProcedure = createTRPCRouter({
       });
 
       await prisma.kpiForm.update({
+        where: {
+          id: input.kpiFormId,
+        },
+        data: {
+          updatedAt: new Date(),
+        },
+      });
+
+      return res;
+    }),
+  createBulkKpi: protectedProcedure
+    .input(
+      z.object({
+        kpiFormId: z.string(),
+        kpis: z.array(kpiBonusSchema),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const toNullableString = (v: unknown): string | null => {
+        if (v === undefined || v === null) return null;
+        const s = String(v).trim();
+        return s === "" ? null : s;
+      };
+
+      const toNullableWeight = (v: unknown): number | null => {
+        if (v === undefined || v === null) return null;
+        const s = String(v).trim();
+        if (s === "") return null;
+        return convertAmountToUnit(Number(s), 2);
+      };
+
+      const toProjectEnum = (v: unknown): Project | null => {
+        if (v === undefined || v === null) return null;
+        const s = String(v).trim();
+        if (s === "") return null;
+        return s as Project;
+      };
+
+      const data = input.kpis.map((k) => ({
+        kpiFormId: input.kpiFormId,
+        name: toNullableString(k.name),
+        objective: toNullableString(k.objective),
+        definition: toNullableString(k.definition),
+        strategy: toNullableString(k.strategy),
+        method: null as string | null,
+        target100: toNullableString(k.target100),
+        target90: toNullableString(k.target90),
+        target80: toNullableString(k.target80),
+        target70: toNullableString(k.target70),
+        type: toProjectEnum(k.type),
+        weight: toNullableWeight(k.weight),
+      }));
+
+      await prisma.kpi.createMany({
+        data,
+      });
+
+      const res = await prisma.kpiForm.update({
         where: {
           id: input.kpiFormId,
         },

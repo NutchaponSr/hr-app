@@ -90,7 +90,7 @@ export const CellInput = <TFieldValues extends FieldValues, T extends SupportedM
 
   const getDisplayValue = useCallback((value: string) => {
     if (variant === "select" && options) {
-      const option = options.find(opt => opt.label === value);
+      const option = options.find(opt => opt.key === value) ?? options.find(opt => opt.label === value);
       return option?.label || value;
     }
 
