@@ -2,19 +2,19 @@ import { z } from "zod";
 
 import { ExcelData } from "@/types/upload";
 import { validateKpiCsv } from "@/modules/kpi/validation";
-import { kpiBonusSchema } from "@/modules/bonus/schema";
+import { kpiBonusCreateSchema } from "@/modules/bonus/schema";
 
 export const validateKpiRows = (rows: ExcelData) => {
   const base = validateKpiCsv(rows);
   const rowErrors: string[] = [];
-  const validRows: z.infer<typeof kpiBonusSchema>[] = [];
+  const validRows: z.infer<typeof kpiBonusCreateSchema>[] = [];
 
   if (!base.ok) {
     return { ok: false, errors: base.errors, warnings: base.warnings, validRows } as const;
   }
 
   rows.forEach((row, idx) => {
-    const parsed = kpiBonusSchema.safeParse(row);
+    const parsed = kpiBonusCreateSchema.safeParse(row);
     if (!parsed.success) {
       const issues = parsed.error.issues
         .map((i) => `${i.path.join(".") || "root"}: ${i.message}`)

@@ -37,16 +37,27 @@ export const Breadcrumbs = ({ paths, nameMap = {}, iconMap = {} }: Props) => {
         const href = "/" + paths.slice(0, index + 1).join("/");
         const displayText = nameMap[path] || (isUUID(path) ? "data" : path);
         const IconComponent = iconMap[path];
+        const isBonus = path === "bonus";
+        
         return (
           <React.Fragment key={index}>
-            <Button asChild size="xs" variant="ghost">
-              <Link href={href}>
+            {isBonus ? (
+              <div className="flex items-center gap-1.5 px-2 py-1 text-sm">
                 {IconComponent && <IconComponent className="size-4" />}
-                <span className="first-letter:uppercase">
+                <span className="first-letter:uppercase text-primary select-none">
                   {displayText}
                 </span>
-              </Link>
-            </Button>
+              </div>
+            ) : (
+              <Button asChild size="xs" variant="ghost">
+                <Link href={href} prefetch>
+                  {IconComponent && <IconComponent className="size-4" />}
+                  <span className="first-letter:uppercase">
+                    {displayText}
+                  </span>
+                </Link>
+              </Button>
+            )}
             {index < paths.length - 1 && (
               <span className="w-2 flex items-center justify-center m-0">
                 <HiSlash className="size-5 block shrink-0 text-[#d4d3cf] dark:text-[#494846]" />

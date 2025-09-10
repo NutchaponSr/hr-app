@@ -95,20 +95,6 @@ export const MeritView = ({ year }: Props) => {
 
                 {(merit.data.competencies && merit.data.cultures && merit.data) ? (
                   <>
-                    {/* <BullettedList
-                      scroll={{
-                        icon: BsFolderFill,
-                        label: "Competency",
-                      }}
-                      label="Skills and behaviors needed for effective performance."
-                    />
-                    <BullettedList
-                      scroll={{
-                        icon: BsBuildingsFill,
-                        label: "Culture",
-                      }}
-                      label="Shared values and ways of working in the organization."
-                    /> */}
                     {merit.data?.task && <MeritInfo data={merit.data.task} />}
                     <div className="w-full my-px h-[30px]" />
                     <div className="flex items-center h-10 start-24 w-full">
@@ -157,7 +143,6 @@ export const MeritView = ({ year }: Props) => {
                                 queryClient.invalidateQueries(trpc.kpiMerit.getInfo.queryOptions({ year }));
                               },
                               onError: (ctx) => {
-                                console.error(ctx.message);
                                 toast.error(ctx.message);
                               }
                             });

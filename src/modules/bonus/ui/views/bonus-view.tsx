@@ -1,134 +1,105 @@
 "use client";
 
-import toast from "react-hot-toast";
-
 import { GoProject } from "react-icons/go";
-import { useRef, useEffect, useState } from "react";
-import { formatDistanceToNowStrict } from "date-fns";
-
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery
-} from "@tanstack/react-query";
-import { PlusIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { BsTriangleFill } from "react-icons/bs";
+import { formatDistanceToNowStrict } from "date-fns";
+import { useSuspenseQuery } from "@tanstack/react-query";
+
+import { convertAmountFromUnit } from "@/lib/utils";
 
 import { Status } from "@/generated/prisma";
 import { STATUS_RECORD } from "@/types/kpi";
 
-import { useYear } from "@/hooks/use-year";
-import { useTable } from "@/hooks/use-table";
-
 import { useTRPC } from "@/trpc/client";
 import { useUploadStore } from "@/store/use-upload-modal-store";
 
-import { LayoutProvider } from "@/layouts/layout-provider";
-
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 
+import { Hint } from "@/components/hint";
 import { Banner } from "@/components/banner";
 import { Header } from "@/components/header";
 import { Toolbar } from "@/components/toolbar";
-import { Comment } from "@/components/comment";
 import { StatusBadge } from "@/components/status-badge";
 import { WarnningBanner } from "@/components/warnning-banner";
+import { SelectionBadge } from "@/components/selection-badge";
 import { SavingIndicator } from "@/components/saving-indicator";
 
+import { KpiCard } from "@/modules/bonus/ui/components/kpi-card";
 import { BonusInfo } from "@/modules/bonus/ui/components/bonus-info";
-import { createColumns } from "@/modules/bonus/ui/components/bonus-columns";
 import { ApproveButton } from "@/modules/bonus/ui/components/bonus-approve-button";
 
-import { canPerform, Role } from "@/modules/bonus/permission";
+import { useBonusModalStore } from "@/modules/bonus/store/use-bonus-modal-store";
 
+import { kpiCategoies } from "@/modules/bonus/constants";
+import { canPerform, Role } from "@/modules/bonus/permission";
+import { Footer } from "@/components/footer";
+import { BonusApprovalConfirmation } from "../components/bonus-approval-confirmation";
 
 interface Props {
-  year: number;
+  id: string;
 }
 
 export const BonusView = ({
-  year,
+  id,
 }: Props) => {
   const trpc = useTRPC();
   const pathname = usePathname();
-  const queryClient = useQueryClient();
 
   const { openModal } = useUploadStore();
-
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const { onOpen } = useBonusModalStore();
 
   const paths: string[] = pathname.split("/").filter(Boolean);
 
-  const [isScrolledX, setIsScrolledX] = useState(false);
+  const { data: kpiBonus } = useSuspenseQuery(trpc.kpiBonus.getById.queryOptions({ id }));
 
-  const { setYear } = useYear();
-
-  const { data: kpiBonus } = useSuspenseQuery(
-    trpc.kpiBonus.getInfo.queryOptions({
-      year,
-    }),
-  );
-
-  const createKpi = useMutation(trpc.kpiBonus.createKpi.mutationOptions());
-  const createForm = useMutation(trpc.kpiBonus.createForm.mutationOptions());
-  const deleteKpis = useMutation(trpc.kpiBonus.deleteBulk.mutationOptions());
-
-  const status = STATUS_RECORD[kpiBonus.data?.task.status || Status.NOT_STARTED];
+  const status = STATUS_RECORD[kpiBonus.data.task.status];
   const perform = canPerform(
     kpiBonus.permission.role as Role,
-    ["write"],
-    kpiBonus.permission.ctx?.status || Status.NOT_STARTED
+    ["approve", "reject"],
+    kpiBonus.permission.ctx?.status
   );
 
-  const { table } = useTable({
-    data: kpiBonus.data?.kpiForm.kpis || [],
-    columns: createColumns(isScrolledX, perform),
-    initialSorting: [{ id: "createdAt", desc: false }],
-    initialColumnVisibility: { createdAt: false },
-  });
+  const revision = canPerform(
+    kpiBonus.permission.role as Role,
+    ["submit"],
+    kpiBonus.permission.ctx?.status
+  );
+  const totalWeight = convertAmountFromUnit(kpiBonus.data.kpis.reduce((acc, kpi) => acc + kpi.weight, 0), 2);
 
-  const onCreate = () => {
-    const kpiFormId = kpiBonus.data?.kpiForm?.id;
-
-    if (!kpiFormId) {
-      toast.error("KPI Form not found");
-      return;
+  const groupedKpis = kpiBonus.data.kpis.reduce((acc, kpi) => {
+    const categoryKey = kpi.category;
+    const categoryName = categoryKey ? kpiCategoies[categoryKey] : 'Uncategorized';
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
     }
-
-    createKpi.mutate({ kpiFormId }, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(
-          trpc.kpiBonus.getInfo.queryOptions({ year }),
-        );
-      },
-    })
-  }
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (scrollRef.current) {
-        setIsScrolledX(scrollRef.current.scrollLeft > 96);
-      }
-    };
-
-    const element = scrollRef.current;
-    if (element) {
-      element.addEventListener("scroll", handleScroll);
-      return () => element.removeEventListener("scroll", handleScroll);
-    }
-  }, []);
+    acc[categoryName].push(kpi);
+    return acc;
+  }, {} as Record<string, typeof kpiBonus.data.kpis>);
 
   return (
     <>
-      <Header paths={paths}>
-        {kpiBonus.data?.kpiForm?.updatedAt && (
-          <SavingIndicator label={`Edited ${formatDistanceToNowStrict(kpiBonus.data.kpiForm.updatedAt, { addSuffix: true })}`} />
+      <Header paths={paths}
+        nameMap={{
+          [id]: String(kpiBonus.data.year)
+        }}
+        iconMap={{
+          [id]: GoProject
+        }}>
+        {kpiBonus.data.updatedAt && (
+          <SavingIndicator label={`Edited ${formatDistanceToNowStrict(kpiBonus.data.updatedAt, { addSuffix: true })}`} />
         )}
         <StatusBadge {...status} />
         <ApproveButton
-          id={kpiBonus.data?.taskId}
-          canElevate={perform}
+          canElevate={perform || revision}
+          taskId={kpiBonus.data.taskId}
         />
       </Header>
       <main className="flex flex-col grow-0 shrink bg-background z-1 h-[calc(-44px+100vh)] max-h-full relative">
@@ -139,7 +110,7 @@ export const BonusView = ({
               variant="danger"
             />
           )}
-          <div ref={scrollRef} className="flex flex-col grow relative overflow-auto me-0 mb-0">
+          <div className="flex flex-col grow relative overflow-auto me-0 mb-0">
             <Banner
               title="KPI Bonus"
               description="Reward employees with performance-based bonuses tied to goals and business impact."
@@ -149,77 +120,76 @@ export const BonusView = ({
             {kpiBonus.data?.task && (
               <BonusInfo data={kpiBonus.data.task} />
             )}
-            <Tabs defaultValue={String(year)} className="contents">
-              <Toolbar
-                perform={perform}
-                table={table}
-                onClick={onCreate}
-                tabTriggers={kpiBonus.years.map((year) => ({
-                  value: year.toString(),
-                  onChange: () => setYear(year),
-                }))}
-                onDelete={() => {
-                  const ids = table.getSelectedRowModel().rows.map((row) => row.original.id);
-
-                  deleteKpis.mutate({ ids }, {
-                    onSuccess: () => {
-                      queryClient.invalidateQueries(
-                        trpc.kpiBonus.getInfo.queryOptions({ year }),
-                      );
-                    },
-                    onError: (error) => {
-                      toast.error(error.message);
-                    },
-                  })
-                }}
-                onUpload={() => openModal("kpi", kpiBonus.data?.kpiFormId)}
-              />
-              <TabsContent value={String(year)}>
-                <div className="grow shrink-0 flex flex-col relative">
-                  <div className="h-full grow shrink-0">
-                    {!kpiBonus.data ? (
-                      <div className="text-primary text-xs relative float-left min-w-full select-none pb-[180px] px-24">
-                        <div className="flex flex-wrap items-center justify-center gap-3 sticky start-24 h-36 -mx-24">
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              createForm.mutate({ year }, {
-                                onSuccess: () => {
-                                  queryClient.invalidateQueries(
-                                    trpc.kpiBonus.getInfo.queryOptions({ year }),
-                                  );
-                                },
-                                onError: (ctx) => {
-                                  toast.error(ctx.message);
-                                }
-                              })
-                            }}
-                            disabled={createForm.isPending}
-                          >
-                            <PlusIcon />
-                            New KPI
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="relative float-left min-w-full select-none px-24">
-                        <div className="relative">
-                          <LayoutProvider
-                            perform={perform}
-                            table={table}
-                            variant="table"
-                            onCreate={onCreate}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
+            <Toolbar
+              perform={perform || revision}
+              onCreate={() => onOpen("create")}
+              onUpload={() => openModal("kpi", kpiBonus.data.id)}
+              context={
+                <div className="flex flex-row items-center gap-x-2 gap-y-1.5">
+                  <SelectionBadge label="Weight" />
+                  <span className="text-sm text-primary">
+                    {totalWeight.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      minimumFractionDigits: 2,
+                    })}
+                  </span>
+                  <Hint label={`${totalWeight} / 100`}>
+                    <Progress
+                      className="h-1 w-40"
+                      value={totalWeight}
+                    />
+                  </Hint>
                 </div>
-              </TabsContent>
-              {kpiBonus.data?.task && (
-                <Comment comments={kpiBonus.data.task.comments} className="ps-24" />
-              )}
-            </Tabs>
+              }
+            />
+            <div className="grow shrink-0 flex flex-col relative z-85">
+              <div className="px-24 pb-[180px] pt-3">
+                <div className="flex flex-col gap-4 mx-auto ps-0 max-w-3xl">
+                  <Accordion
+                    type="multiple"
+                    className="h-full relative"
+                    defaultValue={Object.keys(groupedKpis)}
+                  >
+                    {Object.entries(groupedKpis).map(([categoryName, kpis], index) => (
+                      <AccordionItem key={index} value={categoryName}>
+                        <div className="h-[42px] z-87 relative text-sm">
+                          <div className="flex items-center h-full pt-0 mb-2">
+                            <div className="flex items-center h-full overflow-hidden gap-1">
+                              <AccordionTrigger asChild>
+                                <Button variant="ghost" size="iconXs" className="group">
+                                  <BsTriangleFill className="text-primary rotate-90 size-3 transition-transform group-data-[state=open]:rotate-180" />
+                                </Button>
+                              </AccordionTrigger>
+                              <SelectionBadge label={categoryName} />
+                              <Hint label="Count all" side="top" align="center">
+                                <Button variant="ghost" size="xs" className="text-foreground">
+                                  {kpis.length}
+                                </Button>
+                              </Hint>
+                            </div>
+                          </div>
+                        </div>
+                        <AccordionContent className="relative mb-3 flex flex-col gap-8">
+                          {kpis.map((kpi, idx) => (
+                            <KpiCard
+                              key={idx}
+                              kpi={kpi}
+                              canPerform={perform || revision}
+                            />
+                          ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+              </div>
+            </div>
+
+            {perform && (
+              <Footer>
+                <BonusApprovalConfirmation taskId={kpiBonus.data.taskId} />
+              </Footer>
+            )}
           </div>
         </div>
       </main>

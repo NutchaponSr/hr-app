@@ -1,16 +1,19 @@
 import { z } from "zod";
 
-export const kpiBonusSchema = z.object({
-  name: z.string().optional().nullable(),
-  weight: z.coerce.string().optional().nullable(),
-  objective: z.string().optional().nullable(),
-  definition: z.string().optional().nullable(),
-  strategy: z.string().optional().nullable(),
-  type: z.enum(["PROJECT", "IMPROVEMENT"]).optional().nullable(),
-  target100: z.string().optional().nullable(),
-  target90: z.string().optional().nullable(),
-  target80: z.string().optional().nullable(),
-  target70: z.string().optional().nullable(),
+import { KpiCategory } from "@/generated/prisma";
+
+export const kpiBonusCreateSchema = z.object({
+  name: z.string(),
+  weight: z.coerce.string(),
+  category: z.enum(KpiCategory),
+  objective: z.string(),
+  definition: z.string(),
+  strategy: z.string(),
+  type: z.enum(["PROJECT", "IMPROVEMENT"]),
+  target100: z.string(),
+  target90: z.string(),
+  target80: z.string(),
+  target70: z.string(),
 });
 
-export type KpiBonusSchema = z.infer<typeof kpiBonusSchema>;
+export type KpiBonusCreateSchema = z.infer<typeof kpiBonusCreateSchema>;

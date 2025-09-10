@@ -1,14 +1,14 @@
-import { 
+import {
   BsArrowUpSquareFill,
-  BsBuildingFill, 
-  BsCalendar2DateFill, 
-  BsCashCoin, 
-  BsEasel2Fill, 
-  BsFileEarmarkTextFill, 
-  BsFillInboxFill, 
-  BsFillPersonPlusFill, 
-  BsFolderFill, 
-  BsPersonSquare 
+  BsBuildingFill,
+  BsCalendar2DateFill,
+  BsCashCoin,
+  BsEasel2Fill,
+  BsFileEarmarkTextFill,
+  BsFillInboxFill,
+  BsFillPersonPlusFill,
+  BsFolderFill,
+  BsPersonSquare
 } from "react-icons/bs";
 import { IconType } from "react-icons";
 import { GoPersonFill, GoProject } from "react-icons/go";
@@ -39,7 +39,7 @@ export const appVariants = cva("", {
       sunset: "text-[#d95f0d]",
     }
   }
-}); 
+});
 interface AppCategory extends VariantProps<typeof appVariants> {
   title: string;
   items: {
@@ -92,13 +92,13 @@ export const APP_CATEGORIES: AppCategory[] = [
         title: "HR Documents",
         href: "/hr-documents",
         description: "Access and manage important HR documents and policies",
-        icon: BsFileEarmarkTextFill, 
+        icon: BsFileEarmarkTextFill,
       },
     ],
     border: "marine",
     background: "marine",
     icon: "marine",
-    categoryIcon: GoPersonFill 
+    categoryIcon: GoPersonFill
   },
   {
     title: "Compensation & Benefits",
@@ -140,7 +140,7 @@ export const APP_CATEGORIES: AppCategory[] = [
     border: "sunset",
     background: "sunset",
     icon: "sunset",
-    categoryIcon: BsBuildingFill 
+    categoryIcon: BsBuildingFill
   },
   {
     title: "Tools & Planning",
@@ -161,7 +161,7 @@ export const APP_CATEGORIES: AppCategory[] = [
     border: "warning",
     background: "warning",
     icon: "warning",
-    categoryIcon: IoBuild 
+    categoryIcon: IoBuild
   }
 ];
 
@@ -170,6 +170,76 @@ export const prefixes = [
   "นางสาว",
   "นาง",
 ] as const;
+
+// Apps record for easy access
+export const APPS = {
+  performance: {
+    title: "Performance",
+    href: "/performance",
+    description: "Track and manage employee performance reviews and goals",
+    icon: BsArrowUpSquareFill,
+  },
+  requestsTasks: {
+    title: "Requests & Tasks",
+    href: "/requests-tasks", 
+    description: "Submit and manage various workplace requests and tasks",
+    icon: BsFillInboxFill,
+  },
+  employees: {
+    title: "Employees",
+    href: "/employees",
+    description: "Manage employee profiles, roles, and organizational structure",
+    icon: BsPersonSquare,
+  },
+  recruitment: {
+    title: "Recruitment",
+    href: "/recruitment",
+    description: "Handle job postings, applications, and hiring processes",
+    icon: BsFillPersonPlusFill,
+  },
+  hrDocuments: {
+    title: "HR Documents",
+    href: "/hr-documents",
+    description: "Access and manage important HR documents and policies",
+    icon: BsFileEarmarkTextFill,
+  },
+  compensation: {
+    title: "Compensation",
+    href: "/compensation",
+    description: "View salary information, bonuses, and compensation details",
+    icon: BsCashCoin,
+  },
+  reimbursement: {
+    title: "Reimbursement",
+    href: "/reimbursement",
+    description: "Submit and track expense reimbursements and claims",
+    icon: BsCashCoin,
+  },
+  vibe: {
+    title: "Vibe",
+    href: "/vibe",
+    description: "Share feedback, participate in surveys, and build company culture",
+    icon: BsEasel2Fill,
+  },
+  attendance: {
+    title: "Attendance",
+    href: "/attendance",
+    description: "Track work hours, time off, and attendance records",
+    icon: IoBarChartSharp,
+  },
+  calendar: {
+    title: "Calendar",
+    href: "/calendar",
+    description: "Schedule meetings, events, and manage your work calendar",
+    icon: BsCalendar2DateFill,
+  },
+  project: {
+    title: "Project",
+    href: "/project",
+    description: "Collaborate on projects, track progress, and manage deadlines",
+    icon: BsFolderFill,
+  },
+} as const;
 
 export const databases: Record<Database, {
   title: string;

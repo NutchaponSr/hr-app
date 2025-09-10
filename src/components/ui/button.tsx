@@ -19,7 +19,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         outlineWarnning: "border-[1.25px] border-white hover:bg-primary/6",
         primary: "bg-marine text-white hover:bg-marine/90",
-        primaryGhost: "text-marine bg-[#489cff36] hover:bg-[#489cff52]"
+        primaryGhost: "text-marine bg-[#489cff36] hover:bg-[#489cff52]",
+        dangerOutline: "text-destructive border-[1.25px] border-destructive/24 hover:bg-[#fce9e7] dark:hover:bg-red-muted",
+        mutedOultine: "text-primary hover:bg-[#f2f2f2] dark:hover:bg-[#333333] border-[1.25px] border-border"
       },
       size: {
         default: "h-8 px-4 py-2 has-[>svg]:px-3",

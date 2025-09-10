@@ -1,5 +1,4 @@
 import { JSX, useState } from "react";
-import { PenLineIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -17,13 +16,17 @@ export const useConfirm = ({
   title,
   description,
   cancelLabel = "Cancel",
-  confirmLabel = "Continue"
+  confirmLabel = "Continue",
+  confirmVariant = "dangerOutline",
+  cancelVariant = "mutedOultine"
 }: {
   title?: string;
   description?: string;
   className?: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  confirmVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "outlineWarnning" | "primary" | "primaryGhost" | "dangerOutline" | "mutedOultine";
+  cancelVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "outlineWarnning" | "primary" | "primaryGhost" | "dangerOutline" | "mutedOultine";
 }): [() => JSX.Element, () => Promise<unknown>] => {
   const [promise, setPromise] = useState<{ resolve: (value: boolean) => void } | null>(null);
 
@@ -46,10 +49,9 @@ export const useConfirm = ({
   }
 
   const ConfirmationDialog = () => (
-    <Dialog open={promise !== null}>
-      <DialogContent className={cn(className)}>
+    <Dialog open={promise !== null} modal={false}>
+      <DialogContent showCloseButton={false} className={cn(className)}>
         <DialogHeader className="flex flex-col relative gap-2 items-center w-full">
-          <PenLineIcon className="size-8 text-[#73726e] stroke-[1.5]" />
           <DialogTitle>
             {title}
           </DialogTitle>
@@ -58,10 +60,10 @@ export const useConfirm = ({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col w-full space-y-1.5">
-          <Button variant="destructive" onClick={handleConfirm} className="font-normal h-8">
+          <Button variant={confirmVariant} onClick={handleConfirm} className="font-normal h-8">
             {confirmLabel}
           </Button>
-          <Button variant="ghost" onClick={handleCancel} className="font-normal h-8">
+          <Button variant={cancelVariant} onClick={handleCancel} className="font-normal h-8">
             {cancelLabel}
           </Button>
         </div>

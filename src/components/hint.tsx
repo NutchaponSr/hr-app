@@ -25,7 +25,7 @@ export const Hint = ({
       <TooltipTrigger asChild>
         {children}
       </TooltipTrigger>
-      <TooltipContent {...props} sideOffset={4} className="p-0 rounded-sm">
+      <TooltipContent {...props} sideOffset={4} className="p-0">
         <p className="px-2 py-1 text-xs text-white font-medium">
           {label}
         </p>

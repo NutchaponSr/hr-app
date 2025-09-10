@@ -4,31 +4,31 @@ import { PlusIcon } from "lucide-react";
 import { GoProject } from "react-icons/go";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
+import { STATUS_RECORD } from "@/types/kpi";
 import { Period, Status } from "@/generated/prisma";
 
 import { useTRPC } from "@/trpc/client";
 
 import { Stepper } from "@/modules/performance/ui/components/stepper";
-import { STATUS_RECORD } from "@/types/kpi";
 
 const DEFAULT_STEPPERS = [
   {
     date: "Jan - Mar",
     title: "KPI Definition",
     description: "Define measurable goals aligned with team and company priorities",
-    period: Period.IN_DRAFT, // 👈 กำหนด period ให้ fallback
+    period: Period.IN_DRAFT,
   },
   {
     date: "Jan - Jun",
     title: "Evaluation 1st",
     description: "Mid-year assessment of progress towards defined KPIs",
-    period: Period.EVALUATION_1ST, // สมมติว่ามี enum แบบนี้
+    period: Period.EVALUATION_1ST,
   },
   {
     date: "Jul - Dec",
     title: "Evaluation 2nd",
     description: "Final review of KPI performance and eligibility for bonus",
-    period: Period.EVALUATION_2ND, // สมมติว่ามี enum แบบนี้
+    period: Period.EVALUATION_2ND, 
   },
 ];
 
@@ -88,17 +88,16 @@ export const MeritScreen = ({ year }: Props) => {
             const showAction =
               !isFallback
                 ? (merit?.isEvaluated
-                    ? period !== Period.IN_DRAFT // ถ้า evaluated → ให้เฉพาะ eval
-                    : period === Period.IN_DRAFT) // ถ้ายังไม่ evaluated → ให้เฉพาะ draft
-                : period === Period.IN_DRAFT; // fallback → แสดงแค่ draft
+                    ? period !== Period.IN_DRAFT
+                    : period === Period.IN_DRAFT) 
+                : period === Period.IN_DRAFT; 
 
             return (
               <Stepper
                 key={task.id}
                 action={
                   showAction && (<div className="mt-1.5 ps-2.5">
-                    <Link
-                      href="/performance/merit"
+                    <button
                       className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] rounded dark:bg-[#252525] dark:hover:bg-[#2f2f2f] text-xs"
                     >
                       {task.status === Status.NOT_STARTED && (
@@ -107,7 +106,7 @@ export const MeritScreen = ({ year }: Props) => {
                       {task.status !== Status.NOT_STARTED
                         ? "View KPI"
                         : "Create KPI"}
-                    </Link>
+                    </button>
                   </div>)
                 }
                 date={step.date}

@@ -5,14 +5,17 @@ import { useTRPC } from "@/trpc/client";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/modules/auth/ui/components/user-avatar";
 import { authClient } from "@/lib/auth-client";
+import { useKpiFormId } from "../../hooks/use-kpi-form-id";
 
 interface Props {
-  id: string;
+  taskId: string;
 }
 
-export const BonusApprovalConfirmation = ({ id }: Props) => {
+export const BonusApprovalConfirmation = ({ taskId }: Props) => {
   const trpc = useTRPC();
+  const kpiFormId = useKpiFormId();
   const queryClient = useQueryClient();
+
   const { data } = authClient.useSession();
 
   const [comment, setComment] = useState("");
@@ -21,13 +24,14 @@ export const BonusApprovalConfirmation = ({ id }: Props) => {
 
   const handleConfirmation = (approve: boolean) => {
     confirm.mutate({
-      id,
+      id: kpiFormId,
+      taskId,
       approve,
       comment,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id }));
-        setComment(""); // Clear comment after successful submission
+        queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id: kpiFormId }));
+        setComment(""); 
       },
     });
   };

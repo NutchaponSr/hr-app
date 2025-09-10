@@ -74,7 +74,7 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "text-primary focus:bg-accent focus:text-primary data-[variant=destructive]:text-primary data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:hover:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-primary [&_svg:not([class*='text-'])]:stroke-2 relative flex cursor-default items-center gap-2 rounded px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 font-medium h-7",
+        "text-primary focus:bg-accent focus:text-primary data-[variant=destructive]:text-primary data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:hover:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-primary [&_svg:not([class*='text-'])]:stroke-2 relative flex items-center gap-2 rounded px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 font-normal h-7 cursor-pointer",
         className
       )}
       {...props}
@@ -179,7 +179,7 @@ function DropdownMenuSeparator({
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={cn("bg-border -mx-1 my-1 h-px", className)}
+      className={cn("bg-ring -mx-1 my-1 h-[1.25px]", className)}
       {...props}
     />
   )
