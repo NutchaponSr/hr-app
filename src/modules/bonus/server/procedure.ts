@@ -1,6 +1,6 @@
 import path from "path";
 
-import { z } from "zod/v4";
+import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
@@ -12,21 +12,9 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { App, Status } from "@/generated/prisma";
 
-import { getUserRole, PermissionContext } from "../permission";
 import { kpiBonusCreateSchema } from "../schema";
-
-interface ApprovalCSVProps {
-  order: string;
-  employeeId: string;
-  employeeName: string;
-  employeePositionLevel: string;
-  checkerEMPID?: string;
-  checkerName?: string;
-  checkerPositionLevel?: string;
-  approverEMPID: string;
-  approverName: string;
-  approverPositionLevel: string;
-}
+import { getUserRole, PermissionContext } from "../permission";
+import { ApprovalCSVProps } from "@/types/approval";
 
 export const bonusProcedure = createTRPCRouter({
   getByYear: protectedProcedure

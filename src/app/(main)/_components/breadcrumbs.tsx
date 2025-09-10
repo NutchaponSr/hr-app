@@ -13,9 +13,12 @@ interface Props {
   paths: string[];
   nameMap?: Record<string, string>;
   iconMap?: Record<string, IconType>;
+  disabledPaths?: string[];
+  disabledMap?: Record<string, boolean>;
+  disableLastItem?: boolean;
 }
 
-export const Breadcrumbs = ({ paths, nameMap = {}, iconMap = {} }: Props) => {
+export const Breadcrumbs = ({ paths, nameMap = {}, iconMap = {}, disabledPaths = [], disabledMap = {}, disableLastItem = false }: Props) => {
   // UUID regex pattern to match UUIDs
   const isUUID = (str: string) => {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -37,11 +40,12 @@ export const Breadcrumbs = ({ paths, nameMap = {}, iconMap = {} }: Props) => {
         const href = "/" + paths.slice(0, index + 1).join("/");
         const displayText = nameMap[path] || (isUUID(path) ? "data" : path);
         const IconComponent = iconMap[path];
-        const isBonus = path === "bonus";
-        
+        const isLastItem = index === paths.length - 1;
+        const isDisabled = disabledPaths.includes(path) || disabledMap[path] || (disableLastItem && isLastItem);
+
         return (
           <React.Fragment key={index}>
-            {isBonus ? (
+            {isDisabled ? (
               <div className="flex items-center gap-1.5 px-2 py-1 text-sm">
                 {IconComponent && <IconComponent className="size-4" />}
                 <span className="first-letter:uppercase text-primary select-none">

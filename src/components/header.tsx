@@ -16,6 +16,9 @@ interface Props {
   children?: React.ReactNode;
   nameMap?: Record<string, string>;
   iconMap?: Record<string, IconType>;
+  disabledPaths?: string[];
+  disabledMap?: Record<string, boolean>;
+  disableLastItem?: boolean;
 }
 
 export const Header = ({ children, ...props }: Props) => {

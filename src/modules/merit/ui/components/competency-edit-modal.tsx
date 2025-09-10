@@ -1,0 +1,170 @@
+import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { convertAmountFromUnit } from "@/lib/utils";
+
+import { Competency, CompetencyRecord } from "@/generated/prisma";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHidden,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+import { RowField } from "@/components/row-field";
+
+import { SelectCompetencyPopover } from "@/modules/merit/ui/components/select-competency-popover";
+
+import { competencyRecordSchema, CompetencyRecordSchema } from "@/modules/merit/schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/client";
+import { useMeritId } from "../../hooks/use-merit-id";
+
+interface Props {
+  children: React.ReactNode;
+  competency: CompetencyRecord & { competency: Competency | null };
+}
+
+export const CompetencyEditModal = ({ children, competency }: Props) => {
+  const trpc = useTRPC();
+  const meritId = useMeritId();
+  const queryClient = useQueryClient();
+
+  const [selectedCompetency, setSelectedCompetency] = useState<Competency | null>(competency.competency);
+
+  const updateCompetency = useMutation(trpc.kpiMerit.updateCompetency.mutationOptions());
+
+  useEffect(() => {
+    setSelectedCompetency(competency.competency);
+  }, [competency.competency]);
+
+  const form = useForm<CompetencyRecordSchema>({
+    resolver: zodResolver(competencyRecordSchema),
+    defaultValues: {
+      competencyId: competency.competencyId ?? "",
+      weight: String(convertAmountFromUnit(competency.weight || 0, 2)),
+      input: competency.input ?? "",
+      output: competency.output ?? "",
+    },
+  });
+
+  const handleCompetencySelect = (newCompetency: Competency) => {
+    setSelectedCompetency(newCompetency);
+    form.setValue("competencyId", newCompetency.id);
+  };
+
+  const onSubmit = (value: CompetencyRecordSchema) => {
+    toast.loading("updating...", { id: "competency-update" });
+    updateCompetency.mutate({
+      id: competency.id,
+      competencyRecordSchema: value,
+    }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: meritId }))
+        toast.success("Updated!", { id: "competency-update" });
+      },
+      onError: (ctx) => {
+        toast.error(ctx.message, { id: "competency-update" });
+      },
+    });
+  }
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+      <DialogContent showCloseButton={false} className="h-[calc(100%-144px)] max-w-5xl">
+        <DialogHidden />
+        <ScrollArea className="flex flex-col grow relative overflow-x-hidden overflow-y-auto me-0 mb-0">
+          <div className="w-full flex flex-col relative items-center grow">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-[126px_1fr_126px] w-full pb-[120px]">
+                <div className="col-start-2 col-end-2 min-w-0 mb-3 -ms-1 pb-3">
+                  <div className="w-full flex flex-col items-center shrink-0 grow-0">
+                    <div className="w-full h-16 flex" />
+                    <FormField
+                      control={form.control}
+                      name="competencyId"
+                      render={({ field }) => (
+                        <FormItem className="w-full gap-0">
+                          <FormControl>
+                            <SelectCompetencyPopover
+                              id="competency-select"
+                              perform={true}
+                              onSelect={handleCompetencySelect}
+                              selectedCompetencyId={field.value ?? undefined}
+                            >
+                              <button type="button" className="py-1 px-1.5 flex flex-col hover:bg-primary/6 w-fit rounded">
+                                <span data-value={!!selectedCompetency} className="max-w-full w-full whitespace-break-spaces break-all text-4xl font-bold resize-none field-sizing-content h-full focus-visible:outline-none data-[value=true]:text-primary text-tertiary overflow-hidden text-start">
+                                  {selectedCompetency?.name || "Select competency"}
+                                </span>
+                              </button>
+                            </SelectCompetencyPopover>
+                          </FormControl>
+                          {selectedCompetency && (
+                            <div className="max-w-full overflow-hidden mb-3">
+                              <p className="max-w-full whitespace-break-spaces break-all text-primary text-sm px-1.5 py-1">
+                                {selectedCompetency?.definition}
+                              </p>
+                            </div>
+                          )}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="col-start-2 col-end-2 min-w-0 mb-3 -ms-1 pb-3">
+                  <div className="flex flex-col gap-2">
+                    <h4 className="py-0.5 text-xs leading-[18px] flex flex-row items-center font-medium gap-0.5 ms-1.5 text-tertiary">
+                      Properties
+                    </h4>
+
+                    <div role="table" className="w-full max-w-full mx-auto flex flex-col gap-1.5">
+                      <RowField
+                        form={form}
+                        name="input"
+                        label="Input"
+                        variant="text"
+                      />
+                      <RowField
+                        form={form}
+                        name="output"
+                        label="Output"
+                        variant="text"
+                      />
+                      <RowField
+                        form={form}
+                        name="weight"
+                        label="Weight"
+                        variant="numeric"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-start-2 col-end-2 min-w-0 mb-3 -ms-1 pb-3">
+                  <Button type="submit" variant="secondary" size="md">
+                    Submit
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+}

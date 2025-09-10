@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { inputIcons, InputVariants } from "@/types/inputs";
 
-import { FormControl, FormField, FormItem } from "./ui/form";
+import { FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { InputGenerator } from "./input-generator";
 import { InputDisplay } from "./input-display";
@@ -49,54 +49,54 @@ export const RowField = <T extends FieldValues>({
   }, [fieldValue, updateOffset]);
 
   return (
-    <div role="row" className="flex w-full relative mb-1">
-      <div className="flex flex-row items-center self-start">
-        <div className="flex items-center text-tertiary h-8 w-40 max-w-60 min-w-0">
-          <Hint label={label} side="left">
-            <div role="cell" className="select-none transition flex items-center h-full w-full rounded hover:bg-primary/6 max-w-full px-1.5">
-              <div className="flex items-center leading-5 text-sm min-w-0">
-                <Icon className="size-4 mr-1.5 shrink-0" />
-                <div className="whitespace-nowrap overflow-hidden text-ellipsis">
-                  {label}
-                </div>
+    <FormField
+      control={form.control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="gap-0">
+          <div role="row" className="flex w-full relative">
+            <div className="flex flex-row items-center self-start">
+              <div className="flex items-center text-tertiary h-8 w-40 max-w-60 min-w-0">
+                <Hint label={label} side="left">
+                  <div role="cell" className="select-none transition flex items-center h-full w-full rounded hover:bg-primary/6 max-w-full px-1.5">
+                    <div className="flex items-center leading-5 text-sm min-w-0">
+                      <Icon className="size-4 mr-1.5 shrink-0" />
+                      <div className="whitespace-nowrap overflow-hidden text-ellipsis">
+                        {label}
+                      </div>
+                    </div>
+                  </div>
+                </Hint>
               </div>
             </div>
-          </Hint>
-        </div>
-      </div>
 
-      <div role="cell" className="flex h-full grow shrink basis-auto min-w-0 ms-1">
-        <FormField
-          control={form.control}
-          name={name}
-          render={({ field }) => (
-            <Popover modal>
-              <PopoverTrigger asChild>
-                <div
-                  ref={triggerRef}
-                  role="button"
-                  className="select-none transition relative text-sm overflow-hidden rounded w-full min-h-8 px-2 py-1 flex items-center hover:bg-primary/6"
-                >
-                  <div data-value={!!field.value} className="leading-5 break-all whitespace-pre-wrap text-tertiary data-[value=true]:text-primary">
-                    <InputDisplay
-                      variant={variant}
-                      value={field.value}
-                      options={props.options}
-                    />
+            <div role="cell" className="flex h-full grow shrink basis-auto min-w-0 ms-1">
+              <Popover modal>
+                <PopoverTrigger asChild>
+                  <div
+                    ref={triggerRef}
+                    role="button"
+                    className="select-none transition relative text-sm overflow-hidden rounded w-full min-h-8 px-2 py-1 flex items-center hover:bg-primary/6"
+                  >
+                    <div data-value={!!field.value} className="leading-5 break-all whitespace-pre-wrap text-tertiary data-[value=true]:text-primary">
+                      <InputDisplay
+                        variant={variant}
+                        value={field.value}
+                        options={props.options}
+                      />
+                    </div>
                   </div>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent
-                className="p-0 w-[var(--radix-popover-trigger-width)]"
-                align="start"
-                side="bottom"
-                sideOffset={sideOffset}
-                onOpenAutoFocus={(e) => {
-                  e.preventDefault();
-                  updateOffset();
-                }}
-              >
-                <FormItem>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="p-0 w-[var(--radix-popover-trigger-width)]"
+                  align="start"
+                  side="bottom"
+                  sideOffset={sideOffset}
+                  onOpenAutoFocus={(e) => {
+                    e.preventDefault();
+                    updateOffset();
+                  }}
+                >
                   <FormControl>
                     <InputGenerator
                       variant={variant}
@@ -105,12 +105,13 @@ export const RowField = <T extends FieldValues>({
                       {...props}
                     />
                   </FormControl>
-                </FormItem>
-              </PopoverContent>
-            </Popover>
-          )}
-        />
-      </div>
-    </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   );
 }

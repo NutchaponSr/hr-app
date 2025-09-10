@@ -6,6 +6,7 @@ import { convertAmountFromUnit } from "@/lib/utils";
 
 import { Comment, Employee, Kpi } from "@/generated/prisma";
 
+import { Card } from "@/components/card";
 import { ColumnData } from "@/components/column-data";
 import { ContentBlock } from "@/components/content-block";
 import { CommentSection } from "@/components/comment-section";
@@ -31,7 +32,7 @@ export const KpiCard = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <article className="w-full relative p-4 shadow-[0_12px_32px_rgba(0,0,0,0.02),inset_0_0_0_1px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.03),inset_0_0_0_1px_rgba(0,0,0,0.086)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] dark:hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] bg-background dark:bg-sidebar rounded-sm group">
+    <Card>
       <KpiCardHeader kpi={kpi} canPerform={canPerform} />
       <div className="my-2 px-4">
         <div className="mb-1 px-0.5 flex flex-row items-center space-x-1">
@@ -107,6 +108,6 @@ export const KpiCard = ({
           canPerform={canPerform}
         />
       </div>
-    </article>
+    </Card>
   );
 }
