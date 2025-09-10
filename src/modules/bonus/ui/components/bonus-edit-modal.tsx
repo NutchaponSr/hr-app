@@ -38,21 +38,23 @@ export const BonusEditModal = ({ kpi, children }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const form = useForm<KpiBonusCreateSchema>({
+  const defaultValues: KpiBonusCreateSchema = {
+    name: kpi.name,
+    category: kpi.category,
+    strategy: kpi.strategy,
+    objective: kpi.objective,
+    definition: kpi.definition,
+    type: kpi.type,
+    weight: String(convertAmountFromUnit(kpi.weight, 2)),
+    target70: kpi.target70,
+    target80: kpi.target80,
+    target90: kpi.target90,
+    target100: kpi.target100,
+  };
+
+  const form = useForm({
     resolver: zodResolver(kpiBonusCreateSchema),
-    defaultValues: {
-      name: kpi.name,
-      category: kpi.category,
-      strategy: kpi.strategy,
-      objective: kpi.definition,
-      definition: kpi.definition,
-      type: kpi.type,
-      weight: String(convertAmountFromUnit(kpi.weight, 2)),
-      target70: kpi.target70,
-      target80: kpi.target80,
-      target90: kpi.target90,
-      target100: kpi.target100,
-    }
+    defaultValues,
   });
 
   const updateKpi = useMutation(trpc.kpiBonus.updateKpi.mutationOptions());

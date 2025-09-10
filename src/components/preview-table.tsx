@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 
 import { validateKpiRows } from "@/modules/bonus/utils";
 
-import { useTaskId } from "@/modules/tasks/hooks/use-task-Id";
 import { useKpiBonusCreateBulk } from "@/modules/bonus/api/use-kpi-bonus-create-bulk";
 
 interface Props {
@@ -24,8 +23,6 @@ export const PreviewTable = ({
   file,
   type 
 }: Props) => {
-  const taskId = useTaskId();
-
   const columns = Object.keys(data[0] || {}).filter((f) => f !== "_rowIndex");
 
   const [errors, setErrors] = useState<string[]>([]);
@@ -67,7 +64,7 @@ export const PreviewTable = ({
         { kpiFormId: contextId, kpis: res.validRows },
         {
           onSuccess: ({ year }) => {
-            invalidate(year, taskId);
+            invalidate(year, contextId);
             closeModal();
             reset();
           },
