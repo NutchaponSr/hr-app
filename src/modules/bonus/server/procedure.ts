@@ -4,17 +4,16 @@ import { z } from "zod/v4";
 import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
-import { convertAmountToUnit, findKeyByValue } from "@/lib/utils";
+import { convertAmountToUnit } from "@/lib/utils";
 
 import { readCSV } from "@/seeds/utils/csv";
 
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
-import { App, Period, Status, Project } from "@/generated/prisma";
+import { App, Status } from "@/generated/prisma";
 
-import { projectTypes } from "../constants";
 import { getUserRole, PermissionContext } from "../permission";
-import { kpiBonusSchema } from "../schema";
+import { kpiBonusCreateSchema } from "../schema";
 
 interface ApprovalCSVProps {
   order: string;
@@ -30,7 +29,7 @@ interface ApprovalCSVProps {
 }
 
 export const bonusProcedure = createTRPCRouter({
-  getOne: protectedProcedure
+  getByYear: protectedProcedure
     .input(
       z.object({
         year: z.number(),
@@ -43,91 +42,11 @@ export const bonusProcedure = createTRPCRouter({
           employeeId: ctx.user.employee.id,
         },
         include: {
-          kpiRecords: {
-            include: {
-              task: true,
-            },
-          },
+          task: true,
         },
       });
 
       return res;
-    }),
-  getInfo: protectedProcedure
-    .input(
-      z.object({
-        year: z.number(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const [record, years] = await Promise.all([
-        await prisma.kpiRecord.findFirst({
-          where: {
-            AND: [
-              {
-                period: Period.IN_DRAFT,
-              },
-              {
-                kpiForm: {
-                  year: input.year,
-                  employeeId: ctx.user.employee.id,
-                },
-              },
-            ],
-          },
-          include: {
-            kpiForm: {
-              include: {
-                kpis: true,
-              },
-            },
-            task: {
-              include: {
-                comments: {
-                  orderBy: {
-                    createdAt: "desc",
-                  },
-                  include: {
-                    employee: true,
-                  }
-                },
-                preparer: true,
-                checker: true,
-                approver: true,
-              }
-            },
-          }
-        }),
-        await prisma.kpiForm.findMany({
-          select: {
-            year: true,
-          },
-          where: {
-            employeeId: ctx.user.employee.id,
-          },
-        }),
-      ]);
-
-      let permissionContext: PermissionContext | null = null;
-
-      if (record) {
-        permissionContext = {
-          currentEmployeeId: ctx.user.employee.id,
-          documentOwnerId: record.task.preparedBy,
-          checkerId: record.task.checkedBy || undefined,
-          approverId: record.task.approvedBy,
-          status: record.task.status,
-        };
-      }
-
-      return {
-        years: years.map((f) => f.year),
-        data: record,
-        permission: {
-          ctx: permissionContext,
-          role: permissionContext ? getUserRole(permissionContext) : null,
-        },
-      };
     }),
   getById: protectedProcedure
     .input(
@@ -136,31 +55,19 @@ export const bonusProcedure = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const res = await prisma.task.findUnique({
+      const res = await prisma.kpiForm.findUnique({
         where: {
-          id: input.id,
+          id: input.id
         },
         include: {
-          kpiRecord: {
+          task: {
             include: {
-              kpiForm: {
-                include: {
-                  kpis: true,
-                },
-              },
-            },
+              preparer: true,
+              checker: true,
+              approver: true,
+            }
           },
-          comments: {
-            include: {
-              employee: true,
-            },
-            orderBy: {
-              createdAt: "desc",
-            },
-          },
-          preparer: true,
-          checker: true,
-          approver: true,
+          kpis: true,
         },
       });
 
@@ -168,25 +75,70 @@ export const bonusProcedure = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      let permissionContext: PermissionContext | null = null;
+      const kpiWithComments = await prisma.comment.findMany({
+        where: {
+          connectId: {
+            in: res.kpis.map((kpi) => kpi.id)
+          }
+        },
+        include: {
+          employee: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
 
-      if (res) {
-        permissionContext = {
-          currentEmployeeId: ctx.user.employee.id,
-          documentOwnerId: res.preparedBy,
-          checkerId: res.checkedBy || undefined,
-          approverId: res.approvedBy,
-          status: res.status,
-        };
-      }
+      const commentsByKpiId = kpiWithComments.reduce((acc, comment) => {
+        if (!acc[comment.connectId]) {
+          acc[comment.connectId] = [];
+        }
+        acc[comment.connectId].push(comment);
+        return acc;
+      }, {} as Record<string, typeof kpiWithComments>);
+
+      const kpisWithComments = res.kpis.map(kpi => ({
+        ...kpi,
+        comments: commentsByKpiId[kpi.id] || [],
+      }));
+
+      const permissionContext: PermissionContext = {
+        currentEmployeeId: ctx.user.employee.id,
+        documentOwnerId: res.task.preparedBy,
+        checkerId: res.task.checkedBy || undefined,
+        approverId: res.task.approvedBy,
+        status: res.task.status,
+      };
 
       return {
-        data: res,
+        data: {
+          ...res,
+          kpis: kpisWithComments,
+        },
         permission: {
           ctx: permissionContext,
-          role: permissionContext ? getUserRole(permissionContext) : null,
+          role: getUserRole(permissionContext),
         },
       };
+    }),
+  getKpiById: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      const res = await prisma.kpi.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (!res) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return res;
     }),
   createForm: protectedProcedure
     .input(
@@ -204,27 +156,61 @@ export const bonusProcedure = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
+      const task = await prisma.task.create({
+        data: {
+          type: App.BONUS,
+          status: Status.IN_DRAFT,
+          preparedBy: ctx.user.employee.id,
+          approvedBy: taregetApproval.approverEMPID,
+          ...(taregetApproval.checkerEMPID && {
+            checkedBy: taregetApproval.checkerEMPID,
+          }),
+        },
+      });
+
       const res = await prisma.kpiForm.create({
         data: {
           year: input.year,
           employeeId: ctx.user.employee.id,
-          kpiRecords: {
-            create: {
-              period: Period.IN_DRAFT,
-              task: {
-                create: {
-                  type: App.BONUS,
-                  status: Status.IN_DRAFT,
-                  preparedBy: ctx.user.employee.id,
-                  approvedBy: taregetApproval.approverEMPID,
-                  ...(taregetApproval.checkerEMPID && {
-                    checkedBy: taregetApproval.checkerEMPID,
-                  }),
-                },
-              },
-            },
-          },
+          taskId: task.id,
         },
+      });
+
+      return res;
+    }),
+  duplicateKpi: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const kpi = await prisma.kpi.findUnique({
+        select: {
+          name: true,
+          category: true,
+          definition: true,
+          weight: true,
+          objective: true,
+          type: true,
+          strategy: true,
+          target100: true,
+          target90: true,
+          target80: true,
+          target70: true,
+          kpiFormId: true,
+        },
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (!kpi) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const res = await prisma.kpi.create({
+        data: kpi
       });
 
       return res;
@@ -233,12 +219,17 @@ export const bonusProcedure = createTRPCRouter({
     .input(
       z.object({
         kpiFormId: z.string(),
+        kpiBonusCreateSchema,
       }),
     )
     .mutation(async ({ input }) => {
+      const { weight, ...otherFields } = input.kpiBonusCreateSchema;
+
       const res = await prisma.kpi.create({
         data: {
+          ...otherFields,
           kpiFormId: input.kpiFormId,
+          weight: convertAmountToUnit(Number(weight), 2),
         },
       });
 
@@ -257,44 +248,18 @@ export const bonusProcedure = createTRPCRouter({
     .input(
       z.object({
         kpiFormId: z.string(),
-        kpis: z.array(kpiBonusSchema),
+        kpis: z.array(kpiBonusCreateSchema),
       })
     )
     .mutation(async ({ input }) => {
-      const toNullableString = (v: unknown): string | null => {
-        if (v === undefined || v === null) return null;
-        const s = String(v).trim();
-        return s === "" ? null : s;
-      };
-
-      const toNullableWeight = (v: unknown): number | null => {
-        if (v === undefined || v === null) return null;
-        const s = String(v).trim();
-        if (s === "") return null;
-        return convertAmountToUnit(Number(s), 2);
-      };
-
-      const toProjectEnum = (v: unknown): Project | null => {
-        if (v === undefined || v === null) return null;
-        const s = String(v).trim();
-        if (s === "") return null;
-        return s as Project;
-      };
-
-      const data = input.kpis.map((k) => ({
-        kpiFormId: input.kpiFormId,
-        name: toNullableString(k.name),
-        objective: toNullableString(k.objective),
-        definition: toNullableString(k.definition),
-        strategy: toNullableString(k.strategy),
-        method: null as string | null,
-        target100: toNullableString(k.target100),
-        target90: toNullableString(k.target90),
-        target80: toNullableString(k.target80),
-        target70: toNullableString(k.target70),
-        type: toProjectEnum(k.type),
-        weight: toNullableWeight(k.weight),
-      }));
+      const data = input.kpis.map((k) => {
+        const { weight, ...otherFields } = k;
+        return {
+          ...otherFields,
+          kpiFormId: input.kpiFormId,
+          weight: convertAmountToUnit(Number(weight), 2),
+        };
+      });
 
       await prisma.kpi.createMany({
         data,
@@ -315,40 +280,34 @@ export const bonusProcedure = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        name: z.string().nullable().optional(),
-        weight: z.string().nullable().optional(),
-        strategy: z.string().nullable().optional(),
-        type: z.string().nullable().optional(),
-        target100: z.string().nullable().optional(),
-        target90: z.string().nullable().optional(),
-        target80: z.string().nullable().optional(),
-        target70: z.string().nullable().optional(),
-        definition: z.string().nullable().optional(),
-        objective: z.string().nullable().optional(),
+        kpiBonusCreateSchema,
       })
     )
     .mutation(async ({ input }) => {
-      const { id, ...updateFields } = input;
-
-      const fieldsToUpdate = Object.fromEntries(
-        Object.entries(updateFields).filter(([, value]) => value !== undefined)
-      );
+      const { weight, ...otherFields } = input.kpiBonusCreateSchema;
 
       const res = await prisma.kpi.update({
-        where: { id },
+        where: {
+          id: input.id,
+        },
         data: {
-          ...fieldsToUpdate,
-          ...(fieldsToUpdate.type !== undefined && {
-            type: fieldsToUpdate.type ? findKeyByValue(projectTypes, String(fieldsToUpdate.type)) : null
-          }),
-          ...(fieldsToUpdate.weight !== undefined && {
-            weight: fieldsToUpdate.weight !== null ? convertAmountToUnit(Number(fieldsToUpdate.weight), 2) : null
-          }),
-          kpiForm: {
-            update: {
-              updatedAt: new Date(),
-            },
-          },
+          ...otherFields,
+          weight: convertAmountToUnit(Number(weight), 2),
+        }
+      });
+
+      return res;
+    }),
+  deleteKpi: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const res = await prisma.kpi.delete({
+        where: {
+          id: input.id,
         },
       });
 
@@ -406,13 +365,14 @@ export const bonusProcedure = createTRPCRouter({
       z.object({
         approve: z.boolean(),
         comment: z.string().optional(),
+        taskId: z.string(),
         id: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const task = await prisma.task.findUnique({
         where: {
-          id: input.id,
+          id: input.taskId,
         },
       });
 
@@ -434,35 +394,19 @@ export const bonusProcedure = createTRPCRouter({
         if (input.approve) {
           await prisma.task.update({
             where: {
-              id: input.id,
+              id: input.taskId,
             },
             data: {
               status: Status.PENDING_APPROVER,
-              ...(input.comment && {
-                comments: {
-                  create: {
-                    content: input.comment,
-                    createdBy: ctx.user.employee.id,
-                  },
-                },
-              }),
             },
           });
         } else {
           await prisma.task.update({
             where: {
-              id: input.id,
+              id: input.taskId,
             },
             data: {
               status: Status.REJECTED_BY_CHECKER,
-              ...(input.comment && {
-                comments: {
-                  create: {
-                    content: input.comment,
-                    createdBy: ctx.user.employee.id,
-                  },
-                },
-              }),
             },
           });
         }
@@ -470,38 +414,32 @@ export const bonusProcedure = createTRPCRouter({
         if (input.approve) {
           await prisma.task.update({
             where: {
-              id: input.id,
+              id: input.taskId,
             },
             data: {
               status: Status.APPROVED,
-              ...(input.comment && {
-                comments: {
-                  create: {
-                    content: input.comment,
-                    createdBy: ctx.user.employee.id,
-                  },
-                },
-              }),
             },
           });
         } else {
           await prisma.task.update({
             where: {
-              id: input.id,
+              id: input.taskId,
             },
             data: {
               status: Status.REJECTED_BY_APPROVER,
-              ...(input.comment && {
-                comments: {
-                  create: {
-                    content: input.comment,
-                    createdBy: ctx.user.employee.id,
-                  },
-                },
-              }),
             },
           });
         }
+      }
+
+      if (input.comment) {
+        await prisma.comment.create({
+          data: {
+            content: input.comment,
+            connectId: input.id,
+            createdBy: ctx.user.employee.id,
+          },
+        });
       }
 
       return { success: true };

@@ -58,7 +58,6 @@ export const UploadOperations = ({
 
   const handleDatabaseSelect = (databaseKey: Database) => {
     setSelectedDatabase(databaseKey);
-    console.log("Database selected:", databaseKey);
   };
 
   const handleRemoveFile = (e: React.MouseEvent) => {

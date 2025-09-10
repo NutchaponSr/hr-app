@@ -2,42 +2,47 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { useYear } from "@/hooks/use-year";
 import { useConfirm } from "@/hooks/use-confirm";
 
 import { useTRPC } from "@/trpc/client";
 
 import { Button } from "@/components/ui/button";
 
+import { useKpiFormId } from "@/modules/bonus/hooks/use-kpi-form-id";
+import { toast } from "sonner";
+
 interface Props {
-  id?: string;
+  taskId: string;
   canElevate: boolean;
 }
 
-export const ApproveButton = ({ id, canElevate }: Props) => {
+export const ApproveButton = ({ taskId, canElevate }: Props) => {
   const trpc = useTRPC();
+  const kpiFormId = useKpiFormId();
   const queryClient = useQueryClient();
 
-  const { year } = useYear();
-
   const [ConfirmDialog, confirm] = useConfirm({
-    title: "Start Evaluation KPI Bonus"
+    title: "Start Evaluation KPI Bonus",
+    confirmVariant: "primary"
   });
   
   const start = useMutation(trpc.kpiBonus.startEvaluation.mutationOptions());
   
-  if (!canElevate || !id) return null;
+  if (!canElevate) return null;
 
   const onClick = async () => {
     const ok = await confirm();
     
     if (ok) {
-      start.mutate({ id }, {
+      toast.loading("Starting workflow...", { id: "start-workflow" });
+      start.mutate({ id: taskId }, {
         onSuccess: () => {
-          queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id }));
-          queryClient.invalidateQueries(trpc.kpiBonus.getOne.queryOptions({ year }));
-          queryClient.invalidateQueries(trpc.kpiBonus.getInfo.queryOptions({ year }));
+          toast.success("Worflow started!", { id: "start-workflow" });
+          queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id: kpiFormId }));
         },
+        onError: (ctx) => {
+          toast.error(ctx.message, { id: "start-workflow" });
+        }
       });
     }
   }

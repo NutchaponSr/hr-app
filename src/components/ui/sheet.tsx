@@ -57,9 +57,9 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-9999 flex flex-col gap-4 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 focus-visible:outline-none",
+          "bg-background dark:bg-[#252525] data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-9999 flex flex-col gap-4 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 focus-visible:outline-none",
           side === "right" &&
-            "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 shadow-[0_14px_28px_-6px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06),0_0_0_1.25px_rgba(84,72,48,0.08)] sm:max-w-[564px]",
+            "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 shadow-[0_14px_28px_-6px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06),0_0_0_1.25px_rgba(84,72,48,0.08)] sm:max-w-[564px] dark:shadow-[0_0_0_1px_rgb(48,48,46),0_14px_28px_-6px_rgba(0,0,0,0.2),0_2px_4px_-1px_rgba(0,0,0,0.12)]",
           side === "left" &&
             "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 sm:max-w-sm shadow-[0_14px_28px_-6px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06),0_0_0_1.25px_rgba(84,72,48,0.08)]",
           side === "top" &&

@@ -5,11 +5,13 @@ import { SelectionBadge } from "@/components/selection-badge";
 interface Props {
   value: string;
   variant: InputVariants;
+  options?: Array<{ key: string; label: string; }>;
 } 
 
 export const InputDisplay = ({
   value,
   variant,
+  options,
 }: Props) => {
   switch (variant) {
     case "numeric":
@@ -21,6 +23,8 @@ export const InputDisplay = ({
     case "text":
       return value ? value : "Empty";
     case "select":
-      return value ? <SelectionBadge label={value} />: "Empty";
+      if (!value) return "Empty";
+      const selectedOption = options?.find(opt => opt.key === value);
+      return <SelectionBadge label={selectedOption?.label || value} />;
   }
 }

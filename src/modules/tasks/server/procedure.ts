@@ -34,22 +34,17 @@ export const taskProcedure = createTRPCRouter({
                   status: Status.PENDING_APPROVER,
                   approvedBy: ctx.user.employee.id,
                 },
+                {
+                  status: Status.REJECTED_BY_APPROVER,
+                  preparedBy: ctx.user.employee.id,
+                },
               ],
             },
           ],
         },
         include: {
           preparer: true,
-          kpiRecord: {
-            include: {
-              kpiForm: true,
-            },
-          },
-          meritRecord: {
-            include: {
-              meritForm: true,
-            },
-          },
+          kpiForms: true,
         },
         orderBy: {
           updatedAt: "desc",
@@ -65,9 +60,9 @@ export const taskProcedure = createTRPCRouter({
             updatedAt: task.updatedAt,
           },
           info: {
+            id: task.kpiForms[0].id,
             assignedBy: task.preparer.fullName, 
-            period: task.kpiRecord?.period || task.meritRecord?.period,
-            year: task.kpiRecord?.kpiForm?.year || task.meritRecord?.meritForm?.year,
+            year: task.kpiForms[0].year
           },
         })),
       };

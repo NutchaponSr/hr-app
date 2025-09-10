@@ -1,10 +1,10 @@
-import { App, Period, Status } from "@/generated/prisma";
+import { App, Status } from "@/generated/prisma";
 
 export interface TaskWithInfo {
   info: {
+    id: string;
     assignedBy: string;
-    period?: Period;
-    year?: number;
+    year: number;
   };
   task: {
     id: string;

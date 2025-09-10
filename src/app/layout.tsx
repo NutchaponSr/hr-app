@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { Toaster } from "react-hot-toast";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { cn } from "@/lib/utils";
 
 import { TRPCReactProvider } from "@/trpc/client";
+
+import { Toaster } from "@/components/ui/sonner";
 
 import { SheetProvider } from "@/providers/sheet-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -40,7 +41,7 @@ export default function RootLayout({
             <NuqsAdapter>
               {children}
               <SheetProvider />
-              <Toaster position="top-center" />
+              <Toaster richColors position="bottom-right" />
             </NuqsAdapter>
           </TRPCReactProvider>
         </ThemeProvider>

@@ -16,7 +16,7 @@ export const TaskItem = ({ task }: Props) => {
   const { label, variant } = STATUS_RECORD[task.task.status];
 
   const href = task.task.type === App.BONUS
-    ? `/performance/bonus/${task.task.id}`
+    ? `/performance/bonus/${task.info.id}`
     : `/performance/merit/${task.task.id}`
 
   return (

@@ -4,6 +4,7 @@ import { ExcelData } from "@/types/upload";
 const kpiAllowedColumns = [
   "id",
   "name",
+  "category",
   "weight",
   "objective",
   "strategy",
@@ -13,12 +14,12 @@ const kpiAllowedColumns = [
   "target70",
   "type",
   "definition",
-  "method",
   "kpiFormId",
 ] as const;
 
 const kpiRequiredColumns: ReadonlyArray<(typeof kpiAllowedColumns)[number]> = [
   "name",
+  "category",
   "strategy",
   "objective",
   "type",

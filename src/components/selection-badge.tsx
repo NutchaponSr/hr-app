@@ -32,7 +32,7 @@ export const SelectionBadge = ({
 
   return (
     <div className={cn(badgeVariant({ color }))}>
-      <span className="whitespace-nowrap overflow-hidden text-ellipsis inline-flex items-center h-5 leading-5">
+      <span className="whitespace-nowrap overflow-hidden text-ellipsis inline-flex items-center h-5 leading-5 text-sm">
         {label}
       </span>
       <div 

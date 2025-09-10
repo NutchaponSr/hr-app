@@ -25,7 +25,7 @@ export const Banner = ({
               <div className="flex items-center justify-center size-9 relative shrink-0 mr-2">
                 <Icon className="size-8 text-marine" />
               </div>
-              <h1 className="text-primary font-bold leading-[1.2] text-3xl whitespace-break-spaces break-words">
+              <h1 className="text-primary font-bold leading-[1.2] text-3xl whitespace-break-spaces break-words tracking-[0.5px]">
                 {title}
               </h1>
               </div>
