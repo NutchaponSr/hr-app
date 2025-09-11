@@ -56,6 +56,9 @@ export const meritProcedure = createTRPCRouter({
             include: {
               competency: true,
             },
+            orderBy: {
+              id: "asc",
+            },
           },
           cultureRecords: true,
         },
@@ -64,6 +67,34 @@ export const meritProcedure = createTRPCRouter({
       if (!res) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
+
+      const competencyWithComments = await prisma.comment.findMany({
+        where: {
+          connectId: {
+            in: res.competencyRecords.map((c) => c.id),
+          },
+        },
+        include: {
+          employee: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
+
+      const commentsByKpiId = competencyWithComments.reduce((acc, comment) => {
+        if (!acc[comment.connectId]) {
+          acc[comment.connectId] = [];
+        }
+        acc[comment.connectId].push(comment);
+        return acc;
+      }, {} as Record<string, typeof competencyWithComments>);
+
+      const kpisWithComments = res.competencyRecords.map(kpi => ({
+        ...kpi,
+        comments: commentsByKpiId[kpi.id] || [],
+      }));
+
       const permissionContext: PermissionContext = {
         currentEmployeeId: ctx.user.employee.id,
         documentOwnerId: res.task.preparedBy,
@@ -73,7 +104,10 @@ export const meritProcedure = createTRPCRouter({
       };
 
       return {
-        data: res,
+        data: {
+          ...res,
+          competencyRecords: kpisWithComments,
+        },
         permission: {
           ctx: permissionContext,
           role: getUserRole(permissionContext),

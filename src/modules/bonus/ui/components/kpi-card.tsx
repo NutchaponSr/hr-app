@@ -15,6 +15,9 @@ import { SelectionBadge } from "@/components/selection-badge";
 import { KpiCardHeader } from "@/modules/bonus/ui/components/kpi-card-header";
 
 import { projectTypes } from "@/modules/bonus/constants";
+import { useTRPC } from "@/trpc/client";
+import { useKpiFormId } from "../../hooks/use-kpi-form-id";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   canPerform: boolean;
@@ -29,7 +32,24 @@ export const KpiCard = ({
   canPerform,
   kpi 
 }: Props) => {
+  const trpc = useTRPC();
+  const kpiFormId = useKpiFormId();
+  const queryClient = useQueryClient();
+
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const createComment = useMutation(trpc.comment.create.mutationOptions());
+
+  const onCreate = (content: string) => {
+    createComment.mutate({
+      content,
+      connectId: kpi.id,
+    }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: kpiFormId }));
+      },
+    });
+  }
 
   return (
     <Card>
@@ -103,9 +123,9 @@ export const KpiCard = ({
         </div>
 
         <CommentSection 
-          id={kpi.id} 
           comments={kpi.comments}
           canPerform={canPerform}
+          onCreate={onCreate}
         />
       </div>
     </Card>

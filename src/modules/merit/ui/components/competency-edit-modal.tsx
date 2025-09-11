@@ -1,10 +1,12 @@
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { convertAmountFromUnit } from "@/lib/utils";
 
+import { useTRPC } from "@/trpc/client";
 import { Competency, CompetencyRecord } from "@/generated/prisma";
 
 import {
@@ -27,10 +29,9 @@ import { RowField } from "@/components/row-field";
 
 import { SelectCompetencyPopover } from "@/modules/merit/ui/components/select-competency-popover";
 
+import { useMeritId } from "@/modules/merit/hooks/use-merit-id";
+
 import { competencyRecordSchema, CompetencyRecordSchema } from "@/modules/merit/schema";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useTRPC } from "@/trpc/client";
-import { useMeritId } from "../../hooks/use-merit-id";
 
 interface Props {
   children: React.ReactNode;
@@ -42,9 +43,17 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
   const meritId = useMeritId();
   const queryClient = useQueryClient();
 
+  const [open, setOpen] = useState(false);
   const [selectedCompetency, setSelectedCompetency] = useState<Competency | null>(competency.competency);
 
   const updateCompetency = useMutation(trpc.kpiMerit.updateCompetency.mutationOptions());
+
+  const defaultValues = {
+    competencyId: competency.competencyId ?? "",
+    weight: String(convertAmountFromUnit(competency.weight || 0, 2)),
+    input: competency.input ?? "",
+    output: competency.output ?? "",
+  } as const;
 
   useEffect(() => {
     setSelectedCompetency(competency.competency);
@@ -52,17 +61,16 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
 
   const form = useForm<CompetencyRecordSchema>({
     resolver: zodResolver(competencyRecordSchema),
-    defaultValues: {
-      competencyId: competency.competencyId ?? "",
-      weight: String(convertAmountFromUnit(competency.weight || 0, 2)),
-      input: competency.input ?? "",
-      output: competency.output ?? "",
-    },
+    defaultValues,
   });
 
   const handleCompetencySelect = (newCompetency: Competency) => {
     setSelectedCompetency(newCompetency);
-    form.setValue("competencyId", newCompetency.id);
+    form.setValue("competencyId", newCompetency.id, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   };
 
   const onSubmit = (value: CompetencyRecordSchema) => {
@@ -74,6 +82,8 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
       onSuccess: () => {
         queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: meritId }))
         toast.success("Updated!", { id: "competency-update" });
+        setOpen(false);
+        form.reset(defaultValues);
       },
       onError: (ctx) => {
         toast.error(ctx.message, { id: "competency-update" });
@@ -81,8 +91,16 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
     });
   }
 
+  const onOpenChange = (open: boolean) => {
+    setOpen(open);
+    if (!open) {
+      form.reset(defaultValues);
+      setSelectedCompetency(competency.competency);
+    }
+  }
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>

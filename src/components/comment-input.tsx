@@ -1,40 +1,22 @@
 import { useState } from "react";
 import { BsArrowUpCircleFill } from "react-icons/bs";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
 
-import { useTRPC } from "@/trpc/client";
-
-import { useKpiFormId } from "@/modules/bonus/hooks/use-kpi-form-id";
-
 interface Props {
-  id: string;
   canPerform: boolean;
+  onCreate: (content: string) => void;
 }
 
-export const CommentInput = ({ id, canPerform }: Props) => {
-  const trpc = useTRPC();
-
-  const kpiFormId = useKpiFormId();
-  const queryClient = useQueryClient();
-
+export const CommentInput = ({ canPerform, onCreate }: Props) => {
   const [message, setMessage] = useState("");
-
-  const create = useMutation(trpc.comment.create.mutationOptions());
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    create.mutate({ 
-      content: message,
-      connectId: id,
-    }, {
-      onSuccess: () => {
-        setMessage("");
-        queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id: kpiFormId }));
-      },
-    });
+    onCreate(message);
+
+    setMessage("");
   }
 
   return (

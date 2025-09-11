@@ -15,7 +15,7 @@ export const ContentBlock = ({
       <div className="w-full max-w-full whitespace-break-spaces break-words p-0.5 font-normal text-secondary">
         {content}
       </div>
-      <div className="h-7 w-full flex py-0.5" />
+      <div className="h-5 w-full flex py-0.5" />
     </div>
   );
 }
