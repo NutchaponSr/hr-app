@@ -13,7 +13,7 @@ export const ContentBlock = ({
         {title}
       </h3>
       <div className="w-full max-w-full whitespace-break-spaces break-words p-0.5 font-normal text-secondary">
-        {content}
+        {content || "Empty"}
       </div>
       <div className="h-5 w-full flex py-0.5" />
     </div>

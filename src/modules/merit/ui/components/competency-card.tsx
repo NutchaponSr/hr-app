@@ -1,4 +1,5 @@
 import { ArrowDownIcon } from "lucide-react";
+import { BsPencilSquare } from "react-icons/bs";
 import { useState, useRef, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -13,14 +14,17 @@ import {
   Comment
 } from "@/generated/prisma";
 
+import { Button } from "@/components/ui/button";
+
 import { Card } from "@/components/card";
 import { ColumnData } from "@/components/column-data";
 import { ContentBlock } from "@/components/content-block";
 import { CommentSection } from "@/components/comment-section";
 
-import { CompetencyCardHeader } from "@/modules/merit/ui/components/competency-card-header";
+import { CompetencyEditModal } from "@/modules/merit/ui/components/competency-edit-modal";
 
 import { useMeritId } from "@/modules/merit/hooks/use-merit-id";
+
 
 interface Props {
   order: number;
@@ -39,6 +43,7 @@ export const CompetencyCard = ({ competency, order }: Props) => {
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
+  
   const contentRef = useRef<HTMLDivElement>(null);
 
   const createComment = useMutation(trpc.comment.create.mutationOptions());
@@ -63,7 +68,13 @@ export const CompetencyCard = ({ competency, order }: Props) => {
 
   return (
     <Card>
-      <CompetencyCardHeader competency={competency} canPerform={true} />
+      <div data-perform={true} className="absolute z-1 top-4 end-4 transition-opacity p-0.5 dark:shadow-[0_2px_12px_0_rgba(29,27,22,0.06)] border-border border-[1.25px] rounded-sm gap-px opacity-0 group-hover:opacity-100 dark:bg-[#2f2f2f] data-[perform=true]:flex hidden">
+        <CompetencyEditModal competency={competency}>
+          <Button variant="ghost" size="iconXs">
+            <BsPencilSquare className="text-secondary" />
+          </Button>
+        </CompetencyEditModal>
+      </div>
       <div className="w-full">
         <div className="flex mt-1 self-start">
           <div className="flex items-center justify-center size-8 relative shrink-0 bg-blue-foreground me-2 rounded">
@@ -101,7 +112,7 @@ export const CompetencyCard = ({ competency, order }: Props) => {
             />
             <ContentBlock
               title="Output"
-              content={competency.input}
+              content={competency.output}
             />
           </div>
           {showExpandButton && !isExpanded && (

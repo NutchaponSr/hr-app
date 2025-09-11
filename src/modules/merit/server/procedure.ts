@@ -6,12 +6,45 @@ import { TRPCError } from "@trpc/server";
 import { prisma } from "@/lib/prisma";
 
 import { readCSV } from "@/seeds/utils/csv";
-import { App, Status } from "@/generated/prisma";
+import { App, Comment, Status, Task } from "@/generated/prisma";
 import { ApprovalCSVProps } from "@/types/approval";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
-import { competencyRecordSchema } from "../schema";
+import { competencyRecordSchema, cultureRecordSchema } from "../schema";
 import { convertAmountToUnit } from "@/lib/utils";
+
+// Helper functions
+async function fetchCommentsForRecords(recordIds: string[]) {
+  return prisma.comment.findMany({
+    where: {
+      connectId: { in: recordIds },
+    },
+    include: { employee: true },
+    orderBy: { createdAt: "asc" },
+  });
+}
+
+type CommentWithEmployee = Awaited<ReturnType<typeof fetchCommentsForRecords>>[0];
+
+function groupCommentsByRecordId(comments: CommentWithEmployee[]) {
+  return comments.reduce((acc, comment) => {
+    if (!acc[comment.connectId]) {
+      acc[comment.connectId] = [];
+    }
+    acc[comment.connectId].push(comment);
+    return acc;
+  }, {} as Record<string, CommentWithEmployee[]>);
+}
+
+function buildPermissionContext(currentEmployeeId: string, task: Task): PermissionContext {
+  return {
+    currentEmployeeId,
+    documentOwnerId: task.preparedBy,
+    checkerId: task.checkedBy || undefined,
+    approverId: task.approvedBy,
+    status: task.status,
+  };
+}
 
 export const meritProcedure = createTRPCRouter({
   getByYear: protectedProcedure
@@ -40,10 +73,9 @@ export const meritProcedure = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const res = await prisma.meritForm.findUnique({
-        where: {
-          id: input.id
-        },
+      // Fetch merit form with all related data
+      const meritForm = await prisma.meritForm.findUnique({
+        where: { id: input.id },
         include: {
           task: {
             include: {
@@ -60,53 +92,54 @@ export const meritProcedure = createTRPCRouter({
               id: "asc",
             },
           },
-          cultureRecords: true,
+          cultureRecords: {
+            include: {
+              culture: true,
+            },
+            orderBy: {
+              culture: {
+                id: "asc",
+              }
+            },
+          },
         },
       });
 
-      if (!res) {
+      if (!meritForm) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      const competencyWithComments = await prisma.comment.findMany({
-        where: {
-          connectId: {
-            in: res.competencyRecords.map((c) => c.id),
-          },
-        },
-        include: {
-          employee: true,
-        },
-        orderBy: {
-          createdAt: "asc",
-        },
-      });
+      // Fetch comments for competency and culture records
+      const [competencyComments, cultureComments] = await Promise.all([
+        fetchCommentsForRecords(meritForm.competencyRecords.map(r => r.id)),
+        fetchCommentsForRecords(meritForm.cultureRecords.map(r => r.id)),
+      ]);
 
-      const commentsByKpiId = competencyWithComments.reduce((acc, comment) => {
-        if (!acc[comment.connectId]) {
-          acc[comment.connectId] = [];
-        }
-        acc[comment.connectId].push(comment);
-        return acc;
-      }, {} as Record<string, typeof competencyWithComments>);
+      // Group comments by record ID
+      const competencyCommentsMap = groupCommentsByRecordId(competencyComments);
+      const cultureCommentsMap = groupCommentsByRecordId(cultureComments);
 
-      const kpisWithComments = res.competencyRecords.map(kpi => ({
-        ...kpi,
-        comments: commentsByKpiId[kpi.id] || [],
+      // Attach comments to competency records
+      const competencyRecordsWithComments = meritForm.competencyRecords.map(record => ({
+        ...record,
+        comments: competencyCommentsMap[record.id] || [],
       }));
 
-      const permissionContext: PermissionContext = {
-        currentEmployeeId: ctx.user.employee.id,
-        documentOwnerId: res.task.preparedBy,
-        checkerId: res.task.checkedBy || undefined,
-        approverId: res.task.approvedBy,
-        status: res.task.status,
-      };
+      // Attach comments to culture records
+      const cultureRecordsWithComments = meritForm.cultureRecords.map(record => ({
+        ...record,
+        comment: cultureCommentsMap[record.id] || [],
+        weight: (30 / meritForm.cultureRecords.length) * 100,
+      }));
+
+      // Build permission context
+      const permissionContext = buildPermissionContext(ctx.user.employee.id, meritForm.task);
 
       return {
         data: {
-          ...res,
-          competencyRecords: kpisWithComments,
+          ...meritForm,
+          competencyRecords: competencyRecordsWithComments,
+          cultureRecords: cultureRecordsWithComments,
         },
         permission: {
           ctx: permissionContext,
@@ -191,5 +224,24 @@ export const meritProcedure = createTRPCRouter({
       });
 
       return res;
-    })
+    }),
+  updateCulture: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        cultureRecordSchema,
+      })
+    )
+    .mutation(async ({ input }) => {
+      const res = await prisma.cultureRecord.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          evidence: input.cultureRecordSchema.evdience,
+        },
+      });
+
+      return res;
+    }),
 });
