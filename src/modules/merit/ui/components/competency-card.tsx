@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { ArrowDownIcon } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { convertAmountFromUnit } from "@/lib/utils";
 
 import { useTRPC } from "@/trpc/client";
 
-import { 
-  Competency, 
-  CompetencyRecord, 
-  Employee, 
-  Comment 
+import {
+  Competency,
+  CompetencyRecord,
+  Employee,
+  Comment
 } from "@/generated/prisma";
 
 import { Card } from "@/components/card";
@@ -23,11 +24,11 @@ import { useMeritId } from "@/modules/merit/hooks/use-merit-id";
 
 interface Props {
   order: number;
-  competency: CompetencyRecord & { 
-    competency: Competency | null 
+  competency: CompetencyRecord & {
+    competency: Competency | null
     comments: (Comment & {
       employee: Employee;
-    })[]; 
+    })[];
   };
 }
 
@@ -37,8 +38,17 @@ export const CompetencyCard = ({ competency, order }: Props) => {
   const queryClient = useQueryClient();
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showExpandButton, setShowExpandButton] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const createComment = useMutation(trpc.comment.create.mutationOptions());
+
+  useEffect(() => {
+    if (contentRef.current) {
+      const contentHeight = contentRef.current.scrollHeight;
+      setShowExpandButton(contentHeight > 400);
+    }
+  }, [competency.input]);
 
   const onCreate = (content: string) => {
     createComment.mutate({
@@ -80,8 +90,10 @@ export const CompetencyCard = ({ competency, order }: Props) => {
         </div>
 
         <div className="relative">
-          <div className={`text-sm overflow-y-hidden relative transition-all duration-300 ${isExpanded ? 'max-h-none' : 'max-h-[400px]'
-            }`}
+          <div
+            ref={contentRef}
+            className={`text-sm overflow-y-hidden relative transition-all duration-300 ${isExpanded ? 'max-h-none' : 'max-h-[400px]'
+              }`}
           >
             <ContentBlock
               title="Input"
@@ -92,9 +104,20 @@ export const CompetencyCard = ({ competency, order }: Props) => {
               content={competency.input}
             />
           </div>
+          {showExpandButton && !isExpanded && (
+            <div className="absolute flex justify-center items-start z-1 inset-x-0 h-7.5 -mt-7 dark:bg-[linear-gradient(rgba(241,241,239,0)_0px,rgb(37,37,37)_30px)] bg-[linear-gradient(rgb(255,255,255)_0px,rgb(255,255,255)_30px)]">
+              <button
+                onClick={() => setIsExpanded(true)}
+                className="bg-[#30302e] text-white rounded py-1 px-2 dark:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08),inset_0_0_0_1px_rgba(255,255,255,0.05)] text-xs leading-[1.4] flex items-center justify-center -mt-1 hover:bg-[#3a3a38] transition-colors"
+              >
+                <ArrowDownIcon className="size-3 me-1" />
+                See more
+              </button>
+            </div>
+          )}
         </div>
 
-        <CommentSection 
+        <CommentSection
           canPerform={true}
           comments={competency.comments}
           onCreate={onCreate}
