@@ -69,7 +69,7 @@ export const CommentSection = ({
                 <div className="text-sm">
                   {comments.length} {comments.length === 1 ? "reply" : "replies"}
                 </div>
-                <div className="text-xs text-foreground">
+                <div className="text-xs text-foreground font-normal">
                   {format(latestComment.createdAt, "hh:mm aa")}
                 </div>
               </div>

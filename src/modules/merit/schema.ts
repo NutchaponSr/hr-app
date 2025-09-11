@@ -15,4 +15,9 @@ export const competencyRecordSchema = z.object({
     }),
 });
 
+export const cultureRecordSchema = z.object({
+  evdience: z.string().min(1, "Required"),
+});
+
+export type CultureRecordSchema = z.infer<typeof cultureRecordSchema>;
 export type CompetencyRecordSchema = z.infer<typeof competencyRecordSchema>;

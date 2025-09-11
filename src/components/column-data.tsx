@@ -1,9 +1,13 @@
+import { IconType } from "react-icons";
+
 interface Props {
+  icon?: IconType;
   header: string;
   children: React.ReactNode;
 }
 
 export const ColumnData = ({
+  icon: Icon,
   children,
   header
 }: Props) => {
@@ -13,6 +17,7 @@ export const ColumnData = ({
         <div className="flex items-center text-tertiary h-6 w-min max-w-full min-w-0">
           <div role="cell" className="select-none transition flex items-center h-full w-full rounded px-1.5 max-w-full hover:bg-primary/6">
             <div className="flex items-center leading-4.5 min-w-0 text-xs font-medium">
+              {Icon && <Icon className="size-3 me-1" />}
               <div className="whitespace-nowrap overflow-hidden text-ellipsis">
                 {header}
               </div>

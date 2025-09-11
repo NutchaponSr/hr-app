@@ -2,33 +2,24 @@
 
 import { GoProject } from "react-icons/go";
 import { usePathname } from "next/navigation";
-import { BsTriangleFill } from "react-icons/bs";
+import { BsFillPersonFill } from "react-icons/bs";
 import { formatDistanceToNowStrict } from "date-fns";
 import { useSuspenseQuery } from "@tanstack/react-query";
-
-import { convertAmountFromUnit } from "@/lib/utils";
 
 import { useTRPC } from "@/trpc/client";
 import { STATUS_RECORD } from "@/types/kpi";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { Accordion } from "@/components/ui/accordion";
 
-import { Hint } from "@/components/hint";
 import { Header } from "@/components/header";
 import { Banner } from "@/components/banner";
+import { ColumnData } from "@/components/column-data";
 import { StatusBadge } from "@/components/status-badge";
-import { SelectionBadge } from "@/components/selection-badge";
 import { SavingIndicator } from "@/components/saving-indicator";
 
-import { CompetencyCard } from "@/modules/merit/ui/components/competency-card";
+import { CultureSection } from "@/modules/merit/ui/components/culture-section";
 import { ApproveButton } from "@/modules/bonus/ui/components/bonus-approve-button";
+import { CompetencySection } from "@/modules/merit/ui/components/competency-section";
 
 interface Props {
   id: string;
@@ -43,10 +34,6 @@ export const MeritView = ({ id }: Props) => {
   const { data: merit } = useSuspenseQuery(trpc.kpiMerit.getById.queryOptions({ id }));
 
   const status = STATUS_RECORD[merit.data.task.status];
-
-  const totalCompetenciesWeight = convertAmountFromUnit(
-    merit.data.competencyRecords.reduce((acc, kpi) => acc + (kpi.weight || 0), 0), 2
-  );
 
   return (
     <>
@@ -80,70 +67,24 @@ export const MeritView = ({ id }: Props) => {
               />
             </div>
             <div className="col-start-2 col-end-2 min-w-0 select-none">
-              <Accordion type="multiple" defaultValue={["competency"]}>
-                <AccordionItem value="competency">
-                  <div className="h-[42px] z-87 relative text-sm">
-                    <div className="flex items-center h-full pt-0 mb-2">
-                      <div className="flex items-center h-full overflow-hidden gap-1">
-                        <AccordionTrigger asChild>
-                          <Button variant="ghost" size="iconXs" className="group">
-                            <BsTriangleFill className="text-primary rotate-90 size-3 transition-transform group-data-[state=open]:rotate-180" />
-                          </Button>
-                        </AccordionTrigger>
-
-                        <h2 className="text-primary text-lg font-semibold">
-                          Competency
-                        </h2>
-                      </div>
-                    </div>
-                  </div>
-                  <AccordionContent>
-                    <div className="min-h-9 shrink-0 z-[100] top-0 sticky bg-background flex items-center mb-3">
-                      <div className="flex flex-row items-center gap-x-2 gap-y-1.5">
-                        <SelectionBadge label="Weight" />
-                        <span className="text-sm text-primary">
-                          {totalCompetenciesWeight.toLocaleString("en-US", {
-                            maximumFractionDigits: 2,
-                            minimumFractionDigits: 2,
-                          })}
-                        </span>
-                        <Hint label={`${totalCompetenciesWeight} / 30`}>
-                          <Progress
-                            className="h-1 w-40"
-                            value={(totalCompetenciesWeight / 30) * 100}
-                          />
-                        </Hint>
-                      </div>
-                    </div>
-                    <div className="relative mb-3 flex flex-col gap-8">
-                      {merit.data.competencyRecords.map((competency, idx) => (
-                        <CompetencyCard
-                          key={competency.id}
-                          order={idx + 1}
-                          competency={competency}
-                        />
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="culture">
-                  <div className="h-[42px] z-87 relative text-sm">
-                    <div className="flex items-center h-full pt-0 mb-2">
-                      <div className="flex items-center h-full overflow-hidden gap-1">
-                        <AccordionTrigger asChild>
-                          <Button variant="ghost" size="iconXs" className="group">
-                            <BsTriangleFill className="text-primary rotate-90 size-3 transition-transform group-data-[state=open]:rotate-180" />
-                          </Button>
-                        </AccordionTrigger>
-
-                        <h2 className="text-primary text-lg font-semibold">
-                          Culture
-                        </h2>
-                      </div>
-                    </div>
-                  </div>
-
-                </AccordionItem>
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] w-full gap-y-2 gap-x-1">
+                <ColumnData icon={BsFillPersonFill} header="Owner">
+                  {merit.data.task.preparer.fullName}
+                </ColumnData>
+                {merit.data.task.checker && (
+                  <ColumnData icon={BsFillPersonFill} header="Checker">
+                    {merit.data.task.checker.fullName}
+                  </ColumnData>
+                )}
+                <ColumnData icon={BsFillPersonFill} header="Approver">
+                  {merit.data.task.approver.fullName}
+                </ColumnData>
+              </div>
+            </div>
+            <div className="col-start-2 col-end-2 min-w-0 select-none">
+              <Accordion type="multiple" defaultValue={["competency", "culture"]}>
+                <CompetencySection competencyRecords={merit.data.competencyRecords} />
+                <CultureSection cultureRecord={merit.data.cultureRecords} />
               </Accordion>
             </div>
           </div>

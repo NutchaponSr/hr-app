@@ -126,7 +126,7 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
                               selectedCompetencyId={field.value ?? undefined}
                             >
                               <button type="button" className="py-1 px-1.5 flex flex-col hover:bg-primary/6 w-fit rounded">
-                                <span data-value={!!selectedCompetency} className="max-w-full w-full whitespace-break-spaces break-all text-4xl font-bold resize-none field-sizing-content h-full focus-visible:outline-none data-[value=true]:text-primary text-tertiary overflow-hidden text-start">
+                                <span data-value={!!selectedCompetency} className="max-w-full w-full whitespace-break-spaces break-all text-3xl font-bold resize-none field-sizing-content h-full focus-visible:outline-none data-[value=true]:text-primary text-tertiary overflow-hidden text-start">
                                   {selectedCompetency?.name || "Select competency"}
                                 </span>
                               </button>
