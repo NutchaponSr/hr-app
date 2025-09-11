@@ -17,7 +17,7 @@ const Page = async ({ searchParams }: Props) => {
   const queryClient = getQueryClient();
 
   void queryClient.prefetchQuery(trpc.task.getMany.queryOptions());
-  // void queryClient.prefetchQuery(trpc.kpiMerit.getOne.queryOptions({ year }));
+  void queryClient.prefetchQuery(trpc.kpiMerit.getByYear.queryOptions({ year }));
   void queryClient.prefetchQuery(trpc.kpiBonus.getByYear.queryOptions({ year }));
 
   return (

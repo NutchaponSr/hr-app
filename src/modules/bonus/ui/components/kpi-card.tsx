@@ -6,6 +6,7 @@ import { convertAmountFromUnit } from "@/lib/utils";
 
 import { Comment, Employee, Kpi } from "@/generated/prisma";
 
+import { Card } from "@/components/card";
 import { ColumnData } from "@/components/column-data";
 import { ContentBlock } from "@/components/content-block";
 import { CommentSection } from "@/components/comment-section";
@@ -14,6 +15,9 @@ import { SelectionBadge } from "@/components/selection-badge";
 import { KpiCardHeader } from "@/modules/bonus/ui/components/kpi-card-header";
 
 import { projectTypes } from "@/modules/bonus/constants";
+import { useTRPC } from "@/trpc/client";
+import { useKpiFormId } from "../../hooks/use-kpi-form-id";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   canPerform: boolean;
@@ -28,10 +32,27 @@ export const KpiCard = ({
   canPerform,
   kpi 
 }: Props) => {
+  const trpc = useTRPC();
+  const kpiFormId = useKpiFormId();
+  const queryClient = useQueryClient();
+
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const createComment = useMutation(trpc.comment.create.mutationOptions());
+
+  const onCreate = (content: string) => {
+    createComment.mutate({
+      content,
+      connectId: kpi.id,
+    }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: kpiFormId }));
+      },
+    });
+  }
+
   return (
-    <article className="w-full relative p-4 shadow-[0_12px_32px_rgba(0,0,0,0.02),inset_0_0_0_1px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.03),inset_0_0_0_1px_rgba(0,0,0,0.086)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] dark:hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] bg-background dark:bg-sidebar rounded-sm group">
+    <Card>
       <KpiCardHeader kpi={kpi} canPerform={canPerform} />
       <div className="my-2 px-4">
         <div className="mb-1 px-0.5 flex flex-row items-center space-x-1">
@@ -102,11 +123,11 @@ export const KpiCard = ({
         </div>
 
         <CommentSection 
-          id={kpi.id} 
           comments={kpi.comments}
           canPerform={canPerform}
+          onCreate={onCreate}
         />
       </div>
-    </article>
+    </Card>
   );
 }

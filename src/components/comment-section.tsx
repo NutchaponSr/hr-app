@@ -19,14 +19,18 @@ import { CommentInput } from "@/components/comment-input";
 import { UserAvatar } from "@/modules/auth/ui/components/user-avatar";
 
 interface Props {
-  id: string;
   comments?: (Comment & {
     employee: Employee;
   })[];
   canPerform: boolean;
+  onCreate: (content: string) => void;
 }
 
-export const CommentSection = ({ id, comments, canPerform }: Props) => {
+export const CommentSection = ({ 
+  comments, 
+  canPerform, 
+  onCreate 
+}: Props) => {
   const { data: session } = authClient.useSession();
   const [isClient, setIsClient] = useState(false);
 
@@ -97,7 +101,10 @@ export const CommentSection = ({ id, comments, canPerform }: Props) => {
                         }}
                       />
                     </div>
-                    <CommentInput id={id} canPerform={canPerform} />
+                    <CommentInput 
+                      canPerform={canPerform} 
+                      onCreate={onCreate}
+                    />
                   </div>
                 </div>
               </div>
@@ -121,7 +128,10 @@ export const CommentSection = ({ id, comments, canPerform }: Props) => {
               }}
             />
           </div>
-          <CommentInput id={id} canPerform={canPerform} />
+          <CommentInput
+            canPerform={canPerform} 
+            onCreate={onCreate}
+          />
         </div>
       </div>
     </div>

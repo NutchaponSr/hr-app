@@ -92,7 +92,9 @@ export const BonusView = ({
         }}
         iconMap={{
           [id]: GoProject
-        }}>
+        }}
+        disabledPaths={["bonus"]}
+      >
         {kpiBonus.data.updatedAt && (
           <SavingIndicator label={`Edited ${formatDistanceToNowStrict(kpiBonus.data.updatedAt, { addSuffix: true })}`} />
         )}
@@ -117,9 +119,7 @@ export const BonusView = ({
               icon={GoProject}
               className="ps-24"
             />
-            {kpiBonus.data?.task && (
-              <BonusInfo data={kpiBonus.data.task} />
-            )}
+            <BonusInfo data={kpiBonus.data.task} />
             <Toolbar
               perform={perform || revision}
               onCreate={() => onOpen("create")}

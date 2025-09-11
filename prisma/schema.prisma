@@ -192,6 +192,7 @@ model Task {
   approver Employee @relation("approver", fields: [approvedBy], references: [id], onDelete: Cascade)
 
   kpiForms KpiForm[]
+  meritForms MeritForm[]
 
   @@map("task")
 }
@@ -274,6 +275,7 @@ model MeritForm {
   updatedAt DateTime @updatedAt
 
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   cultureRecords CultureRecord[]
   competencyRecords CompetencyRecord[]
