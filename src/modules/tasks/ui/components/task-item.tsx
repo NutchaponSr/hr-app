@@ -1,12 +1,12 @@
 import Link from "next/link";
 
-import { tasks, TaskWithInfo } from "../../type";
 import { GoProject } from "react-icons/go";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { colorVariant } from "@/types/color";
 import { STATUS_RECORD } from "@/types/kpi";
 import { App } from "@/generated/prisma";
+import { tasks, TaskWithInfo } from "../../type";
 
 interface Props {
   task: TaskWithInfo;
@@ -17,12 +17,12 @@ export const TaskItem = ({ task }: Props) => {
 
   const href = task.task.type === App.BONUS
     ? `/performance/bonus/${task.info.id}`
-    : `/performance/merit/${task.task.id}`
+    : `/performance/merit/${task.info.id}`
 
   return (
     <div className="flex relative">
-      <Link 
-        role="link" 
+      <Link
+        role="link"
         href={href}
         className="flex text-primary select-none transition hover:bg-primary/6 relative grow overflow-hidden rounded h-7.5 items-center px-1"
       >

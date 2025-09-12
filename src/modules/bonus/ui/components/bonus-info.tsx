@@ -1,89 +1,97 @@
-import { BsPeopleFill } from "react-icons/bs";
+"use client";
 
-import { KpiBonusWithInfo } from "@/types/kpi";
+import { toast } from "sonner";
+import { PlusIcon } from "lucide-react";
+import { GoProject } from "react-icons/go";
+import { useRouter } from "next/navigation";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
-import { UserAvatar } from "@/modules/auth/ui/components/user-avatar";
+import { Status } from "@/generated/prisma";
+import { STATUS_RECORD } from "@/types/kpi";
+
+import { useTRPC } from "@/trpc/client";
+
+import { Stepper } from "@/modules/performance/ui/components/stepper";
 
 interface Props {
-  data: KpiBonusWithInfo | null;
+  year: number;
 }
 
-const UserRole = ({
-  title,
-  name,
-  fullName
-}: {
-  title: string;
-  name: string;
-  fullName: string;
-}) => (
-  <div className="flex flex-col">
-    <div className="flex items-center text-tertiary h-6 w-min max-w-full min-w-0">
-      <div role="cell" className="select-none transition cursor-pointer flex items-center h-full w-full rounded px-1.5 max-w-full hover:bg-primary/6">
-        <div className="flex items-center leading-[18px] text-xs font-medium">
-          <div className="flex items-center justify-center h-6 w-5">
-            <BsPeopleFill className="size-3" />
-          </div>
-          <div className="whitespace-nowrap overflow-hidden text-ellipsis">
-            {title}
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className="select-none transition relative text-sm overflow-hidden items-center rounded hover:bg-primary/6 w-full min-h-[30px] py-1 px-1.5 flex">
-      <div className="shrink-0 grow-0 me-1.5 mt-0">
-        <UserAvatar
-          name={name}
-          className={{
-            container: "size-5",
-            fallback: "text-xs font-normal"
-          }}
-        />
-      </div>
-      <div className="text-primary leading-[1.5] break-words whitespace-nowrap text-ellipsis overflow-hidden">
-        {fullName}
-      </div>
-    </div>
-  </div>
-);
+export const BonusInfo = ({ year }: Props) => {
+  const trpc = useTRPC();
+  const router = useRouter();
 
-export const BonusInfo = ({ data }: Props) => {
-  if (!data) return null;
+  const { data: kpiBonus } = useSuspenseQuery(trpc.kpiBonus.getByYear.queryOptions({ year }));
+  const createForm = useMutation(trpc.kpiBonus.createForm.mutationOptions());
 
-  const roles = [
-    {
-      title: "Owner",
-      name: data.preparer.fullName || "",
-      fullName: data.preparer.fullName || ""
-    },
-    {
-      title: "Checker",
-      name: data.checker?.fullName || "",
-      fullName: data.checker?.fullName || ""
-    },
-    {
-      title: "Approver",
-      name: data.approver.fullName || "",
-      fullName: data.approver.fullName || ""
-    }
-  ].filter(role => role.fullName.trim() !== "");
-
-  if (roles.length === 0) return null;
+  const status = STATUS_RECORD[kpiBonus?.task.status || Status.NOT_STARTED];
 
   return (
-    <div className="w-full max-w-full mx-auto ps-24 sticky start-0 pb-3 mb-3 -ms-1">
-      <div className="flex flex-row gap-2">
-        <div className="grid [grid-template-columns:repeat(auto-fit,minmax(80px,max-content))] gap-y-2 gap-x-1 mt-2.5 max-w-full">
-          {roles.map((role) => (
-            <UserRole
-              key={role.title}
-              title={role.title}
-              name={role.name}
-              fullName={role.fullName}
-            />
-          ))}
+    <article className="relative select-none">
+      <div className="flex justify-between shrink-0 items-center h-8 pb-3.5 ms-2">
+        <div className="flex items-center text-xs font-medium text-secondary">
+          <div className="flex items-center justify-center size-4 me-1.5">
+            <GoProject className="size-4 stroke-[0.25]" />
+          </div>
+          <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+            KPI Bonus 
+          </span>
         </div>
       </div>
-    </div>
+
+      <div className="basic-0 grow pt-4 px-6 text-sm text-foreground overflow-hidden">
+        <div className="flex flex-col justify-center min-h-full">
+          <Stepper
+            action={
+              <div className="mt-1.5 ps-2.5">
+                <button
+                  className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs"
+                  onClick={() => {
+                    if (!kpiBonus) {
+                      createForm.mutate({ year }, {
+                        onSuccess: ({ id }) => {
+                          toast.success("Form created!");
+                          router.push(`/performance/bonus/${id}`);
+                        },
+                        onError: () => {
+                          toast.error("Something went wrong");
+                        }
+                      });
+                    } else {
+                      router.push(`/performance/bonus/${kpiBonus.id}`);
+                    }
+                  }}
+                >
+                  {!kpiBonus ? (
+                    <>
+                      <PlusIcon className="size-4 stroke-[1.75] mr-1" />
+                      Create KPI
+                    </>
+                  ) : (
+                    "View KPI"
+                  )}
+                </button>
+              </div>
+            }
+            date="Jan - Mar"
+            title="KPI Definition"
+            description="Define measurable goals aligned with team and company priorities"
+            status={status}
+          />   
+          <Stepper
+            date="Jan - Jun"
+            title="Evaluation 1st"
+            description="Mid-year assessment of progress towards defined KPIs"
+            status={STATUS_RECORD[Status.NOT_STARTED]} // TODO: Status when start evaluation form
+          />   
+          <Stepper
+            date="Jul - Dec"
+            title="Evaluation 2nd"
+            description="Final review of KPI performance and eligibility for bonus"
+            status={STATUS_RECORD[Status.NOT_STARTED]} // TODO: Status when start evaluation form
+          />   
+        </div>
+      </div>
+    </article>
   );
 }

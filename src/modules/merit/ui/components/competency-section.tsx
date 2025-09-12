@@ -22,12 +22,15 @@ interface Props {
       employee: Employee;
     })[];
   })[];
+  perform: boolean;
 }
 
-export const CompetencySection = ({ competencyRecords }: Props) => {
+export const CompetencySection = ({ competencyRecords, perform }: Props) => {
   const totalCompetenciesWeight = convertAmountFromUnit(
-    competencyRecords.reduce((acc, kpi) => acc + (kpi.weight || 0), 0), 2
+    competencyRecords.reduce((acc, kpi) => acc + kpi.weight, 0), 2
   );
+
+  const progressValue = Math.min((totalCompetenciesWeight / 30) * 100, 100);
 
   return (
     <AccordionItem value="competency">
@@ -59,7 +62,7 @@ export const CompetencySection = ({ competencyRecords }: Props) => {
             <Hint label={`${totalCompetenciesWeight} / 30`}>
               <Progress
                 className="h-1 w-40"
-                value={(totalCompetenciesWeight / 30) * 100}
+                value={progressValue}
               />
             </Hint>
           </div>
@@ -69,6 +72,7 @@ export const CompetencySection = ({ competencyRecords }: Props) => {
             <CompetencyCard
               key={competency.id}
               order={idx + 1}
+              perform={perform}
               competency={competency}
             />
           ))}

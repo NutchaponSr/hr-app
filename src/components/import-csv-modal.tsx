@@ -62,10 +62,13 @@ export const ImportCsvModal = () => {
   }
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={() => {
-      closeModal();
-      reset();
-    }}>
+    <Dialog 
+      open={isModalOpen} 
+      onOpenChange={() => {
+        closeModal();
+        reset();
+      }}
+    >
       <DialogContent
         showCloseButton={false}
         className="max-h-[715px] w-[1150px] max-w-[calc(100vw-100px)] h-[calc(100vh-100px)] overflow-hidden flex mb-0 p-0 bg-[#f9f8f7] dark:bg-popover"

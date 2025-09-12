@@ -17,7 +17,7 @@ interface Props {
   year: number;
 }
 
-export const MeritScreen = ({ year }: Props) => {
+export const MeritInfo = ({ year }: Props) => {
   const trpc = useTRPC();
   const router = useRouter();
 
@@ -74,7 +74,7 @@ export const MeritScreen = ({ year }: Props) => {
               </div>
             }
             date="Jan - Mar"
-            title="KPI Definition"
+            title="Merit Definition"
             description="Define measurable goals that will inform merit evaluation"
             status={status}
           />   

@@ -42,7 +42,7 @@ export const CultureEditModal = ({ children, culture }: Props) => {
 
   const defaultValues = {
     evdience: culture.evidence ?? "",
-  } as const;
+  }
 
   const form = useForm<CultureRecordSchema>({
     resolver: zodResolver(cultureRecordSchema),
@@ -59,7 +59,6 @@ export const CultureEditModal = ({ children, culture }: Props) => {
         queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: meritId }))
         toast.success("Updated!", { id: "culture-update" });
         setOpen(false);
-        form.reset(defaultValues);
       },
       onError: (ctx) => {
         toast.error(ctx.message, { id: "culture-update" });
@@ -69,9 +68,7 @@ export const CultureEditModal = ({ children, culture }: Props) => {
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
-    if (!open) {
-      form.reset(defaultValues);
-    }
+    form.reset(defaultValues);
   }
 
   return (

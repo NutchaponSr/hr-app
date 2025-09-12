@@ -13,7 +13,8 @@ import {
   Form,
   FormControl,
   FormField,
-  FormItem
+  FormItem,
+  FormMessage
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -102,6 +103,7 @@ export const BonusCreateModal = () => {
                               className="max-w-full w-full whitespace-break-spaces break-words text-4xl font-bold resize-none field-sizing-content h-full focus-visible:outline-none text-primary !placeholder:text-tertiary overflow-hidden"
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />

@@ -3,7 +3,7 @@ import { BsPencilSquare } from "react-icons/bs";
 import { useState, useRef, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { convertAmountFromUnit } from "@/lib/utils";
+import { cn, convertAmountFromUnit } from "@/lib/utils";
 
 import { useTRPC } from "@/trpc/client";
 
@@ -18,12 +18,12 @@ import { Button } from "@/components/ui/button";
 
 import { Card } from "@/components/card";
 import { ColumnData } from "@/components/column-data";
-import { ContentBlock } from "@/components/content-block";
 import { CommentSection } from "@/components/comment-section";
 
 import { CompetencyEditModal } from "@/modules/merit/ui/components/competency-edit-modal";
 
 import { useMeritId } from "@/modules/merit/hooks/use-merit-id";
+import { RowData } from "@/components/row-data";
 
 
 interface Props {
@@ -34,9 +34,10 @@ interface Props {
       employee: Employee;
     })[];
   };
+  perform: boolean;
 }
 
-export const CompetencyCard = ({ competency, order }: Props) => {
+export const CompetencyCard = ({ competency, order, perform }: Props) => {
   const trpc = useTRPC();
   const meritFormId = useMeritId();
   const queryClient = useQueryClient();
@@ -53,7 +54,7 @@ export const CompetencyCard = ({ competency, order }: Props) => {
       const contentHeight = contentRef.current.scrollHeight;
       setShowExpandButton(contentHeight > 400);
     }
-  }, [competency.input]);
+  }, [competency.output]);
 
   const onCreate = (content: string) => {
     createComment.mutate({
@@ -68,14 +69,14 @@ export const CompetencyCard = ({ competency, order }: Props) => {
 
   return (
     <Card>
-      <div data-perform={true} className="absolute z-1 top-4 end-4 transition-opacity p-0.5 dark:shadow-[0_2px_12px_0_rgba(29,27,22,0.06)] border-border border-[1.25px] rounded-sm gap-px opacity-0 group-hover:opacity-100 dark:bg-[#2f2f2f] data-[perform=true]:flex hidden">
+      <div data-perform={perform} className="absolute z-1 top-4 end-4 transition-opacity p-0.5 dark:shadow-[0_2px_12px_0_rgba(29,27,22,0.06)] border-border border-[1.25px] rounded-sm gap-px opacity-0 group-hover:opacity-100 dark:bg-[#2f2f2f] data-[perform=true]:flex hidden">
         <CompetencyEditModal competency={competency}>
           <Button variant="ghost" size="iconXs">
             <BsPencilSquare className="text-secondary" />
           </Button>
         </CompetencyEditModal>
       </div>
-      <div className="w-full">
+      <div className="my-2 px-4 w-full">
         <div className="flex mt-1 self-start">
           <div className="flex items-center justify-center size-8 relative shrink-0 bg-blue-foreground me-2 rounded">
             <span className="text-xl text-blue-secondary font-bold">
@@ -87,7 +88,7 @@ export const CompetencyCard = ({ competency, order }: Props) => {
           </h1>
         </div>
         <div className="max-w-full overflow-hidden mb-3">
-          <p className="max-w-full w-[780px] whitespace-break-spaces break-words text-primary text-sm">
+          <p className="max-w-full whitespace-break-spaces break-all text-primary text-sm py-1">
             {competency.competency?.definition}
           </p>
         </div>
@@ -101,19 +102,22 @@ export const CompetencyCard = ({ competency, order }: Props) => {
         </div>
 
         <div className="relative">
-          <div
-            ref={contentRef}
-            className={`text-sm overflow-y-hidden relative transition-all duration-300 ${isExpanded ? 'max-h-none' : 'max-h-[400px]'
-              }`}
+          <div ref={contentRef} className={cn(
+            "text-sm overflow-y-hidden relative transition-all duration-300", 
+            isExpanded ? "max-h-none" : "max-h-[400px]")}
           >
-            <ContentBlock
-              title="Input"
-              content={competency.input}
-            />
-            <ContentBlock
-              title="Output"
-              content={competency.output}
-            />
+            <h4 className="py-2.5 text-xs leading-[18px] flex flex-row items-center font-medium gap-0.5 ms-1.5 text-primary">
+              Properties
+            </h4>
+
+            <div role="table" className="w-full max-w-full mx-auto">
+              <RowData label="Input">
+                {competency.input || "Empty"}
+              </RowData>
+              <RowData label="Output">
+                {competency.output || "Empty"}
+              </RowData>
+            </div>
           </div>
           {showExpandButton && !isExpanded && (
             <div className="absolute flex justify-center items-start z-1 inset-x-0 h-7.5 -mt-7 dark:bg-[linear-gradient(rgba(241,241,239,0)_0px,rgb(37,37,37)_30px)] bg-[linear-gradient(rgb(255,255,255)_0px,rgb(255,255,255)_30px)]">
@@ -129,7 +133,7 @@ export const CompetencyCard = ({ competency, order }: Props) => {
         </div>
 
         <CommentSection
-          canPerform={true}
+          canPerform={perform}
           comments={competency.comments}
           onCreate={onCreate}
         />

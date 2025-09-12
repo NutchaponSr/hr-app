@@ -1,9 +1,10 @@
-import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from "clsx";
+import { format, isToday, isYesterday } from "date-fns";
 
 import { prefixes } from "@/constants";
+import { Status } from "@/generated/prisma";
 import { UploadStep } from "@/types/upload";
-import { format, isToday, isYesterday } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -86,4 +87,17 @@ export function formatDateUpdatedAt(date: Date): string {
   }
 
   return format(date, "mmm dd, yyyy, hh:mm aa");
+}
+
+export function getBannerMessage(error: string | null, status: Status) {
+  if (error) return error;
+
+  switch (status) {
+    case Status.REJECTED_BY_CHECKER:
+      return "This KPI form has been rejected by the Checker. Please review the feedback and resubmit for approval.";
+    case Status.REJECTED_BY_APPROVER:
+      return "This KPI form has been rejected by the Approver. Please review the feedback and resubmit for approval.";
+    default:
+      return null;
+  }
 }
