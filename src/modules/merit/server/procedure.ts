@@ -6,7 +6,7 @@ import { TRPCError } from "@trpc/server";
 import { prisma } from "@/lib/prisma";
 
 import { readCSV } from "@/seeds/utils/csv";
-import { App, Comment, Status, Task } from "@/generated/prisma";
+import { App, Status, Task } from "@/generated/prisma";
 import { ApprovalCSVProps } from "@/types/approval";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
@@ -188,7 +188,9 @@ export const meritProcedure = createTRPCRouter({
           taskId: task.id,
           competencyRecords: {
             createMany: {
-              data: Array.from({ length: 4 }, () => ({})),
+              data: Array.from({ length: 4 }, () => ({
+                weight: 0,
+              })),
             },
           },
           cultureRecords: {

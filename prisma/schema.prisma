@@ -351,12 +351,12 @@ model Competency {
 }
 
 model CompetencyRecord {
-  id               String  @id @default(uuid())
-  competencyId     String?
-  meritFormId      String
-  weight           Int?
-  input            String? @db.Text
-  output           String? @db.Text
+  id String @id @default(uuid())
+  competencyId String?
+  meritFormId String
+  weight Int @default(0)
+  input String? @db.Text
+  output String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -370,17 +370,17 @@ model CompetencyRecord {
 }
 
 model CompetencyEvaluation {
-  id             String @id @default(uuid())
-  period         Period
-  inputEvidence  String @db.Text
+  id String @id @default(uuid())
+  period Period
+  inputEvidence String @db.Text
   outputEvidence String @db.Text
-  inputLevel     Int    @default(0)
-  outputLevel    Int    @default(0)
+  inputLevel Int @default(0)
+  outputLevel Int @default(0)
 
   createdAt DateTime @default(now())
 
   competencyRecordId String
-  competencyRecord   CompetencyRecord @relation(fields: [competencyRecordId], references: [id], onDelete: Cascade)
+  competencyRecord CompetencyRecord @relation(fields: [competencyRecordId], references: [id], onDelete: Cascade)
 
   @@map("competencyEvaluation")
 }

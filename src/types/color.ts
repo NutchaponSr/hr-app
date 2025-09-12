@@ -8,7 +8,7 @@ export const colorVariant = cva("",
         red: "text-red-muted dark:text-red-neutral",
         orange: "text-orange-muted dark:text-orange-neutral",
         purple: "text-purple-muted dark:text-purple-neutral",
-        green: "text-green-muted",
+        green: "text-green-muted dark:text-green-neutral",
       },
       background: {
         default: "bg-gray-foreground",

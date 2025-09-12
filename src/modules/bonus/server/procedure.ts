@@ -55,7 +55,11 @@ export const bonusProcedure = createTRPCRouter({
               approver: true,
             }
           },
-          kpis: true,
+          kpis: {
+            orderBy: {
+              id: "asc",
+            },
+          },
         },
       });
 
@@ -281,7 +285,12 @@ export const bonusProcedure = createTRPCRouter({
         data: {
           ...otherFields,
           weight: convertAmountToUnit(Number(weight), 2),
-        }
+          kpiForm: {
+            update: {
+              updatedAt: new Date(),
+            },
+          },
+        },
       });
 
       return res;
@@ -301,135 +310,4 @@ export const bonusProcedure = createTRPCRouter({
 
       return res;
     }),
-  deleteBulk: protectedProcedure
-    .input(
-      z.object({
-        ids: z.array(z.string()),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const res = await prisma.kpi.deleteMany({
-        where: {
-          id: {
-            in: input.ids,
-          },
-        },
-      });
-
-      return res;
-    }),
-  startEvaluation: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      // TODO: Validate weight
-
-      const task = await prisma.task.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (!task) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      const res = await prisma.task.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          status: task.checkedBy ? Status.PENDING_CHECKER : Status.PENDING_APPROVER,
-        },
-      });
-
-      return res;
-    }),
-  confirm: protectedProcedure
-    .input(
-      z.object({
-        approve: z.boolean(),
-        comment: z.string().optional(),
-        taskId: z.string(),
-        id: z.string(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const task = await prisma.task.findUnique({
-        where: {
-          id: input.taskId,
-        },
-      });
-
-      if (!task) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      const permissionContext: PermissionContext = {
-        currentEmployeeId: ctx.user.employee.id,
-        documentOwnerId: task.preparedBy,
-        checkerId: task.checkedBy || undefined,
-        approverId: task.approvedBy,
-        status: task.status,
-      };
-
-      const role = getUserRole(permissionContext);
-
-      if (role === "checker") {
-        if (input.approve) {
-          await prisma.task.update({
-            where: {
-              id: input.taskId,
-            },
-            data: {
-              status: Status.PENDING_APPROVER,
-            },
-          });
-        } else {
-          await prisma.task.update({
-            where: {
-              id: input.taskId,
-            },
-            data: {
-              status: Status.REJECTED_BY_CHECKER,
-            },
-          });
-        }
-      } else if (role === "approver") {
-        if (input.approve) {
-          await prisma.task.update({
-            where: {
-              id: input.taskId,
-            },
-            data: {
-              status: Status.APPROVED,
-            },
-          });
-        } else {
-          await prisma.task.update({
-            where: {
-              id: input.taskId,
-            },
-            data: {
-              status: Status.REJECTED_BY_APPROVER,
-            },
-          });
-        }
-      }
-
-      if (input.comment) {
-        await prisma.comment.create({
-          data: {
-            content: input.comment,
-            connectId: input.id,
-            createdBy: ctx.user.employee.id,
-          },
-        });
-      }
-
-      return { success: true };
-    })
 });

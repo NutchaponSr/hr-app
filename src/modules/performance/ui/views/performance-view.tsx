@@ -4,13 +4,17 @@ import { usePathname } from "next/navigation";
 
 import { APPS } from "@/constants";
 
+import { 
+  Main, 
+  MainContent 
+} from "@/components/main";
 import { Banner } from "@/components/banner";
 import { Header } from "@/components/header";
 
 import { Tasks } from "@/modules/tasks/ui/components/tasks";
 
-import { BonusScreen } from "@/modules/bonus/ui/components/bonus-screen";
-import { MeritScreen } from "@/modules/merit/ui/components/merit-info";
+import { BonusInfo } from "@/modules/bonus/ui/components/bonus-info";
+import { MeritInfo } from "@/modules/merit/ui/components/merit-info";
 
 interface Props {
   year: number;
@@ -24,30 +28,26 @@ export const PerformanceView = ({ year }: Props) => {
   return (
     <>
       <Header paths={paths} />
-      <main className="grow-0 shrink flex flex-col bg-background z-1 h-full max-h-full w-full">
-        <div className="w-full h-full overflow-x-hidden overflow-y-auto me-0 mb-0">
-          <div className="grid grid-cols-[minmax(20px,1fr)_minmax(auto,840px)_minmax(20px,1fr)] w-full gap-14 pb-[30vh]">
-            <div className="col-start-2 col-end-2 min-w-0 select-none">
-              <Banner
-                icon={APPS.performance.icon}
-                title={APPS.performance.title}
-                description={APPS.performance.description}
-              />
-            </div>
+      <Main>
+        <MainContent className="col-start-2 col-end-2 min-w-0 select-none">
+          <Banner
+            icon={APPS.performance.icon}
+            title={APPS.performance.title}
+            description={APPS.performance.description}
+          />
+        </MainContent>
 
-            <div className="col-start-2 col-end-2 min-w-0">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                <BonusScreen year={year} />
-                <MeritScreen year={year} />
-              </div>
-            </div>
-
-            <div className="col-start-2 col-end-2 min-w-0">
-              <Tasks />
-            </div>
+        <MainContent className="col-start-2 col-end-2 min-w-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <BonusInfo year={year} />
+            <MeritInfo year={year} />
           </div>
-        </div>
-      </main>
+        </MainContent>
+
+        <MainContent className="col-start-2 col-end-2 min-w-0">
+          <Tasks />
+        </MainContent>
+      </Main>
     </>
   );
 }

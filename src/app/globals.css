@@ -164,6 +164,7 @@
   --color-yellow-secondary: var(--yellow-secondary);
 
   --color-green: var(--green);
+  --color-green-neutral: var(--green-neutral);
   --color-green-foreground: var(--green-foreground);
   --color-green-muted: var(--green-muted);
   --color-green-secondary: var(--green-secondary);
@@ -320,6 +321,7 @@
   --yellow-secondary: oklch(0.6909 0.1374 77.68);
 
   --green: oklch(0.6472 0.1402 156.54 / 90%);
+  --green-neutral: oklch(0.95 0.01 161.89);
   --green-foreground: oklch(0.6088 0.1264 157.38 / 50%);
   --green-muted: oklch(0.3351 0.0388 160.65);
   --green-secondary: oklch(0.6088 0.1264 157.38);

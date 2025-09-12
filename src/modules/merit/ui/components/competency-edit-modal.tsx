@@ -50,10 +50,10 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
 
   const defaultValues = {
     competencyId: competency.competencyId ?? "",
-    weight: String(convertAmountFromUnit(competency.weight || 0, 2)),
+    weight: String(convertAmountFromUnit(competency.weight, 2)),
     input: competency.input ?? "",
     output: competency.output ?? "",
-  } as const;
+  }
 
   useEffect(() => {
     setSelectedCompetency(competency.competency);
@@ -93,10 +93,8 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
-    if (!open) {
-      form.reset(defaultValues);
-      setSelectedCompetency(competency.competency);
-    }
+    setSelectedCompetency(competency.competency);
+    form.reset(defaultValues);
   }
 
   return (

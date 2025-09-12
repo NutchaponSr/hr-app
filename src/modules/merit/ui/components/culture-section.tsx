@@ -23,9 +23,10 @@ interface Props {
     })[];
     weight: number;
   })[];
+  perform: boolean;
 }
 
-export const CultureSection = ({ cultureRecord }: Props) => {
+export const CultureSection = ({ cultureRecord, perform }: Props) => {
   const totalCompetenciesWeight = convertAmountFromUnit(
     cultureRecord.reduce((acc, kpi) => acc + (kpi.weight || 0), 0), 2
   );
@@ -70,6 +71,7 @@ export const CultureSection = ({ cultureRecord }: Props) => {
             <CultureCard
               key={culture.id}
               culture={culture}
+              perform={perform}
             />
           ))}
         </div>

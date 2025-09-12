@@ -28,6 +28,8 @@ import { ColumnField } from "@/components/column-field";
 
 import { kpiCategoies, projectTypes } from "@/modules/bonus/constants";
 import { kpiBonusCreateSchema, KpiBonusCreateSchema } from "@/modules/bonus/schema";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface Props {
   kpi: Kpi;
@@ -37,6 +39,8 @@ interface Props {
 export const BonusEditModal = ({ kpi, children }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const [open, setOpen] = useState(false);
 
   const defaultValues: KpiBonusCreateSchema = {
     name: kpi.name,
@@ -60,18 +64,31 @@ export const BonusEditModal = ({ kpi, children }: Props) => {
   const updateKpi = useMutation(trpc.kpiBonus.updateKpi.mutationOptions());
 
   const onSubmit = (value: KpiBonusCreateSchema) => {
+    toast.loading("updating...", { id: "kpi-update" });
+
     updateKpi.mutate({
       id: kpi.id,
       kpiBonusCreateSchema: value,
     }, {
       onSuccess: () => {
         queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id: kpi.kpiFormId }));
-      }
+        toast.success("Updated!", { id: "kpi-update" });
+        setOpen(false);
+        form.reset(defaultValues);
+      },
+      onError: (ctx) => {
+        toast.error(ctx.message || "Something went wrong", { id: "kpi-update" });
+      },
     });
   }
 
+  const onOpenChange = (open: boolean) => {
+    setOpen(open);
+    form.reset(defaultValues);
+  }
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>

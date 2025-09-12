@@ -23,10 +23,10 @@ export const Toolbar = ({
   onUpload,
 }: Props) => {
   return (
-    <div className="min-h-9 shrink-0 z-86 top-0 start-0 sticky px-24 bg-background my-1">
+    <div className="min-h-9 shrink-0 my-1">
       <div className="relative">
         <div className="flex items-center h-9 start-24 border-b-[1.25px] border-border">
-          <div className="flex items-center h-full grow shrink w overflow-hidden w-full">
+          <div className="flex items-center h-full grow shrink overflow-hidden w-full">
             {context}
           </div>
           <div className="grow h-full">
@@ -45,7 +45,7 @@ export const Toolbar = ({
                     </button>
                   </PopoverTrigger>
                   <PopoverContent align="end" className="w-[260px] p-1">
-                    <h3 className="text-sm data-[inset]:pl-8 select-none flex items-center min-h-7 ps-1 font-medium">Import</h3>
+                    <h3 className="text-sm data-[inset]:pl-8 select-none flex items-center min-h-7 ps-1 font-medium text-primary">Import</h3>
                     <Button variant="ghost" className="h-auto px-2 w-full" onClick={onUpload}>
                       <div className="flex items-center justify-center min-w-5 min-h-5 self-start">
                         <BsFiletypeCsv className="!stroke-[0.15] size-5 mt-0.5" />
