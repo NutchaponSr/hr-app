@@ -15,7 +15,7 @@ export const ColumnData = ({
   header
 }: Props) => {
   return (
-    <div className={cn("flex flex-col p-1 rounded", isSelected && "bg-[#0376ba0b]")}>
+    <div className={cn("flex flex-col p-1 rounded", isSelected && "bg-[#0376ba0b] dark:bg-[#298bfd10]")}>
       <div className="flex flex-row">
         <div className="flex items-center text-tertiary h-6 w-min max-w-full min-w-0">
           <div role="cell" className="select-none transition flex items-center h-full w-full rounded px-1.5 max-w-full hover:bg-primary/6">
@@ -32,7 +32,7 @@ export const ColumnData = ({
         role="button" 
         className={cn(
           "select-none transition relative text-sm overflow-hidden rounded w-full min-h-7.5 px-2 py-1 flex items-center hover:bg-primary/6 text-primary",
-          isSelected && "bg-background shadow-[0_4px_12px_0_rgba(25,25,25,0.027),0_1px_2px_0_rgba(25,25,25,0.02),0_0_0_1px_rgba(0,111,200,0.09)] hover:bg-[#036fad0b]"
+          isSelected && "bg-background shadow-[0_4px_12px_0_rgba(25,25,25,0.027),0_1px_2px_0_rgba(25,25,25,0.02),0_0_0_1px_rgba(0,111,200,0.09)] dark:shadow-[0_4px_12px_0_rgba(25,25,25,0.4),0_0_0_1px_rgba(71,157,255,0.173)] hover:bg-[#036fad0b] dark:bg-[#213041]"
         )}
       >
         <div className="whitespace-break-spaces text-ellipsis break-all">

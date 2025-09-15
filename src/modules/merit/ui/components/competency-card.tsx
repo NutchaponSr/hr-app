@@ -24,6 +24,7 @@ import { CompetencyEditModal } from "@/modules/merit/ui/components/competency-ed
 
 import { useMeritId } from "@/modules/merit/hooks/use-merit-id";
 import { RowData } from "@/components/row-data";
+import { SelectionBadge } from "@/components/selection-badge";
 
 
 interface Props {
@@ -101,7 +102,10 @@ export const CompetencyCard = ({ competency, order, perform }: Props) => {
             })} %
           </ColumnData>
           <ColumnData header="Expected PL">
-            {competency.expectedLevel || "-"}
+            {competency.expectedLevel 
+              ? <SelectionBadge label={`PL ${competency.expectedLevel}`} /> 
+              : "-"
+            }
           </ColumnData>
         </div>
 
