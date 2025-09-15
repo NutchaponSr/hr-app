@@ -4,6 +4,7 @@ export const competencyRecordSchema = z.object({
   competencyId: z.string().min(1, "Required"),
   input: z.string().min(1, "Required"),
   output: z.string().min(1, "Required"),
+  expectedLevel: z.string().min(1, "Required"),
   weight: z.string()
     .nullable()
     .refine((val) => {

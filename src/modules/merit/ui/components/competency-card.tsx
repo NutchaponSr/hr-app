@@ -24,6 +24,7 @@ import { CompetencyEditModal } from "@/modules/merit/ui/components/competency-ed
 
 import { useMeritId } from "@/modules/merit/hooks/use-merit-id";
 import { RowData } from "@/components/row-data";
+import { SelectionBadge } from "@/components/selection-badge";
 
 
 interface Props {
@@ -83,8 +84,8 @@ export const CompetencyCard = ({ competency, order, perform }: Props) => {
               {order}
             </span>
           </div>
-          <h1 className="text-primary font-bold leading-[1.2] text-2xl whitespace-break-spaces break-all tracking-[0.5px]">
-            {competency.competency?.name}
+          <h1 data-value={!!competency.competency?.name} className="data-[value=true]:text-primary font-bold leading-[1.2] text-2xl whitespace-break-spaces break-all tracking-[0.5px] text-neutral">
+            {competency.competency?.name || "Empty"}
           </h1>
         </div>
         <div className="max-w-full overflow-hidden mb-3">
@@ -92,13 +93,45 @@ export const CompetencyCard = ({ competency, order, perform }: Props) => {
             {competency.competency?.definition}
           </p>
         </div>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] w-full gap-y-2 gap-x-1 mt-2.5 mb-3">
+
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] w-full gap-y-2 gap-x-1 mt-2.5">
           <ColumnData header="Weight">
             {Number(convertAmountFromUnit(competency.weight || 0, 2)).toLocaleString("en-US", {
               maximumFractionDigits: 2,
               minimumFractionDigits: 2,
             })} %
           </ColumnData>
+          <ColumnData header="Expected PL">
+            {competency.expectedLevel 
+              ? <SelectionBadge label={`PL ${competency.expectedLevel}`} /> 
+              : "-"
+            }
+          </ColumnData>
+        </div>
+
+        <div className="grid grid-cols-5 w-full gap-y-2 gap-x-1">
+          {Array.from({ length: 5 }).map((_, index) => {
+            const level = index + 1;
+            const isSelected = String(level) === String(competency.expectedLevel);
+
+            return (
+              <ColumnData
+                key={level}
+                isSelected={isSelected}
+                header={`Level ${level}`}
+              >
+                {
+                  (() => {
+                    const value = competency.competency?.[`t${level}` as keyof Competency];
+                    if (value instanceof Date) {
+                      return value.toLocaleString();
+                    }
+                    return value || "-";
+                  })()
+                }
+              </ColumnData>
+            );
+          })}
         </div>
 
         <div className="relative">
@@ -112,10 +145,10 @@ export const CompetencyCard = ({ competency, order, perform }: Props) => {
 
             <div role="table" className="w-full max-w-full mx-auto">
               <RowData label="Input">
-                {competency.input || "Empty"}
+                {competency.input || "-"}
               </RowData>
               <RowData label="Output">
-                {competency.output || "Empty"}
+                {competency.output || "-"}
               </RowData>
             </div>
           </div>

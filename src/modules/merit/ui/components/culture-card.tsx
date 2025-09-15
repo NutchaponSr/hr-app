@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/card";
 
 import { CultureEditModal } from "./culture-edit-modal";
-import { ContentBlock } from "@/components/content-block";
 import { ArrowDownIcon } from "lucide-react";
 import { CommentSection } from "@/components/comment-section";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -109,7 +108,7 @@ export const CultureCard = ({ culture, perform }: Props) => {
             isExpanded ? "max-h-none" : "max-h-[400px]")}
           >
             <RowData label="Evidence">
-              {culture.evidence || "Empty"}
+              {culture.evidence || "-"}
             </RowData>
             {showExpandButton && !isExpanded && (
             <div className="absolute flex justify-center items-start z-1 inset-x-0 h-7.5 -mt-7 dark:bg-[linear-gradient(rgba(241,241,239,0)_0px,rgb(37,37,37)_30px)] bg-[linear-gradient(rgb(255,255,255)_0px,rgb(255,255,255)_30px)]">
