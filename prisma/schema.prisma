@@ -355,6 +355,7 @@ model CompetencyRecord {
   competencyId String?
   meritFormId String
   weight Int @default(0)
+  expectedLevel String? @db.VarChar(1)
   input String? @db.Text
   output String? @db.Text
 

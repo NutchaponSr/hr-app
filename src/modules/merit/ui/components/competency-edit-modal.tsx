@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
+import { ChevronsUpDownIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -26,6 +27,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { RowField } from "@/components/row-field";
+import { ColumnData } from "@/components/column-data";
+import { ColumnField } from "@/components/column-field";
 
 import { SelectCompetencyPopover } from "@/modules/merit/ui/components/select-competency-popover";
 
@@ -50,6 +53,7 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
 
   const defaultValues = {
     competencyId: competency.competencyId ?? "",
+    expectedLevel: competency.expectedLevel ?? "",
     weight: String(convertAmountFromUnit(competency.weight, 2)),
     input: competency.input ?? "",
     output: competency.output ?? "",
@@ -123,15 +127,19 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
                               onSelect={handleCompetencySelect}
                               selectedCompetencyId={field.value ?? undefined}
                             >
-                              <button type="button" className="py-1 px-1.5 flex flex-col hover:bg-primary/6 w-fit rounded">
+                              <Button type="button" variant="outline" className="w-fit h-full">
                                 <span data-value={!!selectedCompetency} className="max-w-full w-full whitespace-break-spaces break-all text-3xl font-bold resize-none field-sizing-content h-full focus-visible:outline-none data-[value=true]:text-primary text-tertiary overflow-hidden text-start">
                                   {selectedCompetency?.name || "Select competency"}
                                 </span>
-                              </button>
+
+                                <div className="self-start mt-2">
+                                  <ChevronsUpDownIcon className="size-5 text-neutral stroke-[1.75]" />
+                                </div>
+                              </Button>
                             </SelectCompetencyPopover>
                           </FormControl>
                           {selectedCompetency && (
-                            <div className="max-w-full overflow-hidden mb-3">
+                            <div className="max-w-full overflow-hidden">
                               <p className="max-w-full whitespace-break-spaces break-all text-primary text-sm px-1.5 py-1">
                                 {selectedCompetency?.definition}
                               </p>
@@ -141,6 +149,40 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
                         </FormItem>
                       )}
                     />
+                  </div>
+                  <div className="w-full h-4 flex" />
+                  <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] w-full gap-y-2 gap-x-1 mt-2.5">
+                    <ColumnField 
+                      form={form}
+                      name="expectedLevel"
+                      label="Expected PL"
+                      variant="select"
+                      options={Array.from({ length: 5 }).map((_, index) => ({ key: String(index + 1), label: `PL ${index + 1}` }))}
+                    />
+                  </div>
+                  <div className="grid grid-cols-5 w-full gap-y-2 gap-x-1 mt-2.5">
+                    {Array.from({ length: 5 }).map((_, index) => {
+                      const level = index + 1;
+                      const isSelected = String(level) === String(form.watch("expectedLevel"));
+
+                      return (
+                        <ColumnData
+                          key={level}
+                          isSelected={isSelected}
+                          header={`Level ${level}`}
+                        >
+                          {
+                            (() => {
+                              const value = competency.competency?.[`t${level}` as keyof Competency];
+                              if (value instanceof Date) {
+                                return value.toLocaleString();
+                              }
+                              return value || "Empty";
+                            })()
+                          }
+                        </ColumnData>
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="col-start-2 col-end-2 min-w-0 mb-3 -ms-1 pb-3">
@@ -152,6 +194,12 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
                     <div role="table" className="w-full max-w-full mx-auto flex flex-col gap-1.5">
                       <RowField
                         form={form}
+                        name="weight"
+                        label="Weight"
+                        variant="numeric"
+                      />
+                      <RowField
+                        form={form}
                         name="input"
                         label="Input"
                         variant="text"
@@ -161,12 +209,6 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
                         name="output"
                         label="Output"
                         variant="text"
-                      />
-                      <RowField
-                        form={form}
-                        name="weight"
-                        label="Weight"
-                        variant="numeric"
                       />
                     </div>
                   </div>

@@ -221,6 +221,7 @@ export const meritProcedure = createTRPCRouter({
           competencyId: input.competencyRecordSchema.competencyId,
           input: input.competencyRecordSchema.input,
           output: input.competencyRecordSchema.output,
+          expectedLevel: input.competencyRecordSchema.expectedLevel,
           weight: convertAmountToUnit(parseFloat(input.competencyRecordSchema.weight!), 2),
         },
       });

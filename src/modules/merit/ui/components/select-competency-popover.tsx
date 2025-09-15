@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SelectionBadge } from "@/components/selection-badge";
 import { useParams } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface Props {
   id: string;
@@ -110,7 +111,7 @@ export const SelectCompetencyPopover = ({ id, perform, children, onSelect, selec
                 </Command.Empty>
 
                 {competencies && (
-                  <Command.Group>
+                  <Command.Group className="flex flex-col gap-px">
                     {competencies.map((competency) => (
                       <Command.Item 
                         key={competency.id} 
@@ -119,9 +120,10 @@ export const SelectCompetencyPopover = ({ id, perform, children, onSelect, selec
                           onSelect?.(competency);
                           setIsOpen(false);
                         }}
-                        className={`hover:bg-primary/6 flex rounded w-full cursor-pointer transition data-[selected=true]:bg-primary/10 ${
-                          selectedCompetencyId === competency.id ? 'bg-primary/10' : ''
-                        }`}
+                        className={cn(
+                          "flex rounded w-full cursor-pointer transition data-[selected=true]:bg-primary/6",
+                          selectedCompetencyId === competency.id && "bg-primary/6",
+                        )}
                       >
                         <div className="flex items-center gap-2 w-full select-none min-h-[45px] text-sm px-2 py-1">
                           <div className="grow shrink basis-auto min-w-0">
