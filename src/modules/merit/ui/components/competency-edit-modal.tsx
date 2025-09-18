@@ -84,7 +84,7 @@ export const CompetencyEditModal = ({ children, competency }: Props) => {
       competencyRecordSchema: value,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: meritId }))
+        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ formId: meritId }))
         toast.success("Updated!", { id: "competency-update" });
         setOpen(false);
         form.reset(defaultValues);

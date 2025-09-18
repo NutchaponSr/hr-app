@@ -71,7 +71,7 @@ export const BonusCreateModal = () => {
       kpiBonusCreateSchema: value,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id: kpiFormId }));
+        queryClient.invalidateQueries(trpc.kpiBonus.getByFormId.queryOptions({ formId: kpiFormId }));
         handleClose();
       },
     });

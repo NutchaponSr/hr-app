@@ -48,7 +48,7 @@ export const MeritView = ({ id }: Props) => {
 
   const [error, setError] = useState("");
 
-  const { data: merit } = useSuspenseQuery(trpc.kpiMerit.getById.queryOptions({ id }));
+  const { data: merit } = useSuspenseQuery(trpc.kpiMerit.getByFormId.queryOptions({ formId: id }));
 
   const confirmForm = useMutation(trpc.task.confirmation.mutationOptions());
   const startWorkflow = useMutation(trpc.task.startWorkflow.mutationOptions());
@@ -83,7 +83,7 @@ export const MeritView = ({ id }: Props) => {
       id: merit.data.taskId,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id }));
+        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ formId: id }));
         toast.success("Worflow started!", { id: "start-workflow" });
       },
       onError: (ctx) => {
@@ -100,7 +100,7 @@ export const MeritView = ({ id }: Props) => {
       confirm,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id }));
+        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ formId: id }));
         toast.success("Worflow sent!", { id: "confirm-workflow" });
       },
       onError: (ctx) => {
@@ -114,15 +114,15 @@ export const MeritView = ({ id }: Props) => {
       <Header
         paths={paths}
         nameMap={{
-          [id]: String(merit.data.year)
+          [id]: String(merit.data.meritForm?.year)
         }}
         iconMap={{
           [id]: GoProject
         }}
         disabledPaths={['merit']}
       >
-        {merit.data.updatedAt && (
-          <SavingIndicator label={`Edited ${formatDistanceToNowStrict(merit.data.updatedAt, { addSuffix: true })}`} />
+        {merit.data.meritForm?.updatedAt && (
+          <SavingIndicator label={`Edited ${formatDistanceToNowStrict(merit.data.meritForm.updatedAt, { addSuffix: true })}`} />
         )}
         <StatusBadge {...status} />
         <StartWorkflowButton 
@@ -135,7 +135,7 @@ export const MeritView = ({ id }: Props) => {
         message={getBannerMessage(error, merit.data.task.status)}
         variant="danger"
       />
-      <Main>
+      {/* <Main>
         <MainContent>
           <Banner
             title="Merit"
@@ -172,7 +172,7 @@ export const MeritView = ({ id }: Props) => {
             onClick={onApproval}
           />
         </Footer>
-      )}
+      )} */}
     </>
   );
 }

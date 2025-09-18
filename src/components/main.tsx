@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -21,6 +23,26 @@ export const MainContent = ({ children, className }: Props) => {
   return (
     <div className={cn("col-start-2 col-end-2 min-w-0 select-none", className)}>
       {children}
+    </div>
+  );
+}
+
+export const MainHeader = ({ children }: { children: ReactNode }) => {
+  return (
+    <div className="min-h-12 relative">
+      <div className="flex items-center h-12 w-full ps-2">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export const MainTitle = ({ children }: { children: ReactNode }) => {
+  return (
+    <div className="flex items-center h-full grow-[10] overflow-hidden -ms-1">
+      <div className="flex items-center h-8 px-2.5 py-1.5 max-w-[220px] text-tertiary text-xs whitespace-nowrap space-x-1.5">
+        {children}
+      </div>
     </div>
   );
 }

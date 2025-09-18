@@ -1,18 +1,9 @@
-import { App, Status } from "@/generated/prisma";
+import { App } from "@/generated/prisma";
+import { AppRouter } from "@/trpc/routers/_app";
+import { inferProcedureOutput } from "@trpc/server";
 
-export interface TaskWithInfo {
-  info: {
-    id: string;
-    assignedBy: string;
-    year: number;
-  };
-  task: {
-    id: string;
-    type: App;
-    status: Status;
-    updatedAt: Date;
-  };
-}
+
+export type TaskWithInfo = inferProcedureOutput<AppRouter["task"]["getMany"]>[0]; 
 
 export const tasks: Record<App, string> = {
   [App.BONUS]: "Bonus",

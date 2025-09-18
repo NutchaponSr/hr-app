@@ -22,7 +22,7 @@ export const Stepper = ({
 }: Props) => {
   return (
     <div className="flex flex-row not-last:pb-2.5">
-      <div className="w-1/4 pe-2.5 flex flex-col text-xs font-medium">
+      <div className="w-1/4 pe-2.5 flex flex-col text-xs font-medium text-secondary">
         <p>{date}</p>
       </div>
       <div className="w-3/4 flex mb-3.5">
@@ -31,11 +31,11 @@ export const Stepper = ({
           <div className="flex flex-col">
             <div className="flex flex-col flex-1 ps-2.5 overflow-hidden">
               <div className="flex flex-row items-center space-x-2">
-                <h4 className="font-medium whitespace-nowrap text-ellipsis overflow-hidden">{title}</h4>
+                <h4 className="font-medium whitespace-nowrap text-ellipsis overflow-hidden text-secondary">{title}</h4>
                 <div 
                   data-has={!!status} 
                   className={cn(
-                    "data-[has=true]:block hidden self-center py-0.5 px-1 bg-purple-foreground uppercase text-[10px] font-semibold whitespace-nowrap w-fit rounded tracking-wider",
+                    "data-[has=true]:block hidden self-center py-0.5 px-1 uppercase text-[10px] font-semibold whitespace-nowrap w-fit rounded tracking-wider",
                     colorVariant({ background: status?.variant, text: status?.variant })
                   )}
                 >

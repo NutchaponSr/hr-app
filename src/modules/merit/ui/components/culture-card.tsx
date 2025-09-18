@@ -59,7 +59,7 @@ export const CultureCard = ({ culture, perform }: Props) => {
       connectId: culture.id,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: meritFormId }));
+        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ formId: meritFormId }));
       },
     });
   }

@@ -63,8 +63,8 @@ export const PreviewTable = ({
       createBulkKpi.mutate(
         { kpiFormId: contextId, kpis: res.validRows },
         {
-          onSuccess: ({ year }) => {
-            invalidate(year, contextId);
+          onSuccess: () => {
+            invalidate(contextId);
             closeModal();
             reset();
           },

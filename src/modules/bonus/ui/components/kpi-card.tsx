@@ -76,7 +76,7 @@ export const KpiCard = ({
       toast.loading("Deleting kpi...", { id: "delete-kpi" });
       deleteKpi.mutate({ id: kpi.id }, {
         onSuccess: () => {
-          queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id: kpiFormId }));
+          queryClient.invalidateQueries(trpc.kpiBonus.getByFormId.queryOptions({ formId: kpiFormId }));
           toast.success("Deleted!", { id: "delete-kpi" });
         },
       });
@@ -87,7 +87,7 @@ export const KpiCard = ({
     toast.loading("Duplicating kpi...", { id: "dplicate-kpi" });
     duplicateKpi.mutate({ id: kpi.id }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id: kpiFormId }));
+        queryClient.invalidateQueries(trpc.kpiBonus.getByFormId.queryOptions({ formId: kpiFormId }));
         toast.success("Duplicated!", { id: "dplicate-kpi" });
       },
     });
@@ -99,7 +99,7 @@ export const KpiCard = ({
       connectId: kpi.id,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: kpiFormId }));
+        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ formId: kpiFormId }));
       },
     });
   }

@@ -71,7 +71,7 @@ export const BonusEditModal = ({ kpi, children }: Props) => {
       kpiBonusCreateSchema: value,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id: kpi.kpiFormId }));
+        queryClient.invalidateQueries(trpc.kpiBonus.getByFormId.queryOptions({ formId: kpi.kpiFormId }));
         toast.success("Updated!", { id: "kpi-update" });
         setOpen(false);
         form.reset(defaultValues);
