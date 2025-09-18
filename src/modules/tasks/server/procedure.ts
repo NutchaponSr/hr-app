@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
 
-import { Status, Task } from "@/generated/prisma";
+import { App, Status, Task } from "@/generated/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
@@ -23,64 +23,93 @@ export const taskProcedure = createTRPCRouter({
     .query(async ({ ctx }) => {
       const tasks = await prisma.task.findMany({
         where: {
-          AND: [
+          OR: [
             {
-              status: {
-                in: [
-                  Status.PENDING_APPROVER,
-                  Status.PENDING_CHECKER,
-                  Status.REJECTED_BY_APPROVER,
-                  Status.REJECTED_BY_CHECKER,
-                ],
-              },
+              status: Status.IN_DRAFT,
+              preparedBy: ctx.user.employee.id,
             },
             {
-              OR: [
-                {
-                  status: Status.PENDING_CHECKER,
-                  checkedBy: ctx.user.employee.id,
-                },
-                {
-                  status: Status.REJECTED_BY_CHECKER,
-                  preparedBy: ctx.user.employee.id,
-                },
-                {
-                  status: Status.PENDING_APPROVER,
-                  approvedBy: ctx.user.employee.id,
-                },
-                {
-                  status: Status.REJECTED_BY_APPROVER,
-                  preparedBy: ctx.user.employee.id,
-                },
-              ],
+              status: Status.PENDING_CHECKER,
+              checkedBy: ctx.user.employee.id,
+            },
+            {
+              status: Status.REJECTED_BY_CHECKER,
+              preparedBy: ctx.user.employee.id,
+            },
+            {
+              status: Status.PENDING_APPROVER,
+              approvedBy: ctx.user.employee.id,
+            },
+            {
+              status: Status.REJECTED_BY_APPROVER,
+              preparedBy: ctx.user.employee.id,
             },
           ],
         },
         include: {
           preparer: true,
-          kpiForms: true,
-          meritForms: true,
+          form: {
+            include: {
+              kpiForm: true,
+              meritForm: true,
+            },
+          },
         },
         orderBy: {
           updatedAt: "desc",
         }
       });
 
-      return {
-        data: tasks.map((task) => ({
-          task: {
-            id: task.id,
-            type: task.type,
-            status: task.status,
-            updatedAt: task.updatedAt,
+      
+      return tasks.map((task) => ({
+        app: task.type,
+        status: task.status,
+        formId: task.form?.id,
+        year: task.form?.kpiForm?.year || task.form?.meritForm?.year,
+        owner: task.preparer,
+        updatedAt: task.updatedAt,
+      }));
+    }),
+  getManyByYear: protectedProcedure
+    .input(
+      z.object({
+        year: z.number()
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const tasks = await prisma.task.findMany({
+        where: {
+          preparedAt: {
+            gte: new Date(input.year, 0, 1),
+            lte: new Date(input.year, 11, 31, 23, 59, 59),
           },
-          info: {
-            id: task.kpiForms[0]?.id || task.meritForms[0]?.id || "",
-            assignedBy: task.preparer.fullName,
-            year: task.kpiForms[0]?.year || task.meritForms[0]?.year || 0,
+          OR: [
+            {
+              checkedBy: ctx.user.employee.id,
+            },
+            {
+              approvedBy: ctx.user.employee.id,
+            },
+          ],
+        },
+        include: {
+          preparer: true,
+          form: {
+            include: {
+              kpiForm: true,
+              meritForm: true,
+            },
           },
-        })),
-      };
+        },
+      });
+
+      return tasks.map((task) => ({
+        updatedAt: task.form?.kpiForm?.updatedAt || task.form?.meritForm?.updatedAt,
+        status: task.status,
+        app: task.type,
+        owner: task.preparer,
+        formId: task.form?.id,
+      }));
     }),
   startWorkflow: protectedProcedure
     .input(

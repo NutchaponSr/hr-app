@@ -12,7 +12,7 @@ import { Banner } from "@/components/banner";
 import { Header } from "@/components/header";
 
 import { Tasks } from "@/modules/tasks/ui/components/tasks";
-
+import { Tracker } from "@/modules/tasks/ui/components/tracker";
 import { BonusInfo } from "@/modules/bonus/ui/components/bonus-info";
 import { MeritInfo } from "@/modules/merit/ui/components/merit-info";
 
@@ -46,6 +46,10 @@ export const PerformanceView = ({ year }: Props) => {
 
         <MainContent className="col-start-2 col-end-2 min-w-0">
           <Tasks />
+        </MainContent>
+
+        <MainContent>
+          <Tracker year={year} />
         </MainContent>
       </Main>
     </>

@@ -56,7 +56,7 @@ export const CultureEditModal = ({ children, culture }: Props) => {
       cultureRecordSchema: value,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: meritId }))
+        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ formId: meritId }))
         toast.success("Updated!", { id: "culture-update" });
         setOpen(false);
       },

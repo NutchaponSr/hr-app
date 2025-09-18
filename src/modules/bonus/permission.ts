@@ -77,3 +77,18 @@ export function getUserRole(context: PermissionContext): Role | null {
   
   return null;
 }
+
+export function canPerformMany(
+  role: Role,
+  actions: Action[],
+  status: Status
+): Record<Action, boolean> {
+  const permissions = statusPermissions[status]?.[role] || [];
+  return actions.reduce(
+    (acc, action) => {
+      acc[action] = permissions.includes(action);
+      return acc;
+    },
+    {} as Record<Action, boolean>
+  );
+}

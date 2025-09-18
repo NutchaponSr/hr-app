@@ -8,8 +8,8 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
 
-import { Status } from "@/generated/prisma";
 import { STATUS_RECORD } from "@/types/kpi";
+import { Period, Status } from "@/generated/prisma";
 
 import { Stepper } from "@/modules/performance/ui/components/stepper";
 
@@ -24,14 +24,14 @@ export const MeritInfo = ({ year }: Props) => {
   const { data: merit } = useSuspenseQuery(trpc.kpiMerit.getByYear.queryOptions({ year }));
   const createForm = useMutation(trpc.kpiMerit.createForm.mutationOptions());
 
-  const status = STATUS_RECORD[merit?.task.status || Status.NOT_STARTED];
+  const status = STATUS_RECORD[merit.form.inDraft?.task.status || Status.NOT_STARTED];
 
   return (
     <article className="relative select-none">
       <div className="flex justify-between shrink-0 items-center h-8 pb-3.5 ms-2">
         <div className="flex items-center text-xs font-medium text-secondary">
           <div className="flex items-center justify-center size-4 me-1.5">
-            <GoProject className="size-4 stroke-[0.25]" />
+            <GoProject className="size-3 stroke-[0.25]" />
           </div>
           <span className="whitespace-nowrap overflow-hidden text-ellipsis">
             Merit 
@@ -47,8 +47,8 @@ export const MeritInfo = ({ year }: Props) => {
                 <button
                   className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs"
                   onClick={() => {
-                    if (!merit) {
-                      createForm.mutate({ year }, {
+                    if (!merit.form.inDraft) {
+                      createForm.mutate({ year, period: Period.IN_DRAFT }, {
                         onSuccess: ({ id }) => {
                           toast.success("Form created!");
                           router.push(`/performance/merit/${id}`);

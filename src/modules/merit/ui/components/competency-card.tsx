@@ -63,7 +63,7 @@ export const CompetencyCard = ({ competency, order, perform }: Props) => {
       connectId: competency.id,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiMerit.getById.queryOptions({ id: meritFormId }));
+        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ formId: meritFormId }));
       },
     });
   }

@@ -6,7 +6,7 @@ import { GoProject } from "react-icons/go";
 import { useRouter } from "next/navigation";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
-import { Status } from "@/generated/prisma";
+import { Period, Status } from "@/generated/prisma";
 import { STATUS_RECORD } from "@/types/kpi";
 
 import { useTRPC } from "@/trpc/client";
@@ -24,14 +24,15 @@ export const BonusInfo = ({ year }: Props) => {
   const { data: kpiBonus } = useSuspenseQuery(trpc.kpiBonus.getByYear.queryOptions({ year }));
   const createForm = useMutation(trpc.kpiBonus.createForm.mutationOptions());
 
-  const status = STATUS_RECORD[kpiBonus?.task.status || Status.NOT_STARTED];
+  // KpiForm DRAFT Period
+  const status = STATUS_RECORD[kpiBonus.kpiRecord.inDraft?.task.status || Status.NOT_STARTED];
 
   return (
     <article className="relative select-none">
       <div className="flex justify-between shrink-0 items-center h-8 pb-3.5 ms-2">
         <div className="flex items-center text-xs font-medium text-secondary">
           <div className="flex items-center justify-center size-4 me-1.5">
-            <GoProject className="size-4 stroke-[0.25]" />
+            <GoProject className="size-3 stroke-[0.25]" />
           </div>
           <span className="whitespace-nowrap overflow-hidden text-ellipsis">
             KPI Bonus 
@@ -47,8 +48,8 @@ export const BonusInfo = ({ year }: Props) => {
                 <button
                   className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs"
                   onClick={() => {
-                    if (!kpiBonus) {
-                      createForm.mutate({ year }, {
+                    if (!kpiBonus.kpiRecord.inDraft) {
+                      createForm.mutate({ year, period: Period.IN_DRAFT }, {
                         onSuccess: ({ id }) => {
                           toast.success("Form created!");
                           router.push(`/performance/bonus/${id}`);
@@ -58,11 +59,11 @@ export const BonusInfo = ({ year }: Props) => {
                         }
                       });
                     } else {
-                      router.push(`/performance/bonus/${kpiBonus.id}`);
+                      router.push(`/performance/bonus/${kpiBonus.kpiRecord.inDraft.id}`);
                     }
                   }}
                 >
-                  {!kpiBonus ? (
+                  {!kpiBonus.kpiRecord.inDraft ? (
                     <>
                       <PlusIcon className="size-4 stroke-[1.75] mr-1" />
                       Create KPI
