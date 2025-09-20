@@ -9,7 +9,7 @@ export const useKpiBonusCreateBulk = () => {
   const mutation = useMutation(trpc.kpiBonus.createBulkKpi.mutationOptions());
 
   const invalidate = (id: string) => {
-    queryClient.invalidateQueries(trpc.kpiBonus.getByFormId.queryOptions({ formId: id }));
+    queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id }));
   };
 
   return { mutation, invalidate };

@@ -24,7 +24,7 @@ export const MeritInfo = ({ year }: Props) => {
   const { data: merit } = useSuspenseQuery(trpc.kpiMerit.getByYear.queryOptions({ year }));
   const createForm = useMutation(trpc.kpiMerit.createForm.mutationOptions());
 
-  const status = STATUS_RECORD[merit.form.inDraft?.task.status || Status.NOT_STARTED];
+  const status = STATUS_RECORD[merit.form.inDraft?.status || Status.NOT_STARTED];
 
   return (
     <article className="relative select-none">
@@ -39,7 +39,7 @@ export const MeritInfo = ({ year }: Props) => {
         </div>
       </div>
 
-      <div className="basic-0 grow pt-4 px-6 text-sm text-foreground overflow-hidden">
+      <div className="basic-0 grow text-sm text-foreground overflow-hidden">
         <div className="flex flex-col justify-center min-h-full">
           <Stepper
             action={

@@ -13,7 +13,6 @@ import { SelectionBadge } from "@/components/selection-badge";
 import { convertAmountFromUnit } from "@/lib/utils";
 import { Hint } from "@/components/hint";
 import { Progress } from "@/components/ui/progress";
-import { CultureCard } from "./culture-card";
 
 interface Props {
   cultureRecord: (CultureRecord & {
@@ -67,13 +66,9 @@ export const CultureSection = ({ cultureRecord, perform }: Props) => {
           </div>
         </div>
         <div className="relative mb-3 flex flex-col gap-8">
-          {cultureRecord.map((culture) => (
-            <CultureCard
-              key={culture.id}
-              culture={culture}
-              perform={perform}
-            />
-          ))}
+          {/* {cultureRecord.map((culture) => (
+            
+          ))} */}
         </div>
       </AccordionContent>
     </AccordionItem>

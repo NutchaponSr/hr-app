@@ -38,7 +38,7 @@ export const PerformanceView = ({ year }: Props) => {
         </MainContent>
 
         <MainContent className="col-start-2 col-end-2 min-w-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
             <BonusInfo year={year} />
             <MeritInfo year={year} />
           </div>

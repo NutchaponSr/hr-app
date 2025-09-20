@@ -25,7 +25,7 @@ export const BonusInfo = ({ year }: Props) => {
   const createForm = useMutation(trpc.kpiBonus.createForm.mutationOptions());
 
   // KpiForm DRAFT Period
-  const status = STATUS_RECORD[kpiBonus.kpiRecord.inDraft?.task.status || Status.NOT_STARTED];
+  const status = STATUS_RECORD[kpiBonus.task.inDraft?.status || Status.NOT_STARTED];
 
   return (
     <article className="relative select-none">
@@ -40,7 +40,7 @@ export const BonusInfo = ({ year }: Props) => {
         </div>
       </div>
 
-      <div className="basic-0 grow pt-4 px-6 text-sm text-foreground overflow-hidden">
+      <div className="basic-0 grow text-sm text-foreground overflow-hidden">
         <div className="flex flex-col justify-center min-h-full">
           <Stepper
             action={
@@ -48,7 +48,7 @@ export const BonusInfo = ({ year }: Props) => {
                 <button
                   className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs"
                   onClick={() => {
-                    if (!kpiBonus.kpiRecord.inDraft) {
+                    if (!kpiBonus.task.inDraft) {
                       createForm.mutate({ year, period: Period.IN_DRAFT }, {
                         onSuccess: ({ id }) => {
                           toast.success("Form created!");
@@ -59,11 +59,11 @@ export const BonusInfo = ({ year }: Props) => {
                         }
                       });
                     } else {
-                      router.push(`/performance/bonus/${kpiBonus.kpiRecord.inDraft.id}`);
+                      router.push(`/performance/bonus/${kpiBonus.task.inDraft.id}`);
                     }
                   }}
                 >
-                  {!kpiBonus.kpiRecord.inDraft ? (
+                  {!kpiBonus.task.inDraft ? (
                     <>
                       <PlusIcon className="size-4 stroke-[1.75] mr-1" />
                       Create KPI

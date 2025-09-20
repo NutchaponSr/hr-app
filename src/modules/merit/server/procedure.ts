@@ -40,7 +40,7 @@ function buildPermissionContext(currentEmployeeId: string, task: Task): Permissi
   return {
     currentEmployeeId,
     documentOwnerId: task.preparedBy,
-    checkerId: task.checkedBy || undefined,
+    checkerId: task.checkedBy,
     approverId: task.approvedBy,
     status: task.status,
   };
@@ -60,10 +60,10 @@ export const meritProcedure = createTRPCRouter({
           employeeId: ctx.user.employee.id,
         },
         include: {
-          forms: {
-            include: {
-              task: true,
-            },
+          tasks: {
+            orderBy: {
+              preparedAt: "asc"
+            }
           },
         },
       });
@@ -71,31 +71,27 @@ export const meritProcedure = createTRPCRouter({
       return {
         ...meritForm,
         form: {
-          inDraft: meritForm?.forms.find((f) => f.period === Period.IN_DRAFT),
-          evaluation1st: meritForm?.forms.find((f) => f.period === Period.EVALUATION_1ST),
-          evaluation2nd: meritForm?.forms.find((f) => f.period === Period.EVALUATION_2ND),
-        },
+          inDraft: meritForm?.tasks[0],
+          evaluation1st: meritForm?.tasks[1],
+          evaluation2nd: meritForm?.tasks[2],
+        }
       };
     }),
   getByFormId: protectedProcedure
     .input(
       z.object({
-        formId: z.string(),
+        id: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const form = await prisma.form.findUnique({
+      const task = await prisma.task.findUnique({
         where: {
-          id: input.formId,
+          id: input.id,
         },
         include: {
-          task: {
-            include: {
-              preparer: true,
-              checker: true,
-              approver: true,
-            },  
-          },
+          preparer: true,
+          checker: true,
+          approver: true,
           meritForm: {
             include: {
               competencyRecords: {
@@ -121,14 +117,14 @@ export const meritProcedure = createTRPCRouter({
         },
       });
 
-      if (!form || !form.meritForm) {
+      if (!task) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
       // Fetch comments for competency and culture records
       const [competencyComments, cultureComments] = await Promise.all([
-        fetchCommentsForRecords(form.meritForm.competencyRecords.map(r => r.id)),
-        fetchCommentsForRecords(form.meritForm.cultureRecords.map(r => r.id)),
+        fetchCommentsForRecords(task.meritForm?.competencyRecords?.map(r => r.id) ?? []),
+        fetchCommentsForRecords(task.meritForm?.cultureRecords?.map(r => r.id) ?? []),
       ]);
 
       // Group comments by record ID
@@ -136,24 +132,24 @@ export const meritProcedure = createTRPCRouter({
       const cultureCommentsMap = groupCommentsByRecordId(cultureComments);
 
       // Attach comments to competency records
-      const competencyRecordsWithComments = form.meritForm.competencyRecords.map(record => ({
+      const competencyRecordsWithComments = task.meritForm?.competencyRecords?.map(record => ({
         ...record,
         comments: competencyCommentsMap[record.id] || [],
       }));
 
       // Attach comments to culture records
-      const cultureRecordsWithComments = form.meritForm.cultureRecords.map(record => ({
+      const cultureRecordsWithComments = task.meritForm?.cultureRecords?.map(record => ({
         ...record,
         comment: cultureCommentsMap[record.id] || [],
-        weight: (30 / ((form.meritForm?.cultureRecords?.length ?? 1))) * 100,
+        weight: (30 / ((task.meritForm?.cultureRecords?.length ?? 1))) * 100,
       }));
 
       // Build permission context
-      const permissionContext = buildPermissionContext(ctx.user.employee.id, form.task);
+      const permissionContext = buildPermissionContext(ctx.user.employee.id, task);
 
       return {
         data: {
-          ...form,
+          ...task,
           competencyRecords: competencyRecordsWithComments,
           cultureRecords: cultureRecordsWithComments,
         },
@@ -186,44 +182,50 @@ export const meritProcedure = createTRPCRouter({
         },
       });
 
-      const form = await prisma.form.create({
+      let meritForm = await prisma.meritForm.findFirst({
+        where: {
+          year: input.year,
+          employeeId: ctx.user.employee.id,
+        },
+      });
+
+      if (!meritForm) {
+        meritForm = await prisma.meritForm.create({
+          data: {
+            year: input.year,
+            employeeId: ctx.user.employee.id,
+            competencyRecords: {
+              createMany: {
+                data: Array.from({ length: 4 }, () => ({
+                  weight: 0,
+                })),
+              },
+            },
+            cultureRecords: {
+              createMany: {
+                data: cultures.map((cul) => ({
+                  cultureId: cul.id,
+                })),
+              },
+            },
+          },
+        })
+      }
+
+      const task = await prisma.task.create({
         data: {
-          period: input.period,
-          task: {
-            create: {
-              type: App.MERIT,
-              status: Status.IN_DRAFT,
-              preparedBy: ctx.user.employee.id,
-              approvedBy: taregetApproval.approverEMPID,
-              ...(taregetApproval.checkerEMPID && {
-                checkedBy: taregetApproval.checkerEMPID,
-              }),
-            },
-          },
-          meritForm: {
-            create: {
-              year: input.year,
-              employeeId: ctx.user.employee.id,
-              competencyRecords: {
-                createMany: {
-                  data: Array.from({ length: 4 }, () => ({
-                    weight: 0,
-                  })),
-                },
-              },
-              cultureRecords: {
-                createMany: {
-                  data: cultures.map((cul) => ({
-                    cultureId: cul.id,
-                  })),
-                },
-              },
-            },
-          },
+          type: App.MERIT,
+          fileId: meritForm.id,
+          status: Status.IN_DRAFT,
+          preparedBy: ctx.user.employee.id,
+          approvedBy: taregetApproval.approverEMPID,
+          ...(taregetApproval.checkerEMPID && {
+            checkedBy: taregetApproval.checkerEMPID,
+          }),
         }, 
       });
 
-      return form;
+      return task;
     }),
   updateCompetency: protectedProcedure
     .input(

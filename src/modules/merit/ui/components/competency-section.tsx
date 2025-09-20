@@ -13,7 +13,6 @@ import { SelectionBadge } from "@/components/selection-badge";
 import { convertAmountFromUnit } from "@/lib/utils";
 import { Hint } from "@/components/hint";
 import { Progress } from "@/components/ui/progress";
-import { CompetencyCard } from "./competency-card";
 
 interface Props {
   competencyRecords: (CompetencyRecord & {
@@ -68,14 +67,9 @@ export const CompetencySection = ({ competencyRecords, perform }: Props) => {
           </div>
         </div>
         <div className="relative mb-3 flex flex-col gap-8">
-          {competencyRecords.map((competency, idx) => (
-            <CompetencyCard
-              key={competency.id}
-              order={idx + 1}
-              perform={perform}
-              competency={competency}
-            />
-          ))}
+          {/* {competencyRecords.map((competency, idx) => (
+
+          ))} */}
         </div>
       </AccordionContent>
     </AccordionItem>

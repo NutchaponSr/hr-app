@@ -20,21 +20,23 @@ export const badgeVariant = cva("inline-flex items-center shrink max-w-full min-
 
 interface Props extends VariantProps<typeof badgeVariant> {
   label: string;
+  className?: string;
   onClick?: () => void;
 }
 
 export const SelectionBadge = ({
   color,
   label,
+  className,
   onClick
 }: Props) => {
   if (!label) return null;
 
   return (
     <div className={cn(badgeVariant({ color }))}>
-      <span className="whitespace-nowrap overflow-hidden text-ellipsis inline-flex items-center h-5 leading-5 text-sm">
+      <p className={cn("whitespace-nowrap overflow-hidden text-ellipsis h-5 leading-5 text-sm", className)}>
         {label}
-      </span>
+      </p>
       <div 
         role="button" 
         onClick={onClick}

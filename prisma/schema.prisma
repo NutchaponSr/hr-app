@@ -177,17 +177,9 @@ model Comment {
   @@map("comment")
 }
 
-model Approval {
-  id String @id @default(cuid())
-  preparedBy String
-  checkedBy String?
-  approvedBy String
-
-  @@map("approval")
-}
-
 model Task {
   id String @id @default(uuid())
+  fileId String
   
   type App
   status Status @default(NOT_STARTED)
@@ -204,33 +196,20 @@ model Task {
   preparer Employee @relation("preparer", fields: [preparedBy], references: [id], onDelete: Cascade)
   checker Employee? @relation("checker", fields: [checkedBy], references: [id], onDelete: Cascade)
   approver Employee @relation("approver", fields: [approvedBy], references: [id], onDelete: Cascade)
-
-  form Form?
+  kpiForm KpiForm? @relation(fields: [fileId], references: [id], onDelete: Cascade, map: "task_kpiForm_fkey")
+  meritForm MeritForm? @relation(fields: [fileId], references: [id], onDelete: Cascade, map: "task_meritForm_fkey")
 
   @@index([preparedBy])
   @@index([checkedBy])
   @@index([approvedBy])
+  @@index([fileId])
   @@map("task")
-}
-
-model Form {
-  id String @id @default(uuid())
-  formId String? @unique
-  taskId String @unique
-  period Period
-
-  createdAt DateTime @default(now())
-
-  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  kpiForm KpiForm? @relation(fields: [formId], references: [id], onDelete: Cascade, map: "form_kpiForm_fkey")
-  meritForm MeritForm? @relation(fields: [formId], references: [id], onDelete: Cascade, map: "form_meritForm_fkey")
-
-  @@map("form")
 }
 
 model KpiForm {
   id String @id @default(uuid())
   employeeId String
+  period Period @default(IN_DRAFT)
 
   year Int
   createdAt DateTime @default(now())
@@ -238,7 +217,7 @@ model KpiForm {
 
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   
-  forms Form[]
+  tasks Task[]
   kpis Kpi[]
 
   @@unique([year, employeeId])
@@ -249,6 +228,7 @@ model KpiForm {
 model MeritForm {
   id String @id @default(uuid())
   employeeId String
+  period Period @default(IN_DRAFT)
 
   year Int
   createdAt DateTime @default(now())
@@ -256,7 +236,7 @@ model MeritForm {
 
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
-  forms Form[]
+  tasks Task[]
   cultureRecords CultureRecord[]
   competencyRecords CompetencyRecord[]
 
@@ -288,18 +268,18 @@ enum KpiCategory {
 
 model Kpi {
   id String @id @unique @default(uuid())
-  name String
-  category KpiCategory
-  weight Int
-  objective String @db.Text
-  strategy String
+  name String?
+  category KpiCategory?
+  weight Int @default(0)
+  objective String? @db.Text
+  strategy String?
 
-  target100 String @db.Text
-  target80 String @db.Text
-  target90 String @db.Text
-  target70 String @db.Text
-  definition String @db.Text
-  type Project
+  target100 String? @db.Text
+  target80 String? @db.Text
+  target90 String? @db.Text
+  target70 String? @db.Text
+  definition String? @db.Text
+  type Project?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
