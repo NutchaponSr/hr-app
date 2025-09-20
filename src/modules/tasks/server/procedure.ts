@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
 
-import { App, Status, Task } from "@/generated/prisma";
+import { Status, Task } from "@/generated/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
@@ -12,7 +12,7 @@ function buildPermissionContext(currentEmployeeId: string, task: Task): Permissi
   return {
     currentEmployeeId,
     documentOwnerId: task.preparedBy,
-    checkerId: task.checkedBy || undefined,
+    checkerId: task.checkedBy,
     approverId: task.approvedBy,
     status: task.status,
   };
@@ -48,12 +48,8 @@ export const taskProcedure = createTRPCRouter({
         },
         include: {
           preparer: true,
-          form: {
-            include: {
-              kpiForm: true,
-              meritForm: true,
-            },
-          },
+          kpiForm: true,
+          meritForm: true,
         },
         orderBy: {
           updatedAt: "desc",
@@ -62,10 +58,11 @@ export const taskProcedure = createTRPCRouter({
 
       
       return tasks.map((task) => ({
+        taskId: task.id,
         app: task.type,
         status: task.status,
-        formId: task.form?.id,
-        year: task.form?.kpiForm?.year || task.form?.meritForm?.year,
+        fileId: task.id,
+        year: task.kpiForm?.year || task.meritForm?.year,
         owner: task.preparer,
         updatedAt: task.updatedAt,
       }));
@@ -94,21 +91,17 @@ export const taskProcedure = createTRPCRouter({
         },
         include: {
           preparer: true,
-          form: {
-            include: {
-              kpiForm: true,
-              meritForm: true,
-            },
-          },
+          kpiForm: true,
+          meritForm: true,
         },
       });
 
       return tasks.map((task) => ({
-        updatedAt: task.form?.kpiForm?.updatedAt || task.form?.meritForm?.updatedAt,
+        updatedAt: task.kpiForm?.updatedAt || task.meritForm?.updatedAt,
         status: task.status,
         app: task.type,
         owner: task.preparer,
-        formId: task.form?.id,
+        taskId: task.id,
       }));
     }),
   startWorkflow: protectedProcedure

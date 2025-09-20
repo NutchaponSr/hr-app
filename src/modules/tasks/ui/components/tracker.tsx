@@ -83,12 +83,12 @@ export const Tracker = ({ year }: Props) => {
                     App
                   </span>
                 </th>
-                <th className="h-8 flex items-center px-3 min-w-[125px] w-[20%]">
+                <th className="h-8 flex items-center px-3 min-w-[125px] w-[25%]">
                   <span className="text-xs text-secondary font-normal">
                     Status
                   </span>
                 </th>
-                <th className="h-8 flex items-center px-3 min-w-[125px] w-[20%]">
+                <th className="h-8 flex items-center px-3 min-w-[125px] w-[15%]">
                   <span className="text-xs text-secondary font-normal">
                     Edited At
                   </span>
@@ -100,10 +100,10 @@ export const Tracker = ({ year }: Props) => {
                 ? filteredTasks.map((task, index) => {
                   let url: string | null = null;
 
-                  if (task.formId) {
+                  if (task.taskId) {
                     url = task.app === App.BONUS
-                      ? `/performance/bonus/${task.formId}`
-                      : `/performance/merit/${task.formId}`
+                      ? `/performance/bonus/${task.taskId}`
+                      : `/performance/merit/${task.taskId}`
                   }
 
                   return (
@@ -137,10 +137,10 @@ export const Tracker = ({ year }: Props) => {
                       <td className="min-w-[85px] w-[15%] px-3 flex items-center">
                         <SelectionBadge label={types[task.app]} />
                       </td>
-                      <td className="min-w-[125px] w-[20%] px-3 flex items-center">
+                      <td className="min-w-[125px] w-[25%] px-3 flex items-center">
                         <StatusBadge {...STATUS_RECORD[task.status]} />
                       </td>
-                      <td className="min-w-[125px] w-[20%] px-3 flex items-center">
+                      <td className="min-w-[125px] w-[15%] px-3 flex items-center">
                         <div className="whitespace-nowrap overflow-hidden text-ellipsis text-primary text-sm">
                           {task.updatedAt ? format(task.updatedAt, "dd/MM/yy") : "-"}
                         </div>

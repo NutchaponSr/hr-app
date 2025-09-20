@@ -16,8 +16,8 @@ export const TaskItem = ({ task }: Props) => {
   const { label, variant } = STATUS_RECORD[task.status];
 
   const href = task.app === App.BONUS
-    ? `/performance/bonus/${task.formId}`
-    : `/performance/merit/${task.formId}`
+    ? `/performance/bonus/${task.taskId}`
+    : `/performance/merit/${task.taskId}`
 
   return (
     <div className="flex relative">

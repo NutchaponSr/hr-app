@@ -17,7 +17,7 @@ interface Props {
 
 export const Message = ({ isLast, comment }: Props) => {
   return (
-    <div className="py-2 px-4">
+    <div className="py-2">
       <div className="relative text-sm">
         <div className="flex flex-row items-center justify-between">
           <div className="flex flex-row items-center select-none text-sm gap-1.5">

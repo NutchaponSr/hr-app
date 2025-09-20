@@ -5,14 +5,14 @@ import { KpiCategory } from "@/generated/prisma";
 export const kpiBonusCreateSchema = z.object({
   name: z.string().min(1, "Required"),
   weight: z.coerce.string()
-    .nullable()
+    .min(1, "Required")
     .refine((val) => {
-      if (!val) return false;
       const num = parseFloat(val);
       return !isNaN(num) && num >= 1 && num <= 100;
     }, {
-      message: "Weight must be between 1 and 100"
-    }),
+      message: "1 to 100"
+    })
+    .pipe(z.string()),
   category: z.enum(KpiCategory),
   objective: z.string().min(1, "Required"),
   definition: z.string().min(1, "Required"),
@@ -24,4 +24,13 @@ export const kpiBonusCreateSchema = z.object({
   target70: z.string().min(1, "Required"),
 });
 
-export type KpiBonusCreateSchema = z.infer<typeof kpiBonusCreateSchema>;
+export const kpiBonusUpdateSchema = kpiBonusCreateSchema.extend({
+  id: z.string(),
+});
+
+export const kpiFormSchema = z.object({
+  kpis: z.array(kpiBonusUpdateSchema).min(1, "At least one KPI is required"),
+});
+
+export type KpiBonusUpdateSchema = z.infer<typeof kpiBonusUpdateSchema>;
+export type KpiFormSchema = z.infer<typeof kpiFormSchema>
