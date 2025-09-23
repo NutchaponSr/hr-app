@@ -1,58 +1,42 @@
 "use client";
 
 import { Command } from "cmdk";
-import { BsFileEarmark } from "react-icons/bs";
-import { ChevronDownIcon } from "lucide-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useCallback } from "react";
-import toast from "react-hot-toast";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { cn } from "@/lib/utils";
 
 import { useTRPC } from "@/trpc/client";
-import { competencyCatalog } from "@/types/competency";
 import { Competency, CompetencyType } from "@/generated/prisma";
-import { useYear } from "@/hooks/use-year";
 
 import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { SelectionBadge } from "@/components/selection-badge";
-import { useParams } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface Props {
-  id: string;
   perform: boolean;
-  children: React.ReactNode;
+  types: CompetencyType[];
   onSelect?: (competency: Competency) => void;
   selectedCompetencyId?: string;
+  value: string;
 }
 
-export const SelectCompetencyPopover = ({ id, perform, children, onSelect, selectedCompetencyId }: Props) => {
+export const SelectCompetencyPopover = ({ value, types, perform, onSelect, selectedCompetencyId }: Props) => {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
-  const params = useParams<{ id: string; }>();
-
-  const { year } = useYear();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedCompetency, setSelectedCompetency] = useState<Competency | null>(null);
 
-  const { data: competencies, isLoading } = useQuery(trpc.competency.getMany.queryOptions());
-
+  const { data: competencies } = useQuery(trpc.competency.getMany.queryOptions({ types }));
 
   return (
     <Popover modal open={isOpen && perform} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        {children}
+        <Button type="button">
+          {competencies?.find(f => f.id === value)?.name || "Select"}
+        </Button>
       </PopoverTrigger>
       
       <PopoverContent 
@@ -70,37 +54,7 @@ export const SelectCompetencyPopover = ({ id, perform, children, onSelect, selec
             />
           </div>
 
-          {/* Type Filter Dropdown */}
-          {/* <div className="flex flex-row mx-2 my-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button 
-                  data-active={!!selectedType} 
-                  className="transition text-sm inline-flex items-center justify-center whitespace-nowrap rounded-4xl h-6 leading-6 px-2 data-[active=true]:bg-[#e8f2fa] data-[active=true]:text-marine text-tertiary hover:bg-primary/6"
-                  disabled={updateCompetencyMutation.isPending}
-                >
-                  <BsFileEarmark className="size-4 stroke-[0.25] mr-1.5" />
-                  {getTypeLabel()}
-                  <ChevronDownIcon className="size-3 ml-1" />
-                </button>
-              </DropdownMenuTrigger>
-              
-              <DropdownMenuContent align="start">
-                <DropdownMenuLabel>Select Type</DropdownMenuLabel>
-                {Object.entries(competencyCatalog).map(([key, value]) => (
-                  <DropdownMenuItem
-                    key={key}
-                    onClick={() => handleTypeSelect(key as CompetencyType)}
-                    className="cursor-pointer"
-                  >
-                    <SelectionBadge {...value} />
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div> */}
-
-          {/* Competencies List */}
+      
           <div className="max-h-[320px] min-h-0 grow z-[1] overflow-x-hidden overflow-y-auto mx-0 mb-0">
             <div className="flex flex-col gap-px relative p-1">
               <Command.List>
@@ -125,7 +79,7 @@ export const SelectCompetencyPopover = ({ id, perform, children, onSelect, selec
                           selectedCompetencyId === competency.id && "bg-primary/6",
                         )}
                       >
-                        <div className="flex items-center gap-2 w-full select-none min-h-[45px] text-sm px-2 py-1">
+                        <div className="flex items-center gap-2 w-full select-none min-h-7 text-sm px-2 py-1">
                           <div className="grow shrink basis-auto min-w-0">
                             <div className="whitespace-nowrap overflow-hidden text-ellipsis">
                               <div className="flex flex-row items-center">
@@ -134,16 +88,6 @@ export const SelectCompetencyPopover = ({ id, perform, children, onSelect, selec
                                 </div>
                               </div>
                             </div>
-                            
-                            {competency.definition && (
-                              <div className="whitespace-nowrap overflow-hidden text-ellipsis">
-                                <div className="flex text-xs overflow-hidden">
-                                  <div className="text-xs whitespace-nowrap overflow-hidden text-ellipsis text-tertiary">
-                                    {competency.definition}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
                           </div>
                         </div>
                       </Command.Item>

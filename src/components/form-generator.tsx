@@ -162,7 +162,7 @@ const Select = <TFieldValues extends FieldValues>({
     <Popover>
       <Hint 
         align="center" 
-        label={selectedOption}
+        label={selectedOption || "-"}
       >
         <PopoverTrigger asChild>
           <div
@@ -170,10 +170,14 @@ const Select = <TFieldValues extends FieldValues>({
             data-disabled={disabled}
             className="select-none transition relative text-sm overflow-hidden rounded w-full h-7 p-1 flex items-center hover:bg-primary/6 data-[disabled=true]:-z-1"
           >
-            <SelectionBadge 
-              className="max-w-[120px]"
-              label={selectedOption} 
-            />
+            {selectedOption ? (
+              <SelectionBadge 
+                className="max-w-[120px]"
+                label={selectedOption} 
+              />
+            ) : (
+              "Empty"
+            )}
           </div>
         </PopoverTrigger>
       </Hint>
@@ -183,7 +187,7 @@ const Select = <TFieldValues extends FieldValues>({
       >
         <div className="flex flex-col min-w-[180px] max-w-[calc(-24px+100vw)] h-full max-h-[70vh]">
           <div className="shrink-0 max-h-60 shadow-[inset_0_-1.25px_rgba(55,53,47,0.16)] overflow-y-auto overflow-x-hidden">
-            <div className="flex whitespace-nowrap items-start bg-[#f2f1ee99] dark:bg-white/3 overflow-auto text-sm min-h-7 p-1 rounded-t">
+            <div className="flex whitespace-nowrap items-start bg-[#f2f1ee99] dark:bg:white/3 overflow-auto text-sm min-h-7 p-1 rounded-t">
               <div className="flex flex-wrap grow py-1 px-2 gap-1.5">
                 {field.value ? (
                   <SelectionBadge 
@@ -246,3 +250,4 @@ const Select = <TFieldValues extends FieldValues>({
     </Popover>
   );
 }
+

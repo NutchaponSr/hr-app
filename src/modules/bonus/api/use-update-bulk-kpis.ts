@@ -7,7 +7,7 @@ import type { AppRouter } from "@/trpc/routers/_app";
 
 type RequestType = inferProcedureInput<AppRouter["kpiBonus"]["updateBulkKpi"]>;
 
-export const useUpdateBulkKpi = (id: string) => {
+export const useUpdateBulkKpis = (id: string) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
