@@ -40,22 +40,25 @@ export const BonusInfo = ({ year }: Props) => {
         </div>
       </div>
 
-      <div className="basic-0 grow text-sm text-foreground overflow-hidden">
+      <div className="basic-0 grow pt-4 px-6 text-sm text-foreground overflow-hidden">
         <div className="flex flex-col justify-center min-h-full">
           <Stepper
             action={
               <div className="mt-1.5 ps-2.5">
                 <button
+                  disabled={createForm.isPending}
                   className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs"
                   onClick={() => {
                     if (!kpiBonus.task.inDraft) {
+
+                      toast.loading("Creating form kpi...", { id: "create-form-kpi" });
                       createForm.mutate({ year, period: Period.IN_DRAFT }, {
                         onSuccess: ({ id }) => {
-                          toast.success("Form created!");
+                          toast.success("Form created!", { id: "create-form-kpi" });
                           router.push(`/performance/bonus/${id}`);
                         },
-                        onError: () => {
-                          toast.error("Something went wrong");
+                        onError: (ctx) => {
+                          toast.error(ctx.message || "Something went wrong", { id: "create-form-kpi" });
                         }
                       });
                     } else {

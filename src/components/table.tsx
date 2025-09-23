@@ -36,8 +36,8 @@ export const Table = <TData extends RowData>({ table }: Props<TData>) => {
                   <th 
                     key={header.id}
                     className={cn(
-                      "sticky top-10 z-4 bg-sidebar px-3 start-0 h-8 border-y-[1.25px] border-border",
-                      !isBeforeLast && "border-r-[1.25px]",
+                      "sticky top-9 z-4 bg-sidebar px-3 start-0 h-8 shadow-[inset_0_1.25px_0_rgba(42,28,0,0.07),inset_0_-1.25px_0_rgba(42,28,0,0.07)] border-r-[1.25px] border-border",
+                      isBeforeLast && "border-none",
                       width,
                     )}
                   >
@@ -84,7 +84,7 @@ export const Table = <TData extends RowData>({ table }: Props<TData>) => {
                     </td>
                   ) : (
                     <td 
-                      key={cell.id} 
+                      key={index} 
                       className={cn(
                         "align-top px-3 py-2 dark:last:border-none last:shadow-none border-r-[1.25px] border-border",
                         isBeforeLast && "border-none dark:border-none !rounded-r-sm",

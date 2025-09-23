@@ -7,8 +7,19 @@ import { CompetencyType } from "@/generated/prisma";
 
 export const competencyProcedure = createTRPCRouter({
   getMany: protectedProcedure
-    .query(async () => {
-      const res = await prisma.competency.findMany();
+    .input(
+      z.object({
+        types: z.array(z.enum(CompetencyType)),
+      }),
+    )
+    .query(async ({ input }) => {
+      const res = await prisma.competency.findMany({
+        where: {
+          type: {
+            in: input.types,
+          },
+        },
+      });
 
       return res;
     })

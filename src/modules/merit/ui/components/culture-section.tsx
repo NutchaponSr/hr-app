@@ -13,19 +13,24 @@ import { SelectionBadge } from "@/components/selection-badge";
 import { convertAmountFromUnit } from "@/lib/utils";
 import { Hint } from "@/components/hint";
 import { Progress } from "@/components/ui/progress";
+import { FieldArrayWithId, UseFormReturn } from "react-hook-form";
+import { MeritSchema } from "@/modules/merit/schema";
+import { CultureTable } from "./culture-table";
 
 interface Props {
+  canPerform: boolean;
+  form: UseFormReturn<MeritSchema>;
+  fields: FieldArrayWithId<MeritSchema, "cultures", "fieldId">[];
   cultureRecord: (CultureRecord & {
     culture: Culture | null
-    comment: (PrismaComment & {
+    comments: (PrismaComment & {
       employee: Employee;
     })[];
     weight: number;
   })[];
-  perform: boolean;
 }
 
-export const CultureSection = ({ cultureRecord, perform }: Props) => {
+export const CultureSection = ({ cultureRecord, ...props }: Props) => {
   const totalCompetenciesWeight = convertAmountFromUnit(
     cultureRecord.reduce((acc, kpi) => acc + (kpi.weight || 0), 0), 2
   );
@@ -66,9 +71,7 @@ export const CultureSection = ({ cultureRecord, perform }: Props) => {
           </div>
         </div>
         <div className="relative mb-3 flex flex-col gap-8">
-          {/* {cultureRecord.map((culture) => (
-            
-          ))} */}
+          <CultureTable {...props} />
         </div>
       </AccordionContent>
     </AccordionItem>

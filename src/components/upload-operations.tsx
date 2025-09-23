@@ -134,41 +134,40 @@ export const UploadOperations = ({
             <h5 className="text-xs leading-5 text-tertiary whitespace-nowrap overflow-hidden text-ellipsis font-normal mb-1.5">
               Import Location
             </h5>
-            <Popover modal>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="md" className="justify-between text-tertiary">
-                  {selectedDatabase ? (
-                    <div className="flex items-center gap-2 grow shrink basis-0 overflow-hidden">
-                      {(() => {
-                        const IconComponent = databases[selectedDatabase].icon;
-                        return <IconComponent className="size-4 text-marine" />;
-                      })()}
-                      <span className="overflow-hidden text-ellipsis whitespace-nowrap text-primary">
-                        {databases[selectedDatabase].title}
-                      </span>
-                    </div>
-                  ) : (
-                    "Select database"
-                  )}
-                  <ChevronsUpDownIcon />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[318px] p-2">
-                <CommandSearch placeholder="Search database...">
-                  <Command.Group className="flex flex-col gap-px">
-                    {Object.entries(databases).map(([key, database]) => (
-                      <DatabaseItem
-                        key={key}
-                        databaseKey={key}
-                        database={database}
-                        onSelect={() => handleDatabaseSelect(key as Database)}
-                        isActive={selectedDatabase === key}
-                      />
-                    ))}
-                  </Command.Group>
-                </CommandSearch>
-              </PopoverContent>
-            </Popover>
+              <CommandSearch 
+                placeholder="Search database..."
+                className="w-[318px] p-2"
+                trigger={
+                  <Button variant="outline" size="md" className="justify-between text-tertiary">
+                    {selectedDatabase ? (
+                      <div className="flex items-center gap-2 grow shrink basis-0 overflow-hidden">
+                        {(() => {
+                          const IconComponent = databases[selectedDatabase].icon;
+                          return <IconComponent className="size-4 text-marine" />;
+                        })()}
+                        <span className="overflow-hidden text-ellipsis whitespace-nowrap text-primary">
+                          {databases[selectedDatabase].title}
+                        </span>
+                      </div>
+                    ) : (
+                      "Select database"
+                    )}
+                    <ChevronsUpDownIcon />
+                  </Button>
+                }
+              >
+                <Command.Group className="flex flex-col gap-px">
+                  {Object.entries(databases).map(([key, database]) => (
+                    <DatabaseItem
+                      key={key}
+                      databaseKey={key}
+                      database={database}
+                      onSelect={() => handleDatabaseSelect(key as Database)}
+                      isActive={selectedDatabase === key}
+                    />
+                  ))}
+                </Command.Group>
+              </CommandSearch>
           </div>
         )}
       </div>
