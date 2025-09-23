@@ -1,5 +1,5 @@
-import { BsFiletypeCsv } from "react-icons/bs";
 import { ChevronDownIcon } from "lucide-react";
+import { BsSave, BsFiletypeCsv } from "react-icons/bs";
 
 import { 
   Popover,
@@ -7,9 +7,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { Loader } from "./loader";
 
 interface Props {
-  perform: boolean;
+  isPending: boolean;
+  canPerform: boolean;
   context?: React.ReactNode;
   onCreate?: () => void;
   onDelete?: () => void;
@@ -17,26 +19,45 @@ interface Props {
 } 
 
 export const Toolbar = ({ 
-  perform, 
+  isPending,
+  canPerform, 
   context,
   onCreate, 
   onUpload,
 }: Props) => {
   return (
-    <div className="min-h-9 shrink-0 my-1">
+    <div className="min-h-9 px-24 sticky start-0 top-0 bg-background shrink-0 z-86">
       <div className="relative">
-        <div className="flex items-center h-9 start-24 border-b-[1.25px] border-border">
+        <div className="flex items-center h-9 start-24">
           <div className="flex items-center h-full grow shrink overflow-hidden w-full">
             {context}
           </div>
           <div className="grow h-full">
             <div className="flex flex-row justify-end items-center h-full gap-0.5">
               <div 
-                data-show={perform}
+                data-show={canPerform}
                 className="relative shrink-0 rounded overflow-hidden h-7 ml-1 data-[show=true]:inline-flex hidden"
               >
-                <button onClick={onCreate} className="transition flex items-center justify-center whitespace-nowrap rounded-l px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted">
+                <button type="button" onClick={onCreate} className="transition flex items-center justify-center whitespace-nowrap rounded-l px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted">
                   New
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isPending}
+                  data-disabled={isPending}
+                  className="transition flex items-center justify-center whitespace-nowrap px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted shadow-[inset_1px_0_0_rgba(55,53,47,0.16)] gap-1.5 data-[disabled=true]:opacity-80"
+                >
+                  {isPending ? (
+                    <>
+                      <Loader className="!text-white size-4" />
+                      Saving
+                    </>
+                  ) : (
+                    <>
+                      <BsSave className="stroke-[0.25] size-4" />
+                      Save
+                    </>
+                  )}
                 </button>
                 <Popover>
                   <PopoverTrigger asChild>

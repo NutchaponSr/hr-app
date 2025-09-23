@@ -6,12 +6,13 @@ import { TRPCError } from "@trpc/server";
 import { prisma } from "@/lib/prisma";
 
 import { readCSV } from "@/seeds/utils/csv";
-import { App, Period, Status, Task } from "@/generated/prisma";
+import { App, CompetencyType, Period, Status, Task } from "@/generated/prisma";
 import { ApprovalCSVProps } from "@/types/approval";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
-import { competencyRecordSchema, cultureRecordSchema } from "../schema";
 import { convertAmountToUnit } from "@/lib/utils";
+import { meritSchema } from "../schema";
+import { MANAGER_UP } from "../type";
 
 // Helper functions
 async function fetchCommentsForRecords(recordIds: string[]) {
@@ -19,8 +20,12 @@ async function fetchCommentsForRecords(recordIds: string[]) {
     where: {
       connectId: { in: recordIds },
     },
-    include: { employee: true },
-    orderBy: { createdAt: "asc" },
+    include: { 
+      employee: true 
+    },
+    orderBy: { 
+      createdAt: "asc" 
+    },
   });
 }
 
@@ -40,7 +45,7 @@ function buildPermissionContext(currentEmployeeId: string, task: Task): Permissi
   return {
     currentEmployeeId,
     documentOwnerId: task.preparedBy,
-    checkerId: task.checkedBy || undefined,
+    checkerId: task.checkedBy,
     approverId: task.approvedBy,
     status: task.status,
   };
@@ -60,42 +65,38 @@ export const meritProcedure = createTRPCRouter({
           employeeId: ctx.user.employee.id,
         },
         include: {
-          forms: {
-            include: {
-              task: true,
-            },
+          tasks: {
+            orderBy: {
+              preparedAt: "asc"
+            }
           },
         },
       });
 
       return {
         ...meritForm,
-        form: {
-          inDraft: meritForm?.forms.find((f) => f.period === Period.IN_DRAFT),
-          evaluation1st: meritForm?.forms.find((f) => f.period === Period.EVALUATION_1ST),
-          evaluation2nd: meritForm?.forms.find((f) => f.period === Period.EVALUATION_2ND),
-        },
+        task: {
+          inDraft: meritForm?.tasks[0],
+          evaluation1st: meritForm?.tasks[1],
+          evaluation2nd: meritForm?.tasks[2],
+        }
       };
     }),
   getByFormId: protectedProcedure
     .input(
       z.object({
-        formId: z.string(),
+        id: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const form = await prisma.form.findUnique({
+      const task = await prisma.task.findUnique({
         where: {
-          id: input.formId,
+          id: input.id,
         },
         include: {
-          task: {
-            include: {
-              preparer: true,
-              checker: true,
-              approver: true,
-            },  
-          },
+          preparer: true,
+          checker: true,
+          approver: true,
           meritForm: {
             include: {
               competencyRecords: {
@@ -116,46 +117,75 @@ export const meritProcedure = createTRPCRouter({
                   }
                 },
               },
+              employee: true,
             },
           },
         },
       });
 
-      if (!form || !form.meritForm) {
+      if (!task) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      // Fetch comments for competency and culture records
-      const [competencyComments, cultureComments] = await Promise.all([
-        fetchCommentsForRecords(form.meritForm.competencyRecords.map(r => r.id)),
-        fetchCommentsForRecords(form.meritForm.cultureRecords.map(r => r.id)),
+      const typeToName: Record<CompetencyType, string> = {
+        [CompetencyType.MC]: "Managerial Competency",
+        [CompetencyType.FC]: "Functional Competency",
+        [CompetencyType.TC]: "Technical Competency",
+        [CompetencyType.CC]: "Core Competency",
+      };
+
+      const [cultureComments, competencyComments] = await Promise.all([
+        fetchCommentsForRecords(task.meritForm?.cultureRecords?.map(r => r.id) ?? []),
+        fetchCommentsForRecords(task.meritForm?.competencyRecords?.map(r => r.id) ?? []),
       ]);
 
-      // Group comments by record ID
-      const competencyCommentsMap = groupCommentsByRecordId(competencyComments);
       const cultureCommentsMap = groupCommentsByRecordId(cultureComments);
+      const competencyCommentsMap = groupCommentsByRecordId(competencyComments);
 
-      // Attach comments to competency records
-      const competencyRecordsWithComments = form.meritForm.competencyRecords.map(record => ({
+      const competencyRecordsWithComments =
+        MANAGER_UP.includes(task.preparer.rank)
+          ? (() => {
+            const patternTypes: CompetencyType[] = [
+              CompetencyType.MC,
+              CompetencyType.MC,
+              CompetencyType.FC,
+              CompetencyType.FC,
+            ];
+            const records = task.meritForm?.competencyRecords ?? [];
+
+            return records.slice(0, patternTypes.length).map((record, index) => ({
+              ...record,
+              comments: competencyCommentsMap[record.id] || [],
+              type: [patternTypes[index]],
+              label: typeToName[patternTypes[index]],
+            }));
+          })()
+        : (() => {
+            const records = task.meritForm?.competencyRecords ?? [];
+            return records.map((record) => ({
+              ...record,
+              comments: competencyCommentsMap[record.id] || [],
+              type: [CompetencyType.TC, CompetencyType.FC],
+              label: `${typeToName[CompetencyType.TC]}, ${typeToName[CompetencyType.FC]}`,
+            }));
+          })();
+
+      const cultureRecordsWithComments = task.meritForm?.cultureRecords?.map(record => ({
         ...record,
-        comments: competencyCommentsMap[record.id] || [],
+        comments: cultureCommentsMap[record.id] || [],
+        weight: (30 / ((task.meritForm?.cultureRecords?.length ?? 1))) * 100,
       }));
 
-      // Attach comments to culture records
-      const cultureRecordsWithComments = form.meritForm.cultureRecords.map(record => ({
-        ...record,
-        comment: cultureCommentsMap[record.id] || [],
-        weight: (30 / ((form.meritForm?.cultureRecords?.length ?? 1))) * 100,
-      }));
-
-      // Build permission context
-      const permissionContext = buildPermissionContext(ctx.user.employee.id, form.task);
+      const permissionContext = buildPermissionContext(ctx.user.employee.id, task);
 
       return {
         data: {
-          ...form,
-          competencyRecords: competencyRecordsWithComments,
-          cultureRecords: cultureRecordsWithComments,
+          ...task,
+          meritForm: {
+            ...task.meritForm,
+            competencyRecords: competencyRecordsWithComments,
+            cultureRecords: cultureRecordsWithComments,
+          }
         },
         permission: {
           ctx: permissionContext,
@@ -186,85 +216,102 @@ export const meritProcedure = createTRPCRouter({
         },
       });
 
-      const form = await prisma.form.create({
+      let meritForm = await prisma.meritForm.findFirst({
+        where: {
+          year: input.year,
+          employeeId: ctx.user.employee.id,
+        },
+      });
+
+      if (!meritForm) {
+        meritForm = await prisma.meritForm.create({
+          data: {
+            year: input.year,
+            employeeId: ctx.user.employee.id,
+            competencyRecords: {
+              createMany: {
+                data: Array.from({ length: 4 }, () => ({
+                  weight: 0,
+                })),
+              },
+            },
+            cultureRecords: {
+              createMany: {
+                data: cultures.map((cul) => ({
+                  cultureId: cul.id,
+                })),
+              },
+            },
+          },
+        })
+      }
+
+      const task = await prisma.task.create({
         data: {
-          period: input.period,
-          task: {
-            create: {
-              type: App.MERIT,
-              status: Status.IN_DRAFT,
-              preparedBy: ctx.user.employee.id,
-              approvedBy: taregetApproval.approverEMPID,
-              ...(taregetApproval.checkerEMPID && {
-                checkedBy: taregetApproval.checkerEMPID,
-              }),
-            },
-          },
-          meritForm: {
-            create: {
-              year: input.year,
-              employeeId: ctx.user.employee.id,
-              competencyRecords: {
-                createMany: {
-                  data: Array.from({ length: 4 }, () => ({
-                    weight: 0,
-                  })),
-                },
-              },
-              cultureRecords: {
-                createMany: {
-                  data: cultures.map((cul) => ({
-                    cultureId: cul.id,
-                  })),
-                },
-              },
-            },
-          },
+          type: App.MERIT,
+          fileId: meritForm.id,
+          status: Status.IN_DRAFT,
+          preparedBy: ctx.user.employee.id,
+          approvedBy: taregetApproval.approverEMPID,
+          ...(taregetApproval.checkerEMPID && {
+            checkedBy: taregetApproval.checkerEMPID,
+          }),
         }, 
       });
 
-      return form;
+      return task;
     }),
-  updateCompetency: protectedProcedure
+  update: protectedProcedure
     .input(
       z.object({
         id: z.string(),
-        competencyRecordSchema,
+        meritSchema,
       })
     )
     .mutation(async ({ input }) => {
-      const res = await prisma.competencyRecord.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          competencyId: input.competencyRecordSchema.competencyId,
-          input: input.competencyRecordSchema.input,
-          output: input.competencyRecordSchema.output,
-          expectedLevel: input.competencyRecordSchema.expectedLevel,
-          weight: convertAmountToUnit(parseFloat(input.competencyRecordSchema.weight!), 2),
-        },
-      });
+      // First, get the existing records
+      const [existingCompetencyRecords, existingCultureRecords] = await Promise.all([
+        prisma.competencyRecord.findMany({
+          where: { meritFormId: input.id },
+          orderBy: { id: "asc" }
+        }),
+        prisma.cultureRecord.findMany({
+          where: { meritFormId: input.id },
+          orderBy: { id: "asc" }
+        })
+      ]);
 
-      return res;
-    }),
-  updateCulture: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        cultureRecordSchema,
-      })
-    )
-    .mutation(async ({ input }) => {
-      const res = await prisma.cultureRecord.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          evidence: input.cultureRecordSchema.evdience,
-        },
-      });
+      // Update competency records
+      await Promise.all(
+        input.meritSchema.competencies.map(async (c, index) => {
+          if (existingCompetencyRecords[index]) {
+            return prisma.competencyRecord.update({
+              where: { id: existingCompetencyRecords[index].id },
+              data: {
+                competencyId: c.competencyId,
+                input: c.input,
+                output: c.output,
+                weight: convertAmountToUnit(parseFloat(c.weight!), 2),
+              }
+            });
+          }
+        })
+      );
 
-      return res;
-    }),
+      // Update culture records
+      await Promise.all(
+        input.meritSchema.cultures.map(async (culture, index) => {
+          if (existingCultureRecords[index]) {
+            return prisma.cultureRecord.update({
+              where: { id: existingCultureRecords[index].id },
+              data: {
+                evidence: culture.evidence, 
+              }
+            });
+          }
+        })
+      );
+
+      return { success: true };
+    })
 });

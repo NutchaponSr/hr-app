@@ -24,7 +24,7 @@ export const MeritInfo = ({ year }: Props) => {
   const { data: merit } = useSuspenseQuery(trpc.kpiMerit.getByYear.queryOptions({ year }));
   const createForm = useMutation(trpc.kpiMerit.createForm.mutationOptions());
 
-  const status = STATUS_RECORD[merit.form.inDraft?.task.status || Status.NOT_STARTED];
+  const status = STATUS_RECORD[merit.task.inDraft?.status || Status.NOT_STARTED];
 
   return (
     <article className="relative select-none">
@@ -45,27 +45,30 @@ export const MeritInfo = ({ year }: Props) => {
             action={
               <div className="mt-1.5 ps-2.5">
                 <button
+                  disabled={createForm.isPending}
                   className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs"
                   onClick={() => {
-                    if (!merit.form.inDraft) {
+                    if (!merit.task.inDraft) {
+                      toast.loading("Creating form merit...", { id: "create-form-merit" });
+
                       createForm.mutate({ year, period: Period.IN_DRAFT }, {
                         onSuccess: ({ id }) => {
-                          toast.success("Form created!");
+                          toast.success("Form created!", { id: "create-form-merit" });
                           router.push(`/performance/merit/${id}`);
                         },
-                        onError: () => {
-                          toast.error("Something went wrong");
+                        onError: (ctx) => {
+                          toast.error(ctx.message || "Something went wrong", { id: "create-form-merit" });
                         }
                       });
                     } else {
-                      router.push(`/performance/merit/${merit.id}`);
+                      router.push(`/performance/merit/${merit.task.inDraft.id}`);
                     }
                   }}
                 >
-                  {!merit ? (
+                  {!merit.task.inDraft ? (
                     <>
                       <PlusIcon className="size-4 stroke-[1.75] mr-1" />
-                      Create form
+                      Create Merit
                     </>
                   ) : (
                     "View form"

@@ -1,7 +1,7 @@
 import { Status } from "@/generated/prisma";
 
 export type Role = "preparer" | "checker" | "approver";
-export type Action = "read" | "write" | "submit" | "approve" | "reject" | "request_correction";
+export type Action = "read" | "write" | "submit" | "approve" | "reject" | "worflow";
 
 const statusPermissions: Record<Status, Record<Role, Action[]>> = {
   [Status.NOT_STARTED]: {
@@ -11,19 +11,19 @@ const statusPermissions: Record<Status, Record<Role, Action[]>> = {
   },
   
   [Status.IN_DRAFT]: {
-    preparer: ["read", "write", "submit"],
+    preparer: ["read", "write", "submit", "worflow"],
     checker: ["read"],
     approver: ["read"]
   },
   
   [Status.PENDING_CHECKER]: {
     preparer: ["read"],
-    checker: ["read", "approve", "reject"],
+    checker: ["read", "approve", "reject", "write", "submit"],
     approver: ["read"]
   },
   
   [Status.REJECTED_BY_CHECKER]: {
-    preparer: ["read", "write", "submit"],
+    preparer: ["read", "write", "worflow", "submit"],
     checker: ["read"],
     approver: ["read"]
   },
@@ -31,7 +31,7 @@ const statusPermissions: Record<Status, Record<Role, Action[]>> = {
   [Status.PENDING_APPROVER]: {
     preparer: ["read"],
     checker: ["read"],
-    approver: ["read", "approve", "reject", "request_correction"]
+    approver: ["read", "approve", "reject"]
   },
   
   [Status.REJECTED_BY_APPROVER]: {
@@ -50,7 +50,7 @@ const statusPermissions: Record<Status, Record<Role, Action[]>> = {
 export interface PermissionContext {
   currentEmployeeId: string;
   documentOwnerId: string; 
-  checkerId?: string;
+  checkerId: string | null;
   approverId: string;
   status: Status;
 }

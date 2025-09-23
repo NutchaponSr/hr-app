@@ -1,6 +1,6 @@
 import { BsTriangleFill } from "react-icons/bs";
 
-import { Competency, CompetencyRecord, Employee, Comment as PrismaComment } from "@/generated/prisma";
+import { Competency, CompetencyRecord, CompetencyType, Employee, Comment as PrismaComment } from "@/generated/prisma";
 
 import {
   AccordionContent,
@@ -13,19 +13,25 @@ import { SelectionBadge } from "@/components/selection-badge";
 import { convertAmountFromUnit } from "@/lib/utils";
 import { Hint } from "@/components/hint";
 import { Progress } from "@/components/ui/progress";
-import { CompetencyCard } from "./competency-card";
+import { FieldArrayWithId, UseFormReturn } from "react-hook-form";
+import { MeritSchema } from "@/modules/merit/schema";
+import { CompetencyTable } from "./competency-table";
 
 interface Props {
+  canPerform: boolean;
+  form: UseFormReturn<MeritSchema>;
+  fields: FieldArrayWithId<MeritSchema, "competencies", "fieldId">[];
   competencyRecords: (CompetencyRecord & {
     competency: Competency | null
     comments: (PrismaComment & {
       employee: Employee;
     })[];
+    label: string;
+    type: CompetencyType[];
   })[];
-  perform: boolean;
 }
 
-export const CompetencySection = ({ competencyRecords, perform }: Props) => {
+export const CompetencySection = ({  competencyRecords, ...props }: Props) => {
   const totalCompetenciesWeight = convertAmountFromUnit(
     competencyRecords.reduce((acc, kpi) => acc + kpi.weight, 0), 2
   );
@@ -50,7 +56,7 @@ export const CompetencySection = ({ competencyRecords, perform }: Props) => {
         </div>
       </div>
       <AccordionContent>
-        <div className="min-h-9 shrink-0 z-[100] top-0 sticky bg-background flex items-center mb-3">
+        <div className="min-h-9 shrink-0 z-[100] top-0 sticky bg-background flex items-center">
           <div className="flex flex-row items-center gap-x-2 gap-y-1.5">
             <SelectionBadge label="Weight" />
             <span className="text-sm text-primary">
@@ -68,14 +74,7 @@ export const CompetencySection = ({ competencyRecords, perform }: Props) => {
           </div>
         </div>
         <div className="relative mb-3 flex flex-col gap-8">
-          {competencyRecords.map((competency, idx) => (
-            <CompetencyCard
-              key={competency.id}
-              order={idx + 1}
-              perform={perform}
-              competency={competency}
-            />
-          ))}
+          <CompetencyTable {...props} />
         </div>
       </AccordionContent>
     </AccordionItem>

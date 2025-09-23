@@ -8,7 +8,6 @@ import { TRPCReactProvider } from "@/trpc/client";
 
 import { Toaster } from "@/components/ui/sonner";
 
-import { SheetProvider } from "@/providers/sheet-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 import "./globals.css";
@@ -40,7 +39,6 @@ export default function RootLayout({
           <TRPCReactProvider>
             <NuqsAdapter>
               {children}
-              <SheetProvider />
               <Toaster richColors position="bottom-right" />
             </NuqsAdapter>
           </TRPCReactProvider>

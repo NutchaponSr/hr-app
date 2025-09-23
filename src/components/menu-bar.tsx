@@ -1,40 +1,57 @@
 import { BsTrash3 } from "react-icons/bs";
-import { MoreHorizontalIcon } from "lucide-react";
-import { Table } from "@tanstack/react-table";
+import { RowData, Table } from "@tanstack/react-table";
+import { useConfirm } from "@/hooks/use-confirm";
 
-interface Props<T> {
-  table: Table<T>;
-  perform: boolean;
-  onDelete?: () => void;
+interface Props<TData extends RowData> {
+  table: Table<TData>;
+  title: string;
+  canPerform: boolean;
+  onDelete: () => void;
 }
 
-export const MenuBar = <T,>({ table, perform, onDelete }: Props<T>) => {
+export const MenuBar = <TData extends RowData>({ 
+  table,
+  title,
+  canPerform,
+  onDelete 
+}: Props<TData>) => {
+  const [ConfirmationDialog, confirm] = useConfirm({
+    title,
+  });
+
+  const countSelected = table.getSelectedRowModel().rows.length;
+
+  const handleDelete = async () => {
+    const ok = await confirm();
+
+    if (ok) {
+      onDelete();
+    }
+  }
+
   return (
-    <div 
-      data-select={(table.getIsAllRowsSelected() || table.getIsSomePageRowsSelected())}
-      className="absolute -top-1 z-[999] data-[select=true]:block hidden w-fit data-[select=true]:opacity-100 opacity-0 transition-opacity"
-    >
-      <div className="w-fit select-none"> 
-        <div className="inline-flex items-center justify-center rounded bg-background h-8 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1.25px_rgba(84,72,49,0.08)]">
-          <button className="transition whitespace-nowrap h-full flex text-sm items-center text-marine px-2.5 rounded-s shadow-[1.25px_0_0_rgba(55,53,47,0.09)] hover:bg-primary/6">
-            1 Selected
-          </button>
-          {perform && (
-            <button 
-              onClick={() => {
-                onDelete?.();
-                table.setRowSelection({});
-              }} 
-              className="transition whitespace-nowrap h-full flex text-sm items-center text-primary shadow-[1.25px_0_0_rgba(55,53,47,0.09)] hover:bg-primary/6 w-7 shrink-0 justify-center hover:text-destructive"
-            >
-              <BsTrash3 className="size-4 block shrink-0 stroke-[0.2]" />
-            </button>
-          )}
-          <button className="transition whitespace-nowrap h-full flex text-sm items-center rounded-e hover:bg-primary/6 w-7 shrink-0 justify-center text-primary">
-            <MoreHorizontalIcon className="size-4 block shrink-0" />
-          </button>
+    <section data-select={countSelected > 0} className="sticky top-px start-24 z-999 w-fit hidden data-[select=true]:block">
+      <ConfirmationDialog />
+      <div className="absolute top-1">
+        <div className="inline-flex shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(84,72,49,0.08)] dark:shadow-[0_0_0_1px_rgb(48,48,46),0_4px_12px_-2px_rgba(0,0,0,0.16)] rounded justify-center items-center h-8 bg-background">
+          <div 
+            role="button" 
+            data-perform={canPerform}
+            onClick={() => table.toggleAllRowsSelected(false)}
+            className="transition text-marine text-sm whitespace-nowrap h-full items-center flex px-2.5 hover:bg-primary/6 data-[perform=true]:shadow-[1px_0_0_rgba(55,53,47,0.09)] dark:data-[perform=true]:shadow-[1px_0_0_rgba(255,255,255,0.094)] rounded rounded-r-none"
+          >
+            {countSelected} Selected
+          </div>
+          <div 
+            role="button" 
+            onClick={handleDelete}
+            data-perform={canPerform}
+            className="transition text-sm whitespace-nowrap h-full items-center hidden w-7 hover:bg-primary/6 justify-center text-primary hover:text-destructive data-[perform=true]:flex"
+          >
+            <BsTrash3 className="size-4 stroke-[0.2]" />
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

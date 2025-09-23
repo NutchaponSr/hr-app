@@ -25,7 +25,7 @@ export const BonusInfo = ({ year }: Props) => {
   const createForm = useMutation(trpc.kpiBonus.createForm.mutationOptions());
 
   // KpiForm DRAFT Period
-  const status = STATUS_RECORD[kpiBonus.kpiRecord.inDraft?.task.status || Status.NOT_STARTED];
+  const status = STATUS_RECORD[kpiBonus.task.inDraft?.status || Status.NOT_STARTED];
 
   return (
     <article className="relative select-none">
@@ -46,24 +46,27 @@ export const BonusInfo = ({ year }: Props) => {
             action={
               <div className="mt-1.5 ps-2.5">
                 <button
+                  disabled={createForm.isPending}
                   className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs"
                   onClick={() => {
-                    if (!kpiBonus.kpiRecord.inDraft) {
+                    if (!kpiBonus.task.inDraft) {
+
+                      toast.loading("Creating form kpi...", { id: "create-form-kpi" });
                       createForm.mutate({ year, period: Period.IN_DRAFT }, {
                         onSuccess: ({ id }) => {
-                          toast.success("Form created!");
+                          toast.success("Form created!", { id: "create-form-kpi" });
                           router.push(`/performance/bonus/${id}`);
                         },
-                        onError: () => {
-                          toast.error("Something went wrong");
+                        onError: (ctx) => {
+                          toast.error(ctx.message || "Something went wrong", { id: "create-form-kpi" });
                         }
                       });
                     } else {
-                      router.push(`/performance/bonus/${kpiBonus.kpiRecord.inDraft.id}`);
+                      router.push(`/performance/bonus/${kpiBonus.task.inDraft.id}`);
                     }
                   }}
                 >
-                  {!kpiBonus.kpiRecord.inDraft ? (
+                  {!kpiBonus.task.inDraft ? (
                     <>
                       <PlusIcon className="size-4 stroke-[1.75] mr-1" />
                       Create KPI
