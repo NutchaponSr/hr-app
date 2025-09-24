@@ -102,8 +102,8 @@ export const Tracker = ({ year }: Props) => {
 
                   if (task.taskId) {
                     url = task.app === App.BONUS
-                      ? `/performance/bonus/${task.taskId}`
-                      : `/performance/merit/${task.taskId}`
+                      ? `/performance/bonus/${task.taskId}?period=${task.period}`
+                      : `/performance/merit/${task.taskId}?period=${task.period}`
                   }
 
                   return (

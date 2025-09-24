@@ -249,8 +249,13 @@ model KpiEvaluation {
   id String @id @default(uuid())
   period Period
 
-  actual String
-  achievement Int
+  actualOwner String?
+  achievementOwner Int?
+  actualChecker String?
+  achievementChecker Int?
+  actualApprover String?
+  achievementApprover Int?
+  fileUrl String?
 
   kpiId String
   kpi Kpi @relation(fields: [kpiId], references: [id], onDelete: Cascade)

@@ -31,7 +31,7 @@ const statusPermissions: Record<Status, Record<Role, Action[]>> = {
   [Status.PENDING_APPROVER]: {
     preparer: ["read"],
     checker: ["read"],
-    approver: ["read", "approve", "reject"]
+    approver: ["read", "approve", "reject", "submit", "write"]
   },
   
   [Status.REJECTED_BY_APPROVER]: {

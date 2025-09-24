@@ -22,6 +22,12 @@ import {
   PopoverContent, 
   PopoverTrigger
 } from "@/components/ui/popover";
+import { 
+  Select as Selection, 
+  SelectContent, 
+  SelectTrigger,
+  SelectValue
+} from "./ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -250,4 +256,3 @@ const Select = <TFieldValues extends FieldValues>({
     </Popover>
   );
 }
-

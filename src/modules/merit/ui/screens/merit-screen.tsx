@@ -11,7 +11,7 @@ import { Form } from "@/components/ui/form";
 import { Banner } from "@/components/banner";
 import { SelectionBadge } from "@/components/selection-badge";
 
-import { period } from "@/modules/bonus/constants";
+import { periods } from "@/modules/bonus/constants";
 import { CompetencySection } from "../components/competency-section";
 import { Accordion } from "@/components/ui/accordion";
 import { meritSchema, MeritSchema } from "@/modules/merit/schema";
@@ -132,7 +132,7 @@ export const MeritScreen = ({ id, merit, canPerform }: Props) => {
             icon={GoProject}
             context={
               <>
-                <SelectionBadge label={period["IN_DRAFT"]} />
+                <SelectionBadge label={periods["IN_DRAFT"]} />
                 <div className="h-2" />
               </>
             }

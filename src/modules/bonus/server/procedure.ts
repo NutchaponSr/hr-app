@@ -12,7 +12,7 @@ import { ApprovalCSVProps } from "@/types/approval";
 import { App, Period, Status } from "@/generated/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
-import { kpiBonusCreateSchema } from "../schema";
+import { kpiBonusCreateSchema, kpiBonusEvaluationSchema } from "../schema";
 import { getUserRole, PermissionContext } from "../permission";
 
 export const bonusProcedure = createTRPCRouter({
@@ -63,7 +63,11 @@ export const bonusProcedure = createTRPCRouter({
           approver: true,
           kpiForm: {
             include: {
-              kpis: true,
+              kpis: {
+                include: {
+                  kpiEvaluations: true,
+                },
+              },
             },
           },
         },
@@ -163,6 +167,9 @@ export const bonusProcedure = createTRPCRouter({
           year: input.year,
           employeeId: ctx.user.employee.id,
         },
+        include: {
+          kpis: true,
+        },
       });
 
       if (!kpiForm) {
@@ -171,7 +178,34 @@ export const bonusProcedure = createTRPCRouter({
             year: input.year,
             employeeId: ctx.user.employee.id,
           },
-        })
+          include: {
+            kpis: true,
+          },
+        });
+      } else {
+        const kpiFormUpdated = await prisma.kpiForm.update({
+          where: {
+            id: kpiForm.id,
+          },
+          data: {
+            period: input.period,
+          },
+        });
+
+        if (kpiFormUpdated && kpiFormUpdated.period !== Period.IN_DRAFT) {
+          await prisma.kpiEvaluation.createMany({
+            data: kpiForm.kpis.map((kpi) => ({
+              kpiId: kpi.id,
+              period: kpiFormUpdated.period,
+              actualOwner: "",
+              achievementOwner: 0,
+              actualApprover: "",
+              achievementApprover: 0,
+              actualChecker: "",
+              achievementChecker: 0,
+            })),
+          });
+        }
       }
 
       const task = await prisma.task.create({
@@ -290,6 +324,32 @@ export const bonusProcedure = createTRPCRouter({
 
       return result;
     }),
+  updateBulkKpiEvaluation: protectedProcedure
+    .input(
+      z.object({
+        evaluations: z.array(kpiBonusEvaluationSchema.omit({ role: true })),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const updates = await Promise.all(
+        input.evaluations.map(async ({ id, ...evaluation }) =>
+          prisma.kpiEvaluation.update({
+            where: { id },
+            data: {
+              fileUrl: evaluation.fileUrl,
+              actualOwner: evaluation.actualOwner ? evaluation.actualOwner : null,
+              achievementOwner: evaluation.achievementOwner ? evaluation.achievementOwner : null,
+              actualChecker: evaluation.actualChecker ? evaluation.actualChecker : null,
+              achievementChecker: evaluation.achievementChecker ? evaluation.achievementChecker : null,
+              actualApprover: evaluation.actualApprover ? evaluation.actualApprover : null,
+              achievementApprover: evaluation.achievementApprover ? evaluation.achievementApprover : null,
+            },
+          })
+        )
+      );
+
+      return updates;
+    }),
   deleteBulkKpi: protectedProcedure
     .input(
       z.object({
@@ -325,4 +385,22 @@ export const bonusProcedure = createTRPCRouter({
   
       return null;
     }),
+  deleteKpiFile: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const kpi = await prisma.kpiEvaluation.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          fileUrl: null,
+        },
+      });
+
+      return kpi;
+    })
 });

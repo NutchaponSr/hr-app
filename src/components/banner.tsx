@@ -22,6 +22,7 @@ export const Banner = ({
       <div className={cn("max-w-full w-full", className)}>
         <div className="flex w-full h-9" />
         {context}
+        <div className="h-2" />
         <div className="pe-24 mb-2 w-full">
           <div className="flex justify-start flex-row">
             <Icon className="size-9 me-1.5 text-marine" />
