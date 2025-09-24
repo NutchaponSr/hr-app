@@ -32,55 +32,79 @@ export const kpiFormSchema = z.object({
   kpis: z.array(kpiBonusUpdateSchema).min(1, "At least one KPI is required"),
 });
 
-// Per-role evaluation schemas (client-side strict validation)
-export const kpiBonusEvaluationPreparerSchema = z.object({
+// ...existing code...
+export const kpiBonusEvaluationSchema = z.object({
   id: z.string(),
-  actualOwner: z.string().min(1, "Required"),
-  achievementOwner: z.coerce.number().min(1, "Required"),
-  // optional for preparer
-  actualChecker: z.string().min(1, "Required"),
-  achievementChecker: z.coerce.number().min(1, "Required"),
-  actualApprover: z.string().optional(),
-  achievementApprover: z.coerce.number().optional(),
-  fileUrl: z.string().nullable(),
-});
-
-export const kpiBonusEvaluationCheckerSchema = z.object({
-  id: z.string(),
-  // readonly owner fields (not required on submit)
-  actualOwner: z.string().optional(),
-  achievementOwner: z.coerce.number().optional(),
-  // required for checker
-  actualChecker: z.string().min(1, "Required"),
-  achievementChecker: z.coerce.number().min(1, "Required"),
-  // optional for checker
-  actualApprover: z.string().optional(),
-  achievementApprover: z.coerce.number().optional(),
-  fileUrl: z.string().nullable().optional(),
-});
-
-export const kpiBonusEvaluationApproverSchema = z.object({
-  id: z.string(),
-  // readonly owner/checker fields (not required on submit)
+  role: z.enum(["preparer", "checker", "approver"]),
   actualOwner: z.string().optional(),
   achievementOwner: z.coerce.number().optional(),
   actualChecker: z.string().optional(),
   achievementChecker: z.coerce.number().optional(),
-  // required for approver
   actualApprover: z.string().optional(),
-  achievementApprover: z.coerce.number().min(1, "Required"),
-  fileUrl: z.string().nullable().optional(),
+  achievementApprover: z.coerce.number().optional(),
+  fileUrl: z.string().nullable(),
+}).superRefine((data, ctx) => {
+  // attach field-level issues so react-hook-form can show them per-field
+  switch (data.role) {
+    case "preparer":
+      if (!data.actualOwner || data.actualOwner.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["actualOwner"],
+          message: "Required",
+        });
+      }
+      if (data.achievementOwner === undefined || data.achievementOwner < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["achievementOwner"],
+          message: "Required",
+        });
+      }
+      break;
+    case "checker":
+      if (!data.actualChecker || data.actualChecker.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["actualChecker"],
+          message: "Required",
+        });
+      }
+      if (data.achievementChecker === undefined || data.achievementChecker < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["achievementChecker"],
+          message: "Required",
+        });
+      }
+      break;
+    case "approver":
+      if (!data.actualApprover || data.actualApprover.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["actualApprover"],
+          message: "Required",
+        });
+      }
+      if (data.achievementApprover === undefined || data.achievementApprover < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["achievementApprover"],
+          message: "Required",
+        });
+      }
+      break;
+    default:
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["role"],
+        message: "Invalid role",
+      });
+  }
 });
 
-// Server-side permissive schema (accept any role payload)
-export const kpiBonusEvaluationAnyRoleSchema = z.union([
-  kpiBonusEvaluationPreparerSchema,
-  kpiBonusEvaluationCheckerSchema,
-  kpiBonusEvaluationApproverSchema,
-]);
-
 export const kpiBonusEvaluationsSchema = z.object({
-  evaluations: z.array(kpiBonusEvaluationAnyRoleSchema),
+  evaluations: z.array(kpiBonusEvaluationSchema)
 });
 
 export type KpiFormSchema = z.infer<typeof kpiFormSchema>

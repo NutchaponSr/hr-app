@@ -21,3 +21,16 @@ export function validateWeight(position: Position) {
       return 30;
   }
 }
+
+export const getEditableFields = (role: "preparer" | "checker" | "approver") => {
+  switch (role) {
+    case "preparer":
+      return ["actualOwner", "achievementOwner"];
+    case "checker":
+      return ["actualChecker", "achievementChecker"];
+    case "approver":
+      return ["actualApprover", "achievementApprover"];
+    default:
+      return [];
+  }
+};

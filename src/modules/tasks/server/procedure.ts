@@ -102,6 +102,7 @@ export const taskProcedure = createTRPCRouter({
         status: task.status,
         app: task.type,
         owner: task.preparer,
+        period: task.kpiForm?.period || task.meritForm?.period,
         taskId: task.id,
       }));
     }),

@@ -12,7 +12,7 @@ import { ApprovalCSVProps } from "@/types/approval";
 import { App, Period, Status } from "@/generated/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
-import { kpiBonusCreateSchema, kpiBonusEvaluationAnyRoleSchema } from "../schema";
+import { kpiBonusCreateSchema, kpiBonusEvaluationSchema } from "../schema";
 import { getUserRole, PermissionContext } from "../permission";
 
 export const bonusProcedure = createTRPCRouter({
@@ -327,17 +327,23 @@ export const bonusProcedure = createTRPCRouter({
   updateBulkKpiEvaluation: protectedProcedure
     .input(
       z.object({
-        evaluations: z.array(kpiBonusEvaluationAnyRoleSchema),
+        evaluations: z.array(kpiBonusEvaluationSchema.omit({ role: true })),
       })
     )
     .mutation(async ({ input }) => {
-      console.log(input);
-
       const updates = await Promise.all(
-        input.evaluations.map(async ({ id, ...data }) =>
+        input.evaluations.map(async ({ id, ...evaluation }) =>
           prisma.kpiEvaluation.update({
             where: { id },
-            data,
+            data: {
+              fileUrl: evaluation.fileUrl,
+              actualOwner: evaluation.actualOwner ? evaluation.actualOwner : null,
+              achievementOwner: evaluation.achievementOwner ? evaluation.achievementOwner : null,
+              actualChecker: evaluation.actualChecker ? evaluation.actualChecker : null,
+              achievementChecker: evaluation.achievementChecker ? evaluation.achievementChecker : null,
+              actualApprover: evaluation.actualApprover ? evaluation.actualApprover : null,
+              achievementApprover: evaluation.achievementApprover ? evaluation.achievementApprover : null,
+            },
           })
         )
       );
@@ -379,4 +385,22 @@ export const bonusProcedure = createTRPCRouter({
   
       return null;
     }),
+  deleteKpiFile: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const kpi = await prisma.kpiEvaluation.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          fileUrl: null,
+        },
+      });
+
+      return kpi;
+    })
 });

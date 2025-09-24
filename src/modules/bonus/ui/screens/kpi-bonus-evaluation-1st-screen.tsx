@@ -10,8 +10,10 @@ import { KpiWithEvaluation } from "../../types";
 import { kpiBonusEvaluationsSchema, KpiBonusEvaluationsSchema } from "../../schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
-import { useUpdateBulkKpiEvaluations } from "../../api/use-update-bulk-kpi-evaluations";
 import { Loader } from "@/components/loader";
+import { Role } from "../../permission";
+import { useUpdateBulkKpiEvaluations } from "../../api/use-update-bulk-kpi-evaluations";
+import { useEffect } from "react";
 
 interface Props {
   id: string;
@@ -22,55 +24,68 @@ interface Props {
     checkerCanWrite: boolean;
     approverCanWrite: boolean;
   };
+  role: Role;
 }
 
-export const KpiBonusEvaluation1StScreen = ({ id, canPerform, kpiForm }: Props) => {
-  const { 
-    mutation: updateBulkKpiEvaluations, 
+export const KpiBonusEvaluation1StScreen = ({ id, role, canPerform, kpiForm }: Props) => {
+  const {
+    mutation: updateBulkKpiEvaluations,
     opt: updateBulkKpiEvaluationsOpt
   } = useUpdateBulkKpiEvaluations(id);
 
-  // ฟังก์ชัน mapValue นี้จะต้องแน่ใจว่า achievementApprover มีค่าเป็น number เสมอ (ไม่เป็น undefined)
-  const mapValue = (kpi: KpiWithEvaluation): KpiBonusEvaluationsSchema["evaluations"][number] => ({
-    id: kpi.kpiEvaluations[0]?.id,
-    fileUrl: kpi.kpiEvaluations[0]?.fileUrl ?? null,
-    actualOwner: kpi.kpiEvaluations[0]?.actualOwner ?? "",
-    achievementOwner: Number(kpi.kpiEvaluations[0]?.achievementOwner ?? 0),
-    actualChecker: kpi.kpiEvaluations[0]?.actualChecker ?? "",
-    achievementChecker:
-      kpi.kpiEvaluations[0]?.achievementChecker == null
-        ? 0
-        : Number(kpi.kpiEvaluations[0]?.achievementChecker),
-    actualApprover: kpi.kpiEvaluations[0]?.actualApprover ?? "",
-    achievementApprover:
-      kpi.kpiEvaluations[0]?.achievementApprover == null
-        ? 0
-        : Number(kpi.kpiEvaluations[0]?.achievementApprover),
-  });
+  const mapValue = (kpi: KpiWithEvaluation, userRole: Role) => {
+    const evaluation = kpi.kpiEvaluations[0];
+    
+    return {
+      id: evaluation?.id || "",
+      role: userRole,
+      fileUrl: evaluation?.fileUrl ?? null,
+      actualOwner: evaluation?.actualOwner ?? "",
+      achievementOwner: Number(evaluation?.achievementOwner ?? 0),
+      actualChecker: evaluation?.actualChecker ?? "",
+      achievementChecker: Number(evaluation?.achievementChecker ?? 0),
+      actualApprover: evaluation?.actualApprover ?? "",
+      achievementApprover: Number(evaluation?.achievementApprover ?? 0),
+    };
+  };
 
   const kpis = kpiForm.data.kpiForm.kpis;
+  const hasChecker = kpiForm.permission.ctx.checkerId !== null;
 
   const form = useForm<KpiBonusEvaluationsSchema>({
     resolver: zodResolver(kpiBonusEvaluationsSchema) as Resolver<KpiBonusEvaluationsSchema>,
     defaultValues: {
-      evaluations: (kpis || []).map(mapValue)
+      evaluations: (kpis || []).map(kpi => mapValue(kpi, role))
     }
   });
 
   const table = useReactTable({
     data: kpiForm.data.kpiForm.kpis || [],
-    columns: createColumns({ 
-      form, 
-      canPerformOwner: !canPerform.ownerCanWrite,
-      canPerformChecker: !canPerform.checkerCanWrite,
-      canPerformApprover: !canPerform.approverCanWrite,
+    columns: createColumns({
+      form,
+      hasChecker,
+      permissions: {
+        canPerformOwner: !canPerform.ownerCanWrite,
+        canPerformChecker: !canPerform.checkerCanWrite,
+        canPerformApprover: !canPerform.approverCanWrite,
+      },
     }),
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const onSubmit = (value: KpiBonusEvaluationsSchema) => {
-    updateBulkKpiEvaluations({ evaluations: value.evaluations });
-  }
+  const onSubmit = (data: KpiBonusEvaluationsSchema) => {
+    updateBulkKpiEvaluations({ evaluations: data.evaluations });
+  };
+
+  useEffect(() => {
+    if (!kpis) return;
+    form.reset({
+      evaluations: (kpis || []).map(kpi => mapValue(kpi, role)),
+    }, {
+      keepDirty: false,
+      keepTouched: false,
+    });
+  }, [form, kpis, role]);
 
   return (
     <Form {...form}>
