@@ -12,6 +12,7 @@ import { SheetProvider } from "@/providers/sheet-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 import "./globals.css";
+import { EdgeStoreProvider } from "@/lib/edegstore";
 
 const font = Geist({
   subsets: ["latin"],
@@ -39,9 +40,11 @@ export default function RootLayout({
         >
           <TRPCReactProvider>
             <NuqsAdapter>
-              {children}
-              <SheetProvider />
-              <Toaster richColors position="bottom-right" />
+              <EdgeStoreProvider>
+                {children}
+                <SheetProvider />
+                <Toaster richColors position="bottom-right" />
+              </EdgeStoreProvider>
             </NuqsAdapter>
           </TRPCReactProvider>
         </ThemeProvider>

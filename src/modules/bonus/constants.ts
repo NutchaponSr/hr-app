@@ -12,7 +12,7 @@ export const kpiCategoies: Record<KpiCategory, string> = {
   [KpiCategory.L_G]: "Learning & Growth",
 }
 
-export const period: Record<Period, string> = {
+export const periods: Record<Period, string> = {
   [Period.IN_DRAFT]: "In draft",
   [Period.EVALUATION_1ST]: "Evaluation 1 st",
   [Period.EVALUATION_2ND]: "Evaluation 2 nd",

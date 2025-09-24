@@ -26,13 +26,22 @@ import { canPerformMany, Role } from "@/modules/bonus/permission";
 import { Footer } from "@/components/footer";
 import { ApprovalConfirmation } from "@/modules/tasks/ui/components/approval-confirmation";
 import { useApprovalKpi } from "@/modules/tasks/api/use-approval-kpi";
+import { Period } from "@/generated/prisma";
+import { Banner } from "@/components/banner";
+import { SelectionBadge } from "@/components/selection-badge";
+import { periods } from "../../constants";
+import { Content } from "@/components/content";
+import { UserProfile } from "@/modules/auth/ui/components/user-profile";
+import { BsPersonFill } from "react-icons/bs";
 
 interface Props {
   id: string;
+  period: Period;
 }
 
 export const BonusView = ({
   id,
+  period,
 }: Props) => {
   const pathname = usePathname();
 
@@ -93,14 +102,44 @@ export const BonusView = ({
         message={getBannerMessage(error, kpiForm.data.status)}
         variant="danger"
       />
-      <KpiBonusScreen 
-        id={id} 
-        kpiForm={kpiForm} 
-        canPerform={{
-          canWrite: permissions.write,
-          canSubmit: permissions.submit,
-        }}
-      />
+      <main className="grow-0 shrink flex flex-col bg-background h-[calc(-44px+100vh)] max-h-full relative w-full">
+        <div className="flex flex-col grow relative overflow-auto me-0 mb-0">
+          <Banner
+            title="KPI Bonus"
+            className="ps-24"
+            description="Reward employees with performance-based bonuses tied to goals and business impact."
+            icon={GoProject}
+            context={<SelectionBadge label={periods[period]} />}
+          />
+          <div className="flex flex-row gap-2 px-24">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] gap-x-4 my-2 max-w-full">
+              <Content label="Owner" icon={BsPersonFill}>
+                <UserProfile employee={kpiForm.data.preparer} />
+              </Content>
+              {kpiForm.data.checker && (
+                <Content label="Checker" icon={BsPersonFill}>
+                  <UserProfile employee={kpiForm.data.checker} />
+                </Content>
+              )}
+              <Content label="Approver" icon={BsPersonFill}>
+                <UserProfile employee={kpiForm.data.approver} />
+              </Content>
+            </div>
+          </div>
+          <KpiBonusScreen 
+            id={id} 
+            period={period}
+            kpiForm={kpiForm} 
+            role={kpiForm.permission.role!}
+            canPerform={{
+              ownerCanWrite: permissions.write && kpiForm.permission.role === "preparer",
+              checkerCanWrite: permissions.write && kpiForm.permission.role === "checker",
+              approverCanWrite: permissions.write && kpiForm.permission.role === "approver",
+              canSubmit: permissions.submit,
+            }}
+          />
+        </div>
+      </main>
 
       {permissions.approve && (
         <Footer>

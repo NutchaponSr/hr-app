@@ -3,7 +3,7 @@ import { GoHash } from "react-icons/go";
 import { FiLoader } from "react-icons/fi";
 import { BsTextLeft } from "react-icons/bs";
 
-export const inputVariants = ["string", "numeric", "text", "select"] as const;
+export const inputVariants = ["string", "numeric", "text", "select", "dropdown"] as const;
 
 export type InputVariants = typeof inputVariants[number];
 
@@ -12,6 +12,7 @@ export const inputIcons: Record<InputVariants, IconType> = {
   numeric: GoHash,
   text: BsTextLeft,
   select: FiLoader,
+  dropdown: FiLoader,
 }
 
 export type SelectInput = {

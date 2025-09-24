@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
 
-import { Status, Task } from "@/generated/prisma";
+import { App, Status, Task } from "@/generated/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
@@ -65,6 +65,7 @@ export const taskProcedure = createTRPCRouter({
         year: task.kpiForm?.year || task.meritForm?.year,
         owner: task.preparer,
         updatedAt: task.updatedAt,
+        period: task.kpiForm?.period || task.meritForm?.period,
       }));
     }),
   getManyByYear: protectedProcedure
