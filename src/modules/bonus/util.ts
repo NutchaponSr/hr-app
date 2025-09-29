@@ -1,4 +1,7 @@
 import { Position } from "@/generated/prisma";
+import { KpiBonusEvaluationSchema } from "./schema";
+import { KpiWithEvaluation } from "./types";
+import { convertAmountFromUnit } from "@/lib/utils";
 
 export function validateWeight(position: Position) {
   switch (position) {
@@ -34,3 +37,24 @@ export const getEditableFields = (role: "preparer" | "checker" | "approver") => 
       return [];
   }
 };
+
+export function getTotalWithWeight(
+  evaluations: KpiBonusEvaluationSchema[],
+  kpis: KpiWithEvaluation[],
+  key: "achievementOwner" | "achievementChecker" | "achievementApprover"
+) {
+  const total = (evaluations || []).reduce((sum, evalItem, idx) => {
+    const weight = convertAmountFromUnit(
+      (kpis?.[idx]?.weight ?? 0),
+      2
+    );
+    const achievement = Number(evalItem?.[key] ?? 0);
+
+    return sum + ((achievement / 100) * weight);
+  }, 0);
+
+  return total.toLocaleString("en-US", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  });
+}

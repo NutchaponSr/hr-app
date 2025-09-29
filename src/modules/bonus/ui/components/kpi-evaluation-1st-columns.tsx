@@ -74,12 +74,12 @@ export const createColumns = ({
           </div>
           <div className="grid grid-cols-2 gap-2">
             <Content label="Objective">
-              <p className="text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
+              <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
                 {row.original.objective}
               </p>
             </Content>
             <Content label="Definition">
-              <p className=" text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
+              <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
                 {row.original.definition}
               </p>
             </Content>
@@ -116,7 +116,7 @@ export const createColumns = ({
         </div>
       ),
       meta: {
-        width: hasChecker ? "w-[40%]" : "w-[50%]", // Adjust width based on hasChecker
+        width: "w-[40%]"
       },
     },
     {
@@ -130,7 +130,11 @@ export const createColumns = ({
             render={({ field }) => (
               <FormItem className="grow w-full">
                 <FormLabel>Achievement</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={String(field.value)} disabled={permissions.canPerformOwner}>
+                <Select 
+                  value={field.value !== undefined && field.value !== null ? String(field.value) : ""} 
+                  onValueChange={(v) => field.onChange(Number(v))} 
+                  disabled={permissions.canPerformOwner}
+                >
                   <FormControl>
                     <SelectTrigger size="sm" className="w-full">
                       <div className="whitespace-nowrap overflow-hidden text-ellipsis">
@@ -191,7 +195,6 @@ export const createColumns = ({
     },
   ];
 
-  // Conditionally add checker column
   if (hasChecker) {
     columns.push({
       id: "checker",
@@ -204,7 +207,7 @@ export const createColumns = ({
             render={({ field }) => (
               <FormItem className="grow w-full">
                 <FormLabel>Achievement</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={String(field.value)} disabled={permissions.canPerformChecker}>
+                <Select value={field.value !== undefined && field.value !== null ? String(field.value) : ""} onValueChange={(v) => field.onChange(Number(v))} disabled={permissions.canPerformChecker}>
                   <FormControl>
                     <SelectTrigger size="sm" className="w-full">
                       <div className="whitespace-nowrap overflow-hidden text-ellipsis">
@@ -246,7 +249,6 @@ export const createColumns = ({
     });
   }
 
-  // Add approver column
   columns.push({
     id: "approver",
     header: "Approver",
@@ -258,7 +260,7 @@ export const createColumns = ({
           render={({ field }) => (
             <FormItem className="grow w-full">
               <FormLabel>Achievement</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={String(field.value)} disabled={permissions.canPerformApprover}>
+              <Select value={field.value !== undefined && field.value !== null ? String(field.value) : ""} onValueChange={(v) => field.onChange(Number(v))} disabled={permissions.canPerformApprover}>
                 <FormControl>
                   <SelectTrigger size="sm" className="w-full">
                     <div className="whitespace-nowrap overflow-hidden text-ellipsis">
@@ -295,7 +297,7 @@ export const createColumns = ({
       </div>
     ),
     meta: {
-      width: hasChecker ? "w-[20%]" : "w-[25%]", // Adjust width based on hasChecker
+      width: hasChecker ? "w-[20%]" : "w-[25%]",
     },
   });
 

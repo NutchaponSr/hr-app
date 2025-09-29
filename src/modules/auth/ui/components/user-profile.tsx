@@ -10,7 +10,7 @@ interface Props {
 export const UserProfile = ({ employee } :Props) => {
   return (
     <CardProfile employee={employee}>
-      <div className="select-none relative text-sm overflow-hidden items-center flex min-h-7">
+      <div className="select-none relative text-sm overflow-hidden items-center flex min-h-8">
         <div className="shrink-0 grow-0 me-1.5 mt-0">
           <UserAvatar
             name={employee.fullName}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { GoProject } from "react-icons/go";
 import { usePathname } from "next/navigation";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -10,34 +11,49 @@ import { convertAmountFromUnit, getBannerMessage } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { STATUS_RECORD } from "@/types/kpi";
 
-import { Header } from "@/components/header";
+import { Period } from "@/generated/prisma";
+
+import { Banner } from "@/components/banner";
 import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
 import { StatusBadge } from "@/components/status-badge";
 import { WarnningBanner } from "@/components/warnning-banner";
+import { SelectionBadge } from "@/components/selection-badge";
 import { SavingIndicator } from "@/components/saving-indicator";
 
+import { MeritScreen } from "@/modules/merit/ui/screens/merit-screen";
 import { StartWorkflowButton } from "@/modules/tasks/ui/components/start-workflow-button";
-
-import { MeritScreen } from "../screens/merit-screen";
-import { useStartWorkflowMerit } from "@/modules/tasks/api/use-start-workflow-merit";
-import { canPerformMany, Role } from "@/modules/bonus/permission";
-import { useState } from "react";
-import { useApprovalMerit } from "@/modules/tasks/api/use-approval-merit";
 import { ApprovalConfirmation } from "@/modules/tasks/ui/components/approval-confirmation";
+
+import { useApprovalMerit } from "@/modules/tasks/api/use-approval-merit";
+import { useStartWorkflowMerit } from "@/modules/tasks/api/use-start-workflow-merit";
+
+import { periods } from "@/modules/bonus/constants";
+import { canPerformMany, Role } from "@/modules/bonus/permission";
 
 interface Props {
   id: string;
+  period: Period;
 }
 
-export const MeritView = ({ id }: Props) => {
+export const MeritView = ({ id, period }: Props) => {
   const trpc = useTRPC();
   const pathname = usePathname();
+
 
   const paths: string[] = pathname.split("/").filter(Boolean);
 
   const [error, setError] = useState("");
 
-  const { data: merit } = useSuspenseQuery(trpc.kpiMerit.getByFormId.queryOptions({ id }));
+  const query = trpc.kpiMerit.getByFormId.queryOptions({ id });
+
+  const { data: merit } = useSuspenseQuery({
+    ...query,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+  });
+  
   const { mutation: startWorkflow } = useStartWorkflowMerit(id);
   const { mutation: approval, opt: approvalOption } = useApprovalMerit(id);
 
@@ -87,15 +103,30 @@ export const MeritView = ({ id }: Props) => {
         variant="danger"
       />
 
-      <MeritScreen 
-        id={id} 
-        merit={merit} 
-        canPerform={{
-          canWrite: permissions.write,
-          canSubmit: permissions.submit,
-        }}
-      />
+      <main className="grow-0 shrink flex flex-col bg-background h-[calc(-44px+100vh)] max-h-full relative w-full">
+        <div className="flex flex-col grow relative overflow-auto me-0 mb-0">
+          <Banner
+            title="Merit"
+            className="ps-16"
+            description="Evaluate employee achievements and align merit increases with performance outcomes."
+            icon={GoProject}
+            context={<SelectionBadge label={periods[period]} />}
+          />
 
+          <MeritScreen 
+            id={id} 
+            period={period}
+            merit={merit} 
+            canPerform={{
+              canWrite: permissions.write,
+              canSubmit: permissions.submit,
+              ownerCanWrite: permissions.write && merit.permission.role === "preparer",
+              checkerCanWrite: permissions.write && merit.permission.role === "checker",
+              approverCanWrite: permissions.write && merit.permission.role === "approver",
+            }}
+          />
+        </div>
+      </main>
       {permissions.approve && (
         <Footer>
           <ApprovalConfirmation 

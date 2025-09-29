@@ -6,6 +6,10 @@ declare module "@tanstack/react-table" {
     sticky?: boolean;
   }
 
+  interface TableMeta<TData extends RowData> {
+    rowHeights?: Record<string, { input: number; output: number }>;
+  }
+
   interface ColumnSort {
     desc: boolean;
     id: string;

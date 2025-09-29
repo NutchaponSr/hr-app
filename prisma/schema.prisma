@@ -318,7 +318,13 @@ model CultureEvaluation {
   id  String  @id @default(uuid())
   cultureRecordId String 
   period  Period
-  levelBehavior Int @default(0)
+  levelBehaviorOwner Int?
+  levelBehaviorChecker Int?
+  levelBehaviorApprover Int?
+
+  actualOwner String? @db.Text
+  actualChecker String? @db.Text
+  actualApprover String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -392,10 +398,17 @@ model CompetencyRecord {
 model CompetencyEvaluation {
   id String @id @default(uuid())
   period Period
-  inputEvidence String @db.Text
-  outputEvidence String @db.Text
-  inputLevel Int @default(0)
-  outputLevel Int @default(0)
+  inputEvidenceOwner String? @db.Text
+  outputEvidenceOwner String? @db.Text
+  levelOwner Int?
+
+  inputEvidenceChecker String? @db.Text
+  outputEvidenceChecker String? @db.Text
+  levelChecker Int?
+
+  inputEvidenceApprover String? @db.Text
+  outputEvidenceApprover String? @db.Text
+  levelApprover Int?
 
   createdAt DateTime @default(now())
 

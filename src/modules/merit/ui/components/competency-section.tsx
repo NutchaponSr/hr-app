@@ -1,6 +1,7 @@
 import { BsTriangleFill } from "react-icons/bs";
+import { FieldArrayWithId, UseFormReturn } from "react-hook-form";
 
-import { Competency, CompetencyRecord, CompetencyType, Employee, Comment as PrismaComment } from "@/generated/prisma";
+import { convertAmountFromUnit } from "@/lib/utils";
 
 import {
   AccordionContent,
@@ -8,35 +9,42 @@ import {
   AccordionTrigger
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-
-import { SelectionBadge } from "@/components/selection-badge";
-import { convertAmountFromUnit } from "@/lib/utils";
-import { Hint } from "@/components/hint";
 import { Progress } from "@/components/ui/progress";
-import { FieldArrayWithId, UseFormReturn } from "react-hook-form";
+
+import { Hint } from "@/components/hint";
+import { Table } from "@/components/table";
+import { SelectionBadge } from "@/components/selection-badge";
+
 import { MeritSchema } from "@/modules/merit/schema";
-import { CompetencyTable } from "./competency-table";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { createColumns } from "./competency-columns";
+import { useCommentMerit } from "@/modules/comments/api/use-comment-merit";
+import { useMeritId } from "../../hooks/use-merit-id";
+import { CompetencyWithInfo } from "../../type";
 
 interface Props {
   canPerform: boolean;
   form: UseFormReturn<MeritSchema>;
   fields: FieldArrayWithId<MeritSchema, "competencies", "fieldId">[];
-  competencyRecords: (CompetencyRecord & {
-    competency: Competency | null
-    comments: (PrismaComment & {
-      employee: Employee;
-    })[];
-    label: string;
-    type: CompetencyType[];
-  })[];
+  competencyRecords: CompetencyWithInfo[];
 }
 
 export const CompetencySection = ({  competencyRecords, ...props }: Props) => {
+  const id = useMeritId();
+
+  const { mutation: comment } = useCommentMerit(id);
+
   const totalCompetenciesWeight = convertAmountFromUnit(
     competencyRecords.reduce((acc, kpi) => acc + kpi.weight, 0), 2
   );
 
   const progressValue = Math.min((totalCompetenciesWeight / 30) * 100, 100);
+
+  const table = useReactTable({
+    data: competencyRecords || [],
+    columns: createColumns({ ...props, comment }),
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   return (
     <AccordionItem value="competency">
@@ -74,7 +82,7 @@ export const CompetencySection = ({  competencyRecords, ...props }: Props) => {
           </div>
         </div>
         <div className="relative mb-3 flex flex-col gap-8">
-          <CompetencyTable {...props} />
+          <Table table={table} />
         </div>
       </AccordionContent>
     </AccordionItem>

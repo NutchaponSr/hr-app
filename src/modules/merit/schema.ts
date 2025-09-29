@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { CompetencyType, Division, Position } from "@/generated/prisma";
+import { kpiBonusEvaluationSchema } from "../bonus/schema";
 
 export const commentSchema = z.object({
   employee: z.object({
@@ -61,4 +62,178 @@ export const meritSchema = z.object({
   cultures: z.array(cultureSchema),
 });
 
+export const competencyEvaluationSchema = z.object({
+  id: z.string(),
+  role: z.enum(["preparer", "checker", "approver"]),
+  inputEvidenceOwner: z.string().nullable(),
+  outputEvidenceOwner: z.string().nullable(),
+  levelOwner: z.coerce.number().nullable(),
+
+  inputEvidenceChecker: z.string().nullable(),
+  outputEvidenceChecker: z.string().nullable(),
+  levelChecker: z.coerce.number().nullable(),
+
+  inputEvidenceApprover: z.string().nullable(),
+  outputEvidenceApprover : z.string().nullable(),
+  levelApprover: z.coerce.number().nullable(),
+}).superRefine((data, ctx) => {
+  switch (data.role) {
+    case "preparer": 
+      if (!data.inputEvidenceOwner || data.inputEvidenceOwner.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["inputEvidenceOwner"],
+          message: "Required",
+        })
+      }
+
+      if (!data.outputEvidenceOwner || data.outputEvidenceOwner.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["outputEvidenceOwner"],
+          message: "Required",
+        })
+      }
+      
+      if (!data.levelOwner || data.levelOwner < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["levelOwner"],
+          message: "Required",
+        })
+      }
+
+      break;
+    case "checker":
+      if (!data.inputEvidenceChecker || data.inputEvidenceChecker.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["inputEvidenceChecker"],
+          message: "Required",
+        })
+      }
+
+      if (!data.outputEvidenceChecker || data.outputEvidenceChecker.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["outputEvidenceChecker"],
+          message: "Required",
+        })
+      }
+      
+      if (!data.levelChecker || data.levelChecker < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["levelChecker"],
+          message: "Required",
+        })
+      }
+
+      break;
+    case "approver":
+      if (!data.inputEvidenceApprover || data.inputEvidenceApprover.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["inputEvidenceApprover"],
+          message: "Required",
+        })
+      }
+
+      if (!data.outputEvidenceApprover || data.outputEvidenceApprover.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["outputEvidenceApprover"],
+          message: "Required",
+        })
+      }
+      
+      if (!data.levelApprover || data.levelApprover < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["levelApprover"],
+          message: "Required",
+        })
+      }
+
+      break;
+  }
+});
+
+export const cultureEvaluationSchema = z.object({
+  id: z.string(),
+  role: z.enum(["preparer", "checker", "approver"]),
+  levelBehaviorOwner: z.coerce.number().nullable(),
+  levelBehaviorChecker: z.coerce.number().nullable(),
+  levelBehaviorApprover: z.coerce.number().nullable(),
+  actualOwner: z.string().nullable(),
+  actualChecker: z.string().nullable(),
+  actualApprover: z.string().nullable(),
+}).superRefine((data, ctx) => {
+  switch (data.role) {
+    case "preparer":
+      if (!data.levelBehaviorOwner) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["levelBehaviorOwner"],
+          message: "Required",
+        });
+      }
+
+      if (!data.actualOwner || data.actualOwner.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["actualOwner"],
+          message: "Required",
+        });
+      }
+
+      break;
+    case "checker":
+      if (!data.levelBehaviorChecker) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["levelBehaviorChecker"],
+          message: "Required",
+        });
+      }
+
+      if (!data.actualChecker || data.actualChecker.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["actualChecker"],
+          message: "Required",
+        });
+      }
+      
+      break;
+    case "approver":
+      if (!data.levelBehaviorApprover) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["levelBehaviorApprover"],
+          message: "Required",
+        });
+      }
+
+      if (!data.actualApprover || data.actualApprover.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["actualApprover"],
+          message: "Required",
+        });
+      }
+      
+      break;
+  }
+});
+
+
+export const meritEvaluationSchema = z.object({
+  competencies: z.array(competencyEvaluationSchema),
+  cultures: z.array(cultureEvaluationSchema),
+  kpis: z.array(kpiBonusEvaluationSchema),
+});
+
+export type MeritEvaluationSchema = z.infer<typeof meritEvaluationSchema>;
 export type MeritSchema = z.infer<typeof meritSchema>;
+export type ComptencySchema = z.infer<typeof competencySchema>;

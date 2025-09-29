@@ -16,24 +16,34 @@ import { Progress } from "@/components/ui/progress";
 import { FieldArrayWithId, UseFormReturn } from "react-hook-form";
 import { MeritSchema } from "@/modules/merit/schema";
 import { CultureTable } from "./culture-table";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { createColumns } from "./culture-columns";
+import { useMeritId } from "../../hooks/use-merit-id";
+import { useCommentMerit } from "@/modules/comments/api/use-comment-merit";
+import { CultureWithInfo } from "../../type";
+import { Table } from "@/components/table";
 
 interface Props {
   canPerform: boolean;
   form: UseFormReturn<MeritSchema>;
   fields: FieldArrayWithId<MeritSchema, "cultures", "fieldId">[];
-  cultureRecord: (CultureRecord & {
-    culture: Culture | null
-    comments: (PrismaComment & {
-      employee: Employee;
-    })[];
-    weight: number;
-  })[];
+  cultureRecord: CultureWithInfo[];
 }
 
 export const CultureSection = ({ cultureRecord, ...props }: Props) => {
+  const id = useMeritId();
+
+  const { mutation: comment } = useCommentMerit(id);
+
   const totalCompetenciesWeight = convertAmountFromUnit(
     cultureRecord.reduce((acc, kpi) => acc + (kpi.weight || 0), 0), 2
   );
+
+  const table = useReactTable({
+    data: cultureRecord || [],
+    columns: createColumns({ ...props, comment }),
+    getCoreRowModel: getCoreRowModel(),
+  })
 
   return (
     <AccordionItem value="culture">
@@ -71,7 +81,7 @@ export const CultureSection = ({ cultureRecord, ...props }: Props) => {
           </div>
         </div>
         <div className="relative mb-3 flex flex-col gap-8">
-          <CultureTable {...props} />
+          <Table table={table} />
         </div>
       </AccordionContent>
     </AccordionItem>

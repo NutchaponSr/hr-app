@@ -32,7 +32,6 @@ export const kpiFormSchema = z.object({
   kpis: z.array(kpiBonusUpdateSchema).min(1, "At least one KPI is required"),
 });
 
-// ...existing code...
 export const kpiBonusEvaluationSchema = z.object({
   id: z.string(),
   role: z.enum(["preparer", "checker", "approver"]),
@@ -44,7 +43,6 @@ export const kpiBonusEvaluationSchema = z.object({
   achievementApprover: z.coerce.number().optional(),
   fileUrl: z.string().nullable(),
 }).superRefine((data, ctx) => {
-  // attach field-level issues so react-hook-form can show them per-field
   switch (data.role) {
     case "preparer":
       if (!data.actualOwner || data.actualOwner.length === 0) {
@@ -54,6 +52,7 @@ export const kpiBonusEvaluationSchema = z.object({
           message: "Required",
         });
       }
+
       if (data.achievementOwner === undefined || data.achievementOwner < 1) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -61,6 +60,7 @@ export const kpiBonusEvaluationSchema = z.object({
           message: "Required",
         });
       }
+
       break;
     case "checker":
       if (!data.actualChecker || data.actualChecker.length === 0) {
@@ -70,6 +70,7 @@ export const kpiBonusEvaluationSchema = z.object({
           message: "Required",
         });
       }
+
       if (data.achievementChecker === undefined || data.achievementChecker < 1) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -77,6 +78,7 @@ export const kpiBonusEvaluationSchema = z.object({
           message: "Required",
         });
       }
+
       break;
     case "approver":
       if (!data.actualApprover || data.actualApprover.length === 0) {
@@ -86,6 +88,7 @@ export const kpiBonusEvaluationSchema = z.object({
           message: "Required",
         });
       }
+      
       if (data.achievementApprover === undefined || data.achievementApprover < 1) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -93,6 +96,7 @@ export const kpiBonusEvaluationSchema = z.object({
           message: "Required",
         });
       }
+
       break;
     default:
       ctx.addIssue({
@@ -109,4 +113,5 @@ export const kpiBonusEvaluationsSchema = z.object({
 
 export type KpiFormSchema = z.infer<typeof kpiFormSchema>
 export type KpiBonusUpdateSchema = z.infer<typeof kpiBonusUpdateSchema>;
+export type KpiBonusEvaluationSchema = z.infer<typeof kpiBonusEvaluationSchema>;
 export type KpiBonusEvaluationsSchema = z.infer<typeof kpiBonusEvaluationsSchema>;
