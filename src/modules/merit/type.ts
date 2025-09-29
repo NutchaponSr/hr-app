@@ -1,10 +1,33 @@
-import { Comment, Competency, CompetencyRecord, CompetencyType, MeritForm, Position, Task } from "@/generated/prisma";
+import { 
+  Comment, 
+  Competency, 
+  CompetencyEvaluation, 
+  CompetencyRecord, 
+  CompetencyType, 
+  Culture, 
+  CultureRecord, 
+  Employee, 
+  MeritForm, 
+  Position, 
+  Task 
+} from "@/generated/prisma";
 
 export interface CompetencyWithInfo extends CompetencyRecord {
   competency: Competency | null;
-  comments: Comment[];
+  comments: (Comment & {
+    employee: Employee;
+  })[];
+  competencyEvaluations: CompetencyEvaluation[];
   label: string;
   type: CompetencyType[];
+}
+
+export interface CultureWithInfo extends CultureRecord {
+  culture: Culture | null
+  comments: (Comment & {
+    employee: Employee;
+  })[];
+  weight: number;
 }
 
 export interface MeritFormWithInfo extends Task {

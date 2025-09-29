@@ -11,7 +11,7 @@ import { ApprovalCSVProps } from "@/types/approval";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
 import { convertAmountToUnit } from "@/lib/utils";
-import { meritSchema } from "../schema";
+import { competencyEvaluationSchema, cultureEvaluationSchema, meritSchema } from "../schema";
 import { MANAGER_UP } from "../type";
 
 // Helper functions
@@ -102,6 +102,7 @@ export const meritProcedure = createTRPCRouter({
               competencyRecords: {
                 include: {
                   competency: true,
+                  competencyEvaluations: true,
                 },
                 orderBy: {
                   id: "asc",
@@ -110,6 +111,7 @@ export const meritProcedure = createTRPCRouter({
               cultureRecords: {
                 include: {
                   culture: true,
+                  cultureEvaluations: true,
                 },
                 orderBy: {
                   culture: {
@@ -123,9 +125,28 @@ export const meritProcedure = createTRPCRouter({
         },
       });
 
+      
       if (!task) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
+
+      const kpiForm = await prisma.kpiForm.findFirst({
+        where: {
+          employeeId: ctx.user.employee.id,
+          year: task.meritForm?.year,
+        },
+        include: {
+          kpis: {
+            include: {
+              kpiEvaluations: {
+                where: {
+                  period: task.meritForm?.period,
+                },
+              },
+            },
+          },
+        },
+      });
 
       const typeToName: Record<CompetencyType, string> = {
         [CompetencyType.MC]: "Managerial Competency",
@@ -184,8 +205,9 @@ export const meritProcedure = createTRPCRouter({
           meritForm: {
             ...task.meritForm,
             competencyRecords: competencyRecordsWithComments,
-            cultureRecords: cultureRecordsWithComments,
-          }
+            cultureRecords: cultureRecordsWithComments || [],
+          },
+          kpiForm,
         },
         permission: {
           ctx: permissionContext,
@@ -221,6 +243,10 @@ export const meritProcedure = createTRPCRouter({
           year: input.year,
           employeeId: ctx.user.employee.id,
         },
+        include: {
+          competencyRecords: true,
+          cultureRecords: true,
+        }
       });
 
       if (!meritForm) {
@@ -243,7 +269,36 @@ export const meritProcedure = createTRPCRouter({
               },
             },
           },
+          include: {
+            competencyRecords: true,
+            cultureRecords: true,
+          }
         })
+      } else {
+        const meritFormUpdated = await prisma.meritForm.update({
+          where: {
+            id: meritForm.id,
+          },
+          data: {
+            period: input.period,
+          },
+        });
+
+        if (meritFormUpdated && meritFormUpdated.period !== Period.IN_DRAFT) {
+          await prisma.competencyEvaluation.createMany({
+            data: meritForm.competencyRecords.map((c) => ({
+              competencyRecordId: c.id,
+              period: meritFormUpdated.period,
+            })),
+          });
+
+          await prisma.cultureEvaluation.createMany({
+            data: meritForm.cultureRecords.map((c) => ({
+              cultureRecordId: c.id,
+              period: meritFormUpdated.period,
+            })),
+          });
+        }
       }
 
       const task = await prisma.task.create({
@@ -311,6 +366,36 @@ export const meritProcedure = createTRPCRouter({
           }
         })
       );
+
+      return { success: true };
+    }),
+  updateEvaluation: protectedProcedure
+    .input(
+      z.object({ 
+        meritEvaluationSchema: z.object({
+          competencies: z.array(competencyEvaluationSchema.omit({ role: true })),
+          cultures: z.array(cultureEvaluationSchema.omit({ role: true })),
+        }),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await Promise.all([
+        ...input.meritEvaluationSchema.competencies.map(async ({ id, ...competencies }) => 
+          prisma.competencyEvaluation.update({
+            where: { id },
+            data: { 
+              ...competencies 
+
+            }
+          })
+        ),
+        ...input.meritEvaluationSchema.cultures.map(async ({ id, ...cultures }) => 
+          prisma.cultureEvaluation.update({
+            where: { id },
+            data: { ...cultures }
+          })
+        ),
+      ])
 
       return { success: true };
     })

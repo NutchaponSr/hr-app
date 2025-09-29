@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { validateKpiRows } from "@/modules/bonus/utils";
 
 import { useKpiBonusCreateBulk } from "@/modules/bonus/api/use-kpi-bonus-create-bulk";
+import { useKpiFormId } from "@/modules/bonus/hooks/use-kpi-form-id";
 
 interface Props {
   data: ExcelData;
@@ -23,6 +24,8 @@ export const PreviewTable = ({
   file,
   type 
 }: Props) => {
+  const formId = useKpiFormId();
+
   const columns = Object.keys(data[0] || {}).filter((f) => f !== "_rowIndex");
 
   const [errors, setErrors] = useState<string[]>([]);
@@ -64,7 +67,7 @@ export const PreviewTable = ({
         { kpiFormId: contextId, kpis: res.validRows },
         {
           onSuccess: () => {
-            invalidate(contextId);
+            invalidate(formId);
             closeModal();
             reset();
           },

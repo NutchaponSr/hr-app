@@ -197,12 +197,6 @@ export const bonusProcedure = createTRPCRouter({
             data: kpiForm.kpis.map((kpi) => ({
               kpiId: kpi.id,
               period: kpiFormUpdated.period,
-              actualOwner: "",
-              achievementOwner: 0,
-              actualApprover: "",
-              achievementApprover: 0,
-              actualChecker: "",
-              achievementChecker: 0,
             })),
           });
         }

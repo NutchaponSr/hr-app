@@ -97,7 +97,7 @@ export const CompetencyItem = ({
       <div className="flex flex-col gap-1">
         <div className="text-secondary text-xs">Description</div>
         <p className="text-xs text-primary leading-4 whitespace-break-spaces text-ellipsis overflow-hidden">
-          {competencies.find((f) => f.id === form.getValues(`competencies.${index}.competencyId`))?.definition || "Empty"}
+          {competencies.find((f) => f.id === form.watch(`competencies.${index}.competencyId`))?.definition || "Empty"}
         </p>
       </div>
     </div>

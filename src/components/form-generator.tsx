@@ -4,7 +4,7 @@ import {
   FieldValues, 
   UseFormReturn 
 } from "react-hook-form";
-import { useMemo, useState, type ReactElement } from "react";
+import { CSSProperties, useMemo, useState, type ReactElement } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -22,12 +22,6 @@ import {
   PopoverContent, 
   PopoverTrigger
 } from "@/components/ui/popover";
-import { 
-  Select as Selection, 
-  SelectContent, 
-  SelectTrigger,
-  SelectValue
-} from "./ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -45,6 +39,7 @@ interface Props<TFieldValues extends FieldValues> {
     input?: string;
   };
   disabled: boolean;
+  style?: CSSProperties;
   selectOptions?: Array<{ key: string; label: string }>;
 }
 
@@ -57,6 +52,7 @@ interface RenderProps<TFieldValues extends FieldValues> {
     key: string;
     label: string; 
   }>;
+  style?: CSSProperties;
 }
 
 type InputRenderer<TFieldValues extends FieldValues> = (props: RenderProps<TFieldValues>) => ReactElement;
@@ -70,6 +66,7 @@ export const FormGenerator = <TFieldValues extends FieldValues>({
   placeholder,
   className,
   selectOptions,
+  style,
 }: Props<TFieldValues>) => {
   const INPUT_RENDERERS: Partial<Record<InputVariants, InputRenderer<TFieldValues>>> = {
     text: Text,
@@ -94,6 +91,7 @@ export const FormGenerator = <TFieldValues extends FieldValues>({
               placeholder,
               selectOptions,
               className: className?.input,
+              style
             })}
           </FormControl>
           <FormMessage />
@@ -108,6 +106,7 @@ const String = <TFieldValues extends FieldValues>({
   disabled,
   className,
   placeholder = "Empty",
+  style
 }: RenderProps<TFieldValues>) => (
   <Input 
     {...field}
@@ -115,6 +114,7 @@ const String = <TFieldValues extends FieldValues>({
     placeholder={placeholder}
     className={cn("h-7 px-2", className)}
     disabled={disabled}
+    style={style}
   />
 );
 
@@ -134,18 +134,20 @@ const Numeric = <TFieldValues extends FieldValues>({
   />
 );
 
- const Text = <TFieldValues extends FieldValues>({ 
+const Text = <TFieldValues extends FieldValues>({ 
   field, 
   className,
   disabled,
   placeholder = "Empty",
- }: RenderProps<TFieldValues>) => (
+  style
+}: RenderProps<TFieldValues>) => (
   <Textarea 
     {...field}
     value={field.value ?? ""}
     placeholder={placeholder}
     className={cn(className)}
     disabled={disabled}
+    style={style}
   />
 );
 

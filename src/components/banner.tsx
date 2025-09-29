@@ -23,7 +23,7 @@ export const Banner = ({
         <div className="flex w-full h-9" />
         {context}
         <div className="h-2" />
-        <div className="pe-24 mb-2 w-full">
+        <div className="pe-16 mb-2 w-full">
           <div className="flex justify-start flex-row">
             <Icon className="size-9 me-1.5 text-marine" />
             <h1 className="max-w-full w-full whitespace-break-spaces [word-break:break-word] text-primary text-[32px] font-bold leading-[1.2] flex items-center">

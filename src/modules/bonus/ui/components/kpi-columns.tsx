@@ -77,7 +77,7 @@ export const createColumns = ({
             label="Name"
             disabled={canPerform}
             name={`kpis.${index}.name`}
-            variant="string"
+            variant="text"
             className={{
               form: "self-start col-span-3 grow",
             }}

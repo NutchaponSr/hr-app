@@ -24,8 +24,6 @@ export const MeritInfo = ({ year }: Props) => {
   const { data: merit } = useSuspenseQuery(trpc.kpiMerit.getByYear.queryOptions({ year }));
   const createForm = useMutation(trpc.kpiMerit.createForm.mutationOptions());
 
-  const status = STATUS_RECORD[merit.task.inDraft?.status || Status.NOT_STARTED];
-
   return (
     <article className="relative select-none">
       <div className="flex justify-between shrink-0 items-center h-8 pb-3.5 ms-2">
@@ -54,14 +52,14 @@ export const MeritInfo = ({ year }: Props) => {
                       createForm.mutate({ year, period: Period.IN_DRAFT }, {
                         onSuccess: ({ id }) => {
                           toast.success("Form created!", { id: "create-form-merit" });
-                          router.push(`/performance/merit/${id}`);
+                          router.push(`/performance/merit/${id}?period=${Period.IN_DRAFT}`);
                         },
                         onError: (ctx) => {
                           toast.error(ctx.message || "Something went wrong", { id: "create-form-merit" });
                         }
                       });
                     } else {
-                      router.push(`/performance/merit/${merit.task.inDraft.id}`);
+                      router.push(`/performance/merit/${merit.task.inDraft.id}?period=${Period.IN_DRAFT}`);
                     }
                   }}
                 >
@@ -79,13 +77,43 @@ export const MeritInfo = ({ year }: Props) => {
             date="Jan - Mar"
             title="Merit Definition"
             description="Define measurable goals that will inform merit evaluation"
-            status={status}
+            status={STATUS_RECORD[merit.task.inDraft?.status || Status.NOT_STARTED]}
           />   
           <Stepper
+            action={
+              merit.task.inDraft?.status !== Status.APPROVED
+                ? null : (
+                  <div className="mt-1.5 ps-2.5">
+                    <button
+                      disabled={createForm.isPending}
+                      className="w-fit px-2 py-1 flex flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs"
+                      onClick={() => {
+                        if (!merit.task.evaluation1st) {
+
+                          toast.loading("Creating form merit...", { id: "create-form-merit" });
+                          createForm.mutate({ year, period: Period.EVALUATION_1ST }, {
+                            onSuccess: ({ id }) => {
+                              toast.success("Form created!", { id: "create-form-merit" });
+                              router.push(`/performance/merit/${id}?period=${Period.EVALUATION_1ST}`);
+                            },
+                            onError: (ctx) => {
+                              toast.error(ctx.message || "Something went wrong", { id: "create-form-merit" });
+                            }
+                          });
+                        } else {
+                          router.push(`/performance/merit/${merit.task.evaluation1st.id}?period=${Period.EVALUATION_1ST}`);
+                        }
+                      }}
+                    >
+                      Evaluate
+                    </button>
+                  </div>
+                )
+            }
             date="Jan - Jun"
             title="Evaluation 1st"
             description="Mid-year merit review to assess progress and performance"
-            status={STATUS_RECORD[Status.NOT_STARTED]} // TODO: Status when start evaluation form
+            status={STATUS_RECORD[merit.task.evaluation1st?.status || Status.NOT_STARTED]} // TODO: Status when start evaluation form
           />   
           <Stepper
             date="Jul - Dec"

@@ -12,3 +12,7 @@ export type KpiWithEvaluation = Kpi & {
     employee: Employee;
   })[];
 }
+
+export type KpiWithInfo = Kpi & {
+  kpiEvaluations: KpiEvaluation[];
+}

@@ -106,12 +106,12 @@ export const BonusView = ({
         <div className="flex flex-col grow relative overflow-auto me-0 mb-0">
           <Banner
             title="KPI Bonus"
-            className="ps-24"
+            className="ps-16"
             description="Reward employees with performance-based bonuses tied to goals and business impact."
             icon={GoProject}
             context={<SelectionBadge label={periods[period]} />}
           />
-          <div className="flex flex-row gap-2 px-24">
+          <div className="flex flex-row gap-2 px-16">
             <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] gap-x-4 my-2 max-w-full">
               <Content label="Owner" icon={BsPersonFill}>
                 <UserProfile employee={kpiForm.data.preparer} />

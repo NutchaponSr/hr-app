@@ -28,6 +28,7 @@ import { useUpdateBulkKpis } from "@/modules/bonus/api/use-update-bulk-kpis";
 
 import { validateWeight } from "@/modules/bonus/util";
 import { kpiFormSchema, KpiFormSchema } from "@/modules/bonus/schema";
+import { useUploadStore } from "@/store/use-upload-modal-store";
 
 interface Props {
   id: string;
@@ -39,6 +40,8 @@ interface Props {
 }
 
 export const KpiBonusInDraftScreen = ({ id, canPerform, kpiForm }: Props) => {
+  const { openModal } = useUploadStore();
+
   const mapKpiToFormValue = (kpi: Kpi) => ({
     id: kpi.id,
     name: kpi.name ?? "",
@@ -148,6 +151,7 @@ export const KpiBonusInDraftScreen = ({ id, canPerform, kpiForm }: Props) => {
               </span>
             </div>
           }
+          onUpload={() => openModal("kpi", kpiForm.data.fileId)}
         />
         <div className="grow shrink-0 flex flex-col relative">
           <div className="relative float-start min-w-full select-none pb-[180px] px-24">

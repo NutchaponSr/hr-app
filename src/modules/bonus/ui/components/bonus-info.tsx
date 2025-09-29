@@ -6,8 +6,6 @@ import { GoProject } from "react-icons/go";
 import { useRouter } from "next/navigation";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
-import { usePeriod } from "@/hooks/use-period";
-
 import { STATUS_RECORD } from "@/types/kpi";
 import { Period, Status } from "@/generated/prisma";
 
@@ -22,8 +20,6 @@ interface Props {
 export const BonusInfo = ({ year }: Props) => {
   const trpc = useTRPC();
   const router = useRouter();
-
-  const { period } = usePeriod();
 
   const { data: kpiBonus } = useSuspenseQuery(trpc.kpiBonus.getByYear.queryOptions({ year }));
   const createForm = useMutation(trpc.kpiBonus.createForm.mutationOptions());
