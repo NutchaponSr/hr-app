@@ -77,12 +77,12 @@ export const createColumns = ({ form, permissions }: Props): ColumnDef<Competenc
     header: "Owner",
     cell: ({ row, table }) => {
       const heights = table.options.meta?.rowHeights?.[row.id] || { input: 0, output: 0 };
-
+      
       return (
         <div className="flex flex-col gap-2">
           <FormGenerator 
             form={form}
-            name={`competencies.${row.index}.inputEvidenceOwner`}
+            name={`competencies.${row.index}.inputEvidenceChecker`}
             label="Input Evidence"
             variant="text"
             disabled={!permissions.canPerformOwner}

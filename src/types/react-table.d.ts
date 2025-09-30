@@ -8,6 +8,7 @@ declare module "@tanstack/react-table" {
 
   interface TableMeta<TData extends RowData> {
     rowHeights?: Record<string, { input: number; output: number }>;
+    columnWidth?: number;
   }
 
   interface ColumnSort {

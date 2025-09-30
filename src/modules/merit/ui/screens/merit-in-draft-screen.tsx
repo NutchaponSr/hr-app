@@ -17,9 +17,11 @@ import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useEffect } from "react";
-import { BsSave } from "react-icons/bs";
+import { BsPersonFill, BsSave } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/loader";
+import { Content } from "@/components/content";
+import { UserProfile } from "@/modules/auth/ui/components/user-profile";
 
 
 interface Props {
@@ -114,6 +116,21 @@ export const MeritInDraftScreen = ({ id, merit, canPerform }: Props) => {
 
   return (
     <Form {...form}>
+      <div className="flex flex-row gap-2 px-16">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] gap-x-4 my-2 max-w-full">
+          <Content label="Owner" icon={BsPersonFill}>
+            <UserProfile employee={merit.data.preparer} />
+          </Content>
+          {merit.data.checker && (
+            <Content label="Checker" icon={BsPersonFill}>
+              <UserProfile employee={merit.data.checker} />
+            </Content>
+          )}
+          <Content label="Approver" icon={BsPersonFill}>
+            <UserProfile employee={merit.data.approver} />
+          </Content>
+        </div>
+      </div>
       <form 
         onSubmit={form.handleSubmit(onSubmit)} 
         className="contents"

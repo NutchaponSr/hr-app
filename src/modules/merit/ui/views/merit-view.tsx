@@ -108,7 +108,7 @@ export const MeritView = ({ id, period }: Props) => {
           <Banner
             title="Merit"
             className="ps-16"
-            description="Evaluate employee achievements and align merit increases with performance outcomes."
+            description="ตั้งแต่ระดับ ผู้ช่วยผู้จัดการทั่วไป ขึ้นไป (Evaluation Form of Asst. General Manager Above Level)"
             icon={GoProject}
             context={<SelectionBadge label={periods[period]} />}
           />

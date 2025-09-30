@@ -29,7 +29,7 @@ export const KpiEvaluationTable = ({
   table 
 }: Props) => {  
   return (
-    <Table>
+    <Table className="border-x-[1.25px] border-[#2377CE]">
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
@@ -61,7 +61,7 @@ export const KpiEvaluationTable = ({
                     )}
                   >
                     <div className="flex items-center h-full">
-                      <div className="text-xs font-normal text-secondary whitespace-nowrap overflow-hidden text-ellipsis">
+                      <div className="text-xs font-normal text-white whitespace-nowrap overflow-hidden text-ellipsis">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -88,7 +88,7 @@ export const KpiEvaluationTable = ({
                   key={row.id}
                   data-selected={row.getIsSelected()}
                   className={cn(
-                    "relative h-px border-b-[1.25px] last:border-none border-border group data-[selected=true]:inset-x-0 data-[selected=true]:top-[0.5px] data-[selected=true]:bottom-[0.5px] data-[selected=true]:bg-[#2383e224] data-[selected=true]:bg-size-[auto_100px] data-[selected=true]:rounded",
+                    "relative h-px border-b-[1.25px] last:border-none border-[#2377CE]",
                     isLastDataRow && "border-none"
                   )}
                 >
@@ -111,7 +111,7 @@ export const KpiEvaluationTable = ({
                         <TableCell 
                           key={index} 
                           className={cn(
-                            "align-top px-3 py-2 dark:last:border-none last:shadow-none border-r-[1.25px] border-border",
+                            "align-top px-3 py-2 dark:last:border-none last:shadow-none border-r-[1.25px] border-[#2377CE]",
                             isBeforeLast && "border-none dark:border-none !rounded-r-sm",
                             isSticky && "sticky start-0",
                             width,
@@ -128,17 +128,14 @@ export const KpiEvaluationTable = ({
                 </TableRow>
               );
             })}
-            <TableRow className="sticky z-85 w-full bottom-0 start-0 grow-0 shrink basis-0 shadow-[0_1.25px_0_rgba(42,28,0,0.07),0_-1.25px_0_rgba(42,28,0,0.07)] dark:shadow-[0_1.25px_0_rgba(255,255,243,0.082),0_-1.25px_0_rgba(255,255,243,0.082)]">
-              <TableCell className="border-r-[1.25px] border-border">
-                <div className="inline-flex justify-end items-center bg-sidebar pe-1 h-12 w-full">
+            <TableRow className="sticky z-85 w-full bottom-0 start-0 grow-0 shrink basis-0">
+              <TableCell className="border-r-[1.25px] border-[#2377CE]">
+                <div className="inline-flex justify-end items-center bg-marine shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)] pe-1 h-12 w-full">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
-                    <div className="self-center start-1.5 px-1 py-0.5 bg-[#006fc817] dark:bg-[#439bff3d] text-marine rounded text-[10px] uppercase tracking-wide leading-[1.3] font-medium whitespace-nowrap w-fit me-1.5">
-                      Weight
-                    </div>
-                    <span className="font-medium text-foreground text-xs uppercase tracking-[1px] me-1 select-none">
+                    <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
                       Sum
                     </span>
-                    <span className="text-secondary text-sm">
+                    <span className="text-white text-sm">
                       {
                         convertAmountFromUnit(table.getCoreRowModel().rows.reduce(
                           (acc, row) => acc + (row.original.weight ?? 0),
@@ -152,46 +149,46 @@ export const KpiEvaluationTable = ({
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="border-r-[1.25px] border-border">
-                <div className="inline-flex justify-end items-center bg-sidebar pe-1 h-12 w-full">
+              <TableCell className="border-r-[1.25px] border-[#2377CE]">
+                <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)]">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
                     <div className="self-center start-1.5 px-1 py-0.5 bg-[#006fc817] dark:bg-[#439bff3d] text-marine rounded text-[9px] uppercase tracking-wide leading-[1.3] font-medium whitespace-nowrap w-fit me-1.5">
                       Achievement (%) * Weight
                     </div>
-                    <span className="font-medium text-foreground text-xs uppercase tracking-[1px] me-1 select-none">
+                    <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
                       Sum
                     </span>
-                    <span className="text-secondary text-sm">
+                    <span className="text-white text-sm">
                       {totalAchievementOwnerWithWeight}
                     </span>
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="border-r-[1.25px] border-border">
-                <div className="inline-flex justify-end items-center bg-sidebar pe-1 h-12 w-full">
+              <TableCell className="border-r-[1.25px] border-[#2377CE]">
+                <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)]">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
                     <div className="self-center start-1.5 px-1 py-0.5 bg-[#006fc817] dark:bg-[#439bff3d] text-marine rounded text-[9px] uppercase tracking-wide leading-[1.3] font-medium whitespace-nowrap w-fit me-1.5">
                       Achievement (%) * Weight
                     </div>
-                    <span className="font-medium text-foreground text-xs uppercase tracking-[1px] me-1 select-none">
+                    <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
                       Sum
                     </span>
-                    <span className="text-secondary text-sm">
+                    <span className="text-white text-sm">
                       {totalAchievementCheckerWithWeight}
                     </span>
                   </div>
                 </div>
               </TableCell>
               <TableCell>
-                <div className="inline-flex justify-end items-center bg-sidebar pe-1 h-12 w-full">
-                  <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
+                <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)]">
+                  <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap ">
                     <div className="self-center start-1.5 px-1 py-0.5 bg-[#006fc817] dark:bg-[#439bff3d] text-marine rounded text-[9px] uppercase tracking-wide leading-[1.3] font-medium whitespace-nowrap w-fit me-1.5">
                       Achievement (%) * Weight
                     </div>
-                    <span className="font-medium text-foreground text-xs uppercase tracking-[1px] me-1 select-none">
+                    <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
                       Sum
                     </span>
-                    <span className="text-secondary text-sm">
+                    <span className="text-white text-sm">
                       {totalAchievementApproverWithWeight}
                     </span>
                   </div>

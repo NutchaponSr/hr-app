@@ -29,6 +29,9 @@ import { useUpdateBulkKpis } from "@/modules/bonus/api/use-update-bulk-kpis";
 import { validateWeight } from "@/modules/bonus/util";
 import { kpiFormSchema, KpiFormSchema } from "@/modules/bonus/schema";
 import { useUploadStore } from "@/store/use-upload-modal-store";
+import { UserProfile } from "@/modules/auth/ui/components/user-profile";
+import { Content } from "@/components/content";
+import { BsPersonFill } from "react-icons/bs";
 
 interface Props {
   id: string;
@@ -112,6 +115,21 @@ export const KpiBonusInDraftScreen = ({ id, canPerform, kpiForm }: Props) => {
 
   return (
     <Form {...form}>
+      <div className="flex flex-row gap-2 px-16">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] gap-x-4 my-2 max-w-full">
+          <Content label="Owner" icon={BsPersonFill}>
+            <UserProfile employee={kpiForm.data.preparer} />
+          </Content>
+          {kpiForm.data.checker && (
+            <Content label="Checker" icon={BsPersonFill}>
+              <UserProfile employee={kpiForm.data.checker} />
+            </Content>
+          )}
+          <Content label="Approver" icon={BsPersonFill}>
+            <UserProfile employee={kpiForm.data.approver} />
+          </Content>
+        </div>
+      </div>
       <form 
         onSubmit={form.handleSubmit(onSubmit)} 
         className="contents"
@@ -154,7 +172,7 @@ export const KpiBonusInDraftScreen = ({ id, canPerform, kpiForm }: Props) => {
           onUpload={() => openModal("kpi", kpiForm.data.fileId)}
         />
         <div className="grow shrink-0 flex flex-col relative">
-          <div className="relative float-start min-w-full select-none pb-[180px] px-24">
+          <div className="relative float-start min-w-full select-none pb-[180px] px-16">
             <div className="relative">
               <Table table={table} />
             </div>

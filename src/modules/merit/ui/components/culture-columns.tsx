@@ -26,7 +26,7 @@ export const createColumns = ({ canPerform, form, comment }: Props): ColumnDef<C
             {row.original.culture!.name}
           </div>
         </div>
-        <div className="italic underline underline-offset-[1.25px] [word-break:break-word] whitespace-break-spaces overflow-hidden text-ellipsis text-sm text-marine leading-5">
+        <div className="italic underline-offset-[1.25px] [word-break:break-word] whitespace-break-spaces overflow-hidden text-ellipsis text-sm text-danger leading-5">
           {`"${row.original.culture!.description}"`}
         </div>
       </div>
