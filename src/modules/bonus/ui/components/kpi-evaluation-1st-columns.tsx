@@ -42,7 +42,7 @@ export const createColumns = ({
             </div>
             <div className="col-span-3">
               <Content label="Name">
-                <p className="text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
+                <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
                   {row.original.name}
                 </p>
               </Content>

@@ -36,7 +36,7 @@ export const createColumns = ({ form, permissions }: Props): ColumnDef<CultureWi
             {row.original.culture!.name}
           </div>
         </div>
-        <div className="italic [word-break:break-word] whitespace-break-spaces overflow-hidden text-ellipsis text-sm text-marine leading-5">
+        <div className="italic [word-break:break-word] whitespace-break-spaces overflow-hidden text-ellipsis text-sm text-danger leading-5">
           {`"${row.original.culture!.description}"`}
         </div>
       </div>

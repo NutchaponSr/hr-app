@@ -30,9 +30,6 @@ import { Period } from "@/generated/prisma";
 import { Banner } from "@/components/banner";
 import { SelectionBadge } from "@/components/selection-badge";
 import { periods } from "../../constants";
-import { Content } from "@/components/content";
-import { UserProfile } from "@/modules/auth/ui/components/user-profile";
-import { BsPersonFill } from "react-icons/bs";
 
 interface Props {
   id: string;
@@ -111,21 +108,6 @@ export const BonusView = ({
             icon={GoProject}
             context={<SelectionBadge label={periods[period]} />}
           />
-          <div className="flex flex-row gap-2 px-16">
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] gap-x-4 my-2 max-w-full">
-              <Content label="Owner" icon={BsPersonFill}>
-                <UserProfile employee={kpiForm.data.preparer} />
-              </Content>
-              {kpiForm.data.checker && (
-                <Content label="Checker" icon={BsPersonFill}>
-                  <UserProfile employee={kpiForm.data.checker} />
-                </Content>
-              )}
-              <Content label="Approver" icon={BsPersonFill}>
-                <UserProfile employee={kpiForm.data.approver} />
-              </Content>
-            </div>
-          </div>
           <KpiBonusScreen 
             id={id} 
             period={period}

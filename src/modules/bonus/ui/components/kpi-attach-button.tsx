@@ -100,7 +100,7 @@ export const KpiAttachButton = ({ id, value, canPerform, onChange }: Props) => {
             handlePickFile();
           }} 
           data-disabled={canPerform}
-          className="transition border-[1.25px] border-border rounded hover:bg-primary/6 flex items-center py-1 px-2 w-full min-h-8 group/image relative data-[disabled=true]:opacity-80 data-[disabled=true]:pointer-events-none"
+          className="transition border-[1.25px] border-border rounded bg-background hover:bg-primary/6 flex items-center py-1 px-2 w-full min-h-8 group/image relative data-[disabled=true]:opacity-80 data-[disabled=true]:pointer-events-none"
         >
           {isUploading ? (
             <>

@@ -25,7 +25,7 @@ export const CultureEvaluationTable = ({ form, table }: Props) => {
   const cultures = form.watch("cultures");
 
   return (
-    <Table>
+    <Table className="border-x-[1.25px] border-[#2377CE]">
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
@@ -58,7 +58,7 @@ export const CultureEvaluationTable = ({ form, table }: Props) => {
                     )}
                   >
                     <div className="flex items-center h-full">
-                      <div className="text-xs font-normal text-secondary whitespace-nowrap overflow-hidden text-ellipsis">
+                      <div className="text-xs font-normal text-white whitespace-nowrap overflow-hidden text-ellipsis">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -77,61 +77,62 @@ export const CultureEvaluationTable = ({ form, table }: Props) => {
       <TableBody>
         {table.getRowModel().rows?.length ? (
           <>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-selected={row.getIsSelected()}
-                className="relative h-px border-b-[1.25px] border-border group data-[selected=true]:inset-x-0 data-[selected=true]:top-[0.5px] data-[selected=true]:bottom-[0.5px] data-[selected=true]:bg-[#2383e224] data-[selected=true]:bg-size-[auto_100px] data-[selected=true]:rounded"
-              >
-                {row.getVisibleCells().map((cell, index, cells) => {
-                  const width = cell.column.columnDef.meta?.width;
-                  const isSticky = cell.column.columnDef.meta?.sticky;
-                  const columnMatched = PROHIBIT_COLUMNS.includes(cell.id.split("_")[1]);
-  
-                  const isBeforeLast = index === cells.length - 2;
-                  const isAfterFirst = index === cells.length - 6;
-  
-                  return (
-                    columnMatched ? (
-                      <TableCell key={cell.id} className="sticky stroke-9 z-85 flex">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ) : (
-                      <TableCell 
-                        key={index} 
-                        className={cn(
-                          "align-top px-3 py-2 dark:last:border-none last:shadow-none border-r-[1.25px] border-border",
-                          isBeforeLast && "border-none dark:border-none !rounded-r-sm",
-                          isAfterFirst && "!rounded-l-sm",
-                          isSticky && "sticky start-0",
-                          width,
-                        )}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    )
-                  );
-                })}
-              </TableRow>
-            ))}
-            <TableRow className="sticky z-85 w-full bottom-0 start-0 grow-0 shrink basis-0 shadow-[0_1.25px_0_rgba(42,28,0,0.07),0_-1.25px_0_rgba(42,28,0,0.07)] dark:shadow-[0_1.25px_0_rgba(255,255,243,0.082),0_-1.25px_0_rgba(255,255,243,0.082)]">
-              <TableCell colSpan={2} className="bg-sidebar border-r-[1.25px] border-border" />
-              <TableCell className="border-r-[1.25px] border-border">
-                <div className="inline-flex justify-end items-center bg-sidebar pe-1 h-12 w-full">
+            {table.getRowModel().rows.map((row, rowIndex) => {
+              const isLastDataRow = rowIndex === table.getRowModel().rows.length - 1; 
+
+              return (
+                <TableRow
+                  key={row.id}
+                  data-selected={row.getIsSelected()}
+                  className="relative h-px border-b-[1.25px] border-[#2377CE]"
+                >
+                  {row.getVisibleCells().map((cell, index, cells) => {
+                    const width = cell.column.columnDef.meta?.width;
+                    const isSticky = cell.column.columnDef.meta?.sticky;
+                    const columnMatched = PROHIBIT_COLUMNS.includes(cell.id.split("_")[1]);
+    
+                    const isBeforeLast = index === cells.length - 2;
+                    const isAfterFirst = index === cells.length - 6;
+    
+                    return (
+                      columnMatched ? (
+                        <TableCell key={cell.id} className="sticky stroke-9 z-85 flex">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ) : (
+                        <TableCell 
+                          key={index} 
+                          className={cn(
+                            "align-top px-3 py-2 dark:last:border-none last:shadow-none border-r-[1.25px] border-[#2377CE]",
+                            isBeforeLast && "border-none dark:border-none !rounded-r-sm",
+                            isAfterFirst && "!rounded-l-sm",
+                            isSticky && "sticky start-0",
+                            width,
+                          )}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      )
+                    );
+                  })}
+                </TableRow>
+              );
+            })}
+            <TableRow className="sticky z-85 w-full bottom-0 grow-0 shrink basis-0 shadow-[0_1.25px_0_rgba(15,15,15,0.1),0_-1.25px_0_rgba(15,15,15,0.1)]">
+              <TableCell colSpan={2} className="bg-marine border-r-[1.25px] border-[#2377CE]" />
+              <TableCell className="border-r-[1.25px] border-[#2377CE]">
+                <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
-                    <div className="self-center start-1.5 px-1 py-0.5 bg-[#006fc817] dark:bg-[#439bff3d] text-marine rounded text-[9px] uppercase tracking-wide leading-[1.3] font-medium whitespace-nowrap w-fit me-1.5">
-                      Level * Weight
-                    </div>
-                    <span className="font-medium text-foreground text-xs uppercase tracking-[1px] me-1 select-none">
+                    <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
                       Sum
                     </span>
-                    <span className="text-secondary text-sm">
+                    <span className="text-white text-sm">
                       {(() => {
                           const rowValues = (cultures || []).map((comp, idx) => {
                           const level = Number(comp.levelBehaviorOwner ?? 0);
@@ -152,16 +153,13 @@ export const CultureEvaluationTable = ({ form, table }: Props) => {
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="border-r-[1.25px] border-border">
-                <div className="inline-flex justify-end items-center bg-sidebar pe-1 h-12 w-full">
+              <TableCell className="border-r-[1.25px] border-[#2377CE]">
+                <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
-                    <div className="self-center start-1.5 px-1 py-0.5 bg-[#006fc817] dark:bg-[#439bff3d] text-marine rounded text-[9px] uppercase tracking-wide leading-[1.3] font-medium whitespace-nowrap w-fit me-1.5">
-                      Level * Weight
-                    </div>
-                    <span className="font-medium text-foreground text-xs uppercase tracking-[1px] me-1 select-none">
+                    <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
                       Sum
                     </span>
-                    <span className="text-secondary text-sm">
+                    <span className="text-white text-sm">
                       {(() => {
                           const rowValues = (cultures || []).map((comp, idx) => {
                           const level = Number(comp.levelBehaviorChecker ?? 0);
@@ -183,15 +181,15 @@ export const CultureEvaluationTable = ({ form, table }: Props) => {
                 </div>
               </TableCell>
               <TableCell>
-                <div className="inline-flex justify-end items-center bg-sidebar pe-1 h-12 w-full">
+                <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
                     <div className="self-center start-1.5 px-1 py-0.5 bg-[#006fc817] dark:bg-[#439bff3d] text-marine rounded text-[9px] uppercase tracking-wide leading-[1.3] font-medium whitespace-nowrap w-fit me-1.5">
                       Level * Weight
                     </div>
-                    <span className="font-medium text-foreground text-xs uppercase tracking-[1px] me-1 select-none">
+                    <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
                       Sum
                     </span>
-                    <span className="text-secondary text-sm">
+                    <span className="text-white text-sm">
                       {(() => {
                           const rowValues = (cultures || []).map((comp, idx) => {
                           const level = Number(comp.levelBehaviorApprover ?? 0);

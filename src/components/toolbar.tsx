@@ -26,9 +26,9 @@ export const Toolbar = ({
   onUpload,
 }: Props) => {
   return (
-    <div className="min-h-9 px-24 sticky start-0 top-0 bg-background shrink-0 z-86">
+    <div className="min-h-9 px-16 sticky start-0 top-0 bg-background shrink-0 z-86">
       <div className="relative">
-        <div className="flex items-center h-9 start-24">
+        <div className="flex items-center h-9 start-16">
           <div className="flex items-center h-full grow shrink overflow-hidden w-full">
             {context}
           </div>
