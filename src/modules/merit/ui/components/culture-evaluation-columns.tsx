@@ -100,10 +100,11 @@ export const createColumns = ({ form, permissions }: Props): ColumnDef<CultureWi
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="1">Need Improve ({"<"}70%)</SelectItem>
-                  <SelectItem value="2">Level 2 (80%)</SelectItem>
-                  <SelectItem value="3">Level 3 (90%)</SelectItem>
-                  <SelectItem value="4">Meet Expert(100%)</SelectItem>
+                  <SelectItem value="1">Level 1</SelectItem>
+                  <SelectItem value="2">Level 2</SelectItem>
+                  <SelectItem value="3">Level 3</SelectItem>
+                  <SelectItem value="4">Level 4</SelectItem>
+                  <SelectItem value="5">Level 5</SelectItem>
                 </SelectContent>
               </Select>
               <Content label="Level * Weight">
@@ -154,10 +155,11 @@ export const createColumns = ({ form, permissions }: Props): ColumnDef<CultureWi
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="1">Need Improve ({"<"}70%)</SelectItem>
-                  <SelectItem value="2">Level 2 (80%)</SelectItem>
-                  <SelectItem value="3">Level 3 (90%)</SelectItem>
-                  <SelectItem value="4">Meet Expert(100%)</SelectItem>
+                  <SelectItem value="1">Level 1</SelectItem>
+                  <SelectItem value="2">Level 2</SelectItem>
+                  <SelectItem value="3">Level 3</SelectItem>
+                  <SelectItem value="4">Level 4</SelectItem>
+                  <SelectItem value="5">Level 5</SelectItem>
                 </SelectContent>
               </Select>
               <Content label="Level * Weight">
@@ -208,10 +210,11 @@ export const createColumns = ({ form, permissions }: Props): ColumnDef<CultureWi
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="1">Need Improve ({"<"}70%)</SelectItem>
-                  <SelectItem value="2">Level 2 (80%)</SelectItem>
-                  <SelectItem value="3">Level 3 (90%)</SelectItem>
-                  <SelectItem value="4">Meet Expert(100%)</SelectItem>
+                  <SelectItem value="1">Level 1</SelectItem>
+                  <SelectItem value="2">Level 2</SelectItem>
+                  <SelectItem value="3">Level 3</SelectItem>
+                  <SelectItem value="4">Level 4</SelectItem>
+                  <SelectItem value="5">Level 5</SelectItem>
                 </SelectContent>
               </Select>
               <Content label="Level * Weight">
