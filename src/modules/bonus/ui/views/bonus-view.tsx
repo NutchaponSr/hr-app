@@ -99,16 +99,15 @@ export const BonusView = ({
         message={getBannerMessage(error, kpiForm.data.status)}
         variant="danger"
       />
+
+      <WarnningBanner
+        message={`แบบประเมิน KPI Bonus ประจำปี ${kpiForm.data.kpiForm?.year} : ${kpiForm.data.preparer.fullName}`}
+        variant="blue"
+      />
+
       <main className="grow-0 shrink flex flex-col bg-background h-[calc(-44px+100vh)] max-h-full relative w-full">
         <div className="flex flex-col grow relative overflow-auto me-0 mb-0">
-          <Banner
-            title="KPI Bonus"
-            className="ps-16"
-            description="Reward employees with performance-based bonuses tied to goals and business impact."
-            icon={GoProject}
-            context={<SelectionBadge label={periods[period]} />}
-          />
-          <KpiBonusScreen 
+          <KpiBonusScreen   
             id={id} 
             period={period}
             kpiForm={kpiForm} 

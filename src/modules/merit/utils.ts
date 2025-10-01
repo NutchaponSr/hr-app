@@ -61,21 +61,21 @@ export function meritEvaluationMapValue(merit: inferProcedureOutput<AppRouter["k
     };
   });
 
-  const kpis = merit.data.kpiForm?.kpis.map((kpi) => {
-    const evaluation = kpi.kpiEvaluations[0];
+  // const kpis = merit.data.kpiForm?.kpis.map((kpi) => {
+  //   const evaluation = kpi.kpiEvaluations[0];
 
-    return {
-      role,
-      id: evaluation.id,
-      actualOwner: evaluation.actualOwner,
-      achievementOwner: evaluation.achievementOwner,
-      actualChecker: evaluation.actualChecker,
-      achievementChecker: evaluation.achievementChecker,
-      actualApprover: evaluation.actualApprover,
-      achievementApprover: evaluation.achievementApprover,
-      fileUrl: evaluation.fileUrl,
-    }
-  })
+  //   return {
+  //     role,
+  //     id: evaluation.id,
+  //     actualOwner: evaluation.actualOwner,
+  //     achievementOwner: evaluation.achievementOwner,
+  //     actualChecker: evaluation.actualChecker,
+  //     achievementChecker: evaluation.achievementChecker,
+  //     actualApprover: evaluation.actualApprover,
+  //     achievementApprover: evaluation.achievementApprover,
+  //     fileUrl: evaluation.fileUrl,
+  //   }
+  // })
 
   return {
     competencies,

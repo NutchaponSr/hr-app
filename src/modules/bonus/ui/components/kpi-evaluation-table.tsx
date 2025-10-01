@@ -41,9 +41,9 @@ export const KpiEvaluationTable = ({
 
               return (
                 columnMatched ? (
-                  <th
+                  <TableHead
                     key={header.id}
-                    className="sticky start-8 top-10 z-87"
+                    className="sticky start-8 top-9 z-87 p-0"
                   >
                     {header.isPlaceholder
                       ? null
@@ -51,11 +51,12 @@ export const KpiEvaluationTable = ({
                         header.column.columnDef.header,
                         header.getContext()
                     )}
-                  </th>
+                  </TableHead>
                 ) : (
                   <TableHead 
                     key={header.id}
                     className={cn(
+                      "top-9 z-87",
                       isBeforeLast && "border-none",
                       width,
                     )}
@@ -128,7 +129,7 @@ export const KpiEvaluationTable = ({
                 </TableRow>
               );
             })}
-            <TableRow className="sticky z-85 w-full bottom-0 start-0 grow-0 shrink basis-0">
+            <TableRow className="sticky z-85 w-full bottom-11 start-0 grow-0 shrink basis-0">
               <TableCell className="border-r-[1.25px] border-[#2377CE]">
                 <div className="inline-flex justify-end items-center bg-marine shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)] pe-1 h-12 w-full">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">

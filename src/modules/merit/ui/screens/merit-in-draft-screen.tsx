@@ -22,6 +22,10 @@ import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/loader";
 import { Content } from "@/components/content";
 import { UserProfile } from "@/modules/auth/ui/components/user-profile";
+import { GoProject } from "react-icons/go";
+import { SelectionBadge } from "@/components/selection-badge";
+import { periods } from "@/modules/bonus/constants";
+import { Banner } from "@/components/banner";
 
 
 interface Props {
@@ -116,6 +120,14 @@ export const MeritInDraftScreen = ({ id, merit, canPerform }: Props) => {
 
   return (
     <Form {...form}>
+      <Banner
+        title="Merit"
+        className="ps-16"
+        description="ตั้งแต่ระดับ ผู้ช่วยผู้จัดการทั่วไป ขึ้นไป (Evaluation Form of Asst. General Manager Above Level)"
+        icon={GoProject}
+        context={<SelectionBadge label={periods["IN_DRAFT"]} />}
+        subTitle={merit.data.preparer.fullName}
+      />
       <div className="flex flex-row gap-2 px-16">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] gap-x-4 my-2 max-w-full">
           <Content label="Owner" icon={BsPersonFill}>
@@ -135,7 +147,7 @@ export const MeritInDraftScreen = ({ id, merit, canPerform }: Props) => {
         onSubmit={form.handleSubmit(onSubmit)} 
         className="contents"
       >
-        <div className="sticky top-0 z-999">
+        <div className="sticky top-0 z-86">
           <div className="absolute right-24 top-1">
             {canPerform.canSubmit && (
               <Button

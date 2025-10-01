@@ -4,7 +4,7 @@ import { colorVariant } from "@/types/color";
 interface Props {
   message: string | null;
   children?: React.ReactNode;
-  variant: "danger" | "warning";
+  variant: "danger" | "warning" | "blue";
 }
 
 export const WarnningBanner = ({ 

@@ -12,35 +12,35 @@ export const KpiSummaryTable = () => {
     <Table>
       <TableHeader className="border-[#CAD1DD] dark:border-[#3d587C] border-y-[1.25px]">
         <TableRow>
-          <TableHead className="w-[20%] static bg-[#2383e224] border-[#CAD1DD] dark:border-[#3d587C]">
+          <TableHead className="w-[20%] static bg-[#2383e224] border-[#CAD1DD] dark:border-[#3d587C] shadow-none">
             <div className="flex items-center h-full">
               <div className="text-xs font-normal text-secondary whitespace-nowrap overflow-hidden text-ellipsis">
                 Subject
               </div>
             </div>
           </TableHead>
-          <TableHead className="w-[10%] static bg-[#2383e224] border-[#CAD1DD] dark:border-[#3d587C]">
+          <TableHead className="w-[10%] static bg-[#2383e224] border-[#CAD1DD] dark:border-[#3d587C] shadow-none">
             <div className="flex items-center h-full">
               <div className="text-xs font-normal text-secondary whitespace-nowrap overflow-hidden text-ellipsis">
                 Full score (%)
               </div>
             </div>
           </TableHead>
-          <TableHead className="w-[20%] static bg-[#2383e224] border-[#CAD1DD] dark:border-[#3d587C]">
+          <TableHead className="w-[20%] static bg-[#2383e224] border-[#CAD1DD] dark:border-[#3d587C] shadow-none">
             <div className="flex items-center h-full">
               <div className="text-xs font-normal text-secondary whitespace-nowrap overflow-hidden text-ellipsis">
                 Owner
               </div>
             </div>
           </TableHead>
-          <TableHead className="w-[20%] static bg-[#2383e224] border-[#CAD1DD] dark:border-[#3d587C]">
+          <TableHead className="w-[20%] static bg-[#2383e224] border-[#CAD1DD] dark:border-[#3d587C] shadow-none">
             <div className="flex items-center h-full">
               <div className="text-xs font-normal text-secondary whitespace-nowrap overflow-hidden text-ellipsis">
                 Checker
               </div>
             </div>
           </TableHead>
-          <TableHead className="w-[20%] border-none static bg-[#2383e224]">
+          <TableHead className="w-[20%] border-none static bg-[#2383e224] shadow-none">
             <div className="flex items-center h-full">
               <div className="text-xs font-normal text-secondary whitespace-nowrap overflow-hidden text-ellipsis">
                 Approver

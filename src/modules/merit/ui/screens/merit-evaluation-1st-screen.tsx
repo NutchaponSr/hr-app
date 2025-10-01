@@ -24,6 +24,10 @@ import { UserProfile } from "@/modules/auth/ui/components/user-profile";
 import { RowData } from "@/components/row-data";
 import { MeritSummaryTable } from "../components/merit-summary-table";
 import { competencyLevels, cultureLevels } from "../../constants";
+import { Banner } from "@/components/banner";
+import { GoProject } from "react-icons/go";
+import { SelectionBadge } from "@/components/selection-badge";
+import { periods } from "@/modules/bonus/constants";
 
 type ResponseType = inferProcedureOutput<AppRouter["kpiMerit"]["getByFormId"]>
 
@@ -112,32 +116,49 @@ export const MeritEvaluation1stScreen = ({
 
   return (
     <Form {...form}>
-      <div className="w-full max-w-full self-center px-16">
-        <div className="grid grid-cols-3 gap-8">
-          <div className="grow-0 shrink-0">
-            <div role="table" className="m-0 flex flex-col gap-1">
-              <RowData icon={BsPersonFill} label="Owner">
-                <UserProfile employee={merit.data.preparer} />
-              </RowData>
-              {merit.data.checker && (
-                <RowData icon={BsPersonFill} label="Checker">
-                  <UserProfile employee={merit.data.checker} />
-                </RowData>
-              )}
-              <RowData icon={BsPersonFill} label="Approver">
-                <UserProfile employee={merit.data.approver} />
-              </RowData>
-            </div>
-          </div>
-          <div className="grow-0 shrink-0 col-span-2">
-            <MeritSummaryTable 
-              form={form} 
-              kpis={merit.data.kpiForm!.kpis}
-              competencyRecords={merit.data.meritForm.competencyRecords}  
-              cultureRecords={merit.data.meritForm.cultureRecords}
+      <div className="w-full max-w-full self-center z-100 mb-5">
+        <Accordion type="multiple" defaultValue={["header"]}>
+          <AccordionItem value="header">
+            <Banner
+              trigger
+              title="Merit"
+              className="ps-16"
+              description="ตั้งแต่ระดับ ผู้ช่วยผู้จัดการทั่วไป ขึ้นไป (Evaluation Form of Asst. General Manager Above Level)"
+              icon={GoProject}
+              context={<SelectionBadge label={periods["EVALUATION_1ST"]} />}
+              subTitle={merit.data.preparer.fullName}
             />
-          </div>
-        </div>
+            <AccordionContent>
+              <div className="w-full max-w-full self-center px-16">
+                <div className="grid grid-cols-3 gap-8">
+                  <div className="grow-0 shrink-0">
+                    <div role="table" className="m-0 flex flex-col gap-1">
+                      <RowData icon={BsPersonFill} label="Owner">
+                        <UserProfile employee={merit.data.preparer} />
+                      </RowData>
+                      {merit.data.checker && (
+                        <RowData icon={BsPersonFill} label="Checker">
+                          <UserProfile employee={merit.data.checker} />
+                        </RowData>
+                      )}
+                      <RowData icon={BsPersonFill} label="Approver">
+                        <UserProfile employee={merit.data.approver} />
+                      </RowData>
+                    </div>
+                  </div>
+                  <div className="grow-0 shrink-0 col-span-2">
+                    <MeritSummaryTable 
+                      form={form} 
+                      kpis={merit.data.kpiForm!.kpis}
+                      competencyRecords={merit.data.meritForm.competencyRecords}  
+                      cultureRecords={merit.data.meritForm.cultureRecords}
+                    />
+                  </div>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
       <form className="contents" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="grow shrink-0 flex flex-col relative">

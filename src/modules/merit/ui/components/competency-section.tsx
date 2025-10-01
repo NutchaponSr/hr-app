@@ -21,6 +21,7 @@ import { createColumns } from "./competency-columns";
 import { useCommentMerit } from "@/modules/comments/api/use-comment-merit";
 import { useMeritId } from "../../hooks/use-merit-id";
 import { CompetencyWithInfo } from "../../type";
+import { CompetencyInDraftTable } from "./competency-in-draft-table";
 
 interface Props {
   canPerform: boolean;
@@ -82,7 +83,7 @@ export const CompetencySection = ({  competencyRecords, ...props }: Props) => {
           </div>
         </div>
         <div className="relative mb-3 flex flex-col gap-8">
-          <Table table={table} />
+          <CompetencyInDraftTable table={table} />
         </div>
       </AccordionContent>
     </AccordionItem>

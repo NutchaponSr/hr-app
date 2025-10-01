@@ -13,12 +13,10 @@ import { STATUS_RECORD } from "@/types/kpi";
 
 import { Period } from "@/generated/prisma";
 
-import { Banner } from "@/components/banner";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { StatusBadge } from "@/components/status-badge";
 import { WarnningBanner } from "@/components/warnning-banner";
-import { SelectionBadge } from "@/components/selection-badge";
 import { SavingIndicator } from "@/components/saving-indicator";
 
 import { MeritScreen } from "@/modules/merit/ui/screens/merit-screen";
@@ -28,7 +26,6 @@ import { ApprovalConfirmation } from "@/modules/tasks/ui/components/approval-con
 import { useApprovalMerit } from "@/modules/tasks/api/use-approval-merit";
 import { useStartWorkflowMerit } from "@/modules/tasks/api/use-start-workflow-merit";
 
-import { periods } from "@/modules/bonus/constants";
 import { canPerformMany, Role } from "@/modules/bonus/permission";
 
 interface Props {
@@ -39,7 +36,6 @@ interface Props {
 export const MeritView = ({ id, period }: Props) => {
   const trpc = useTRPC();
   const pathname = usePathname();
-
 
   const paths: string[] = pathname.split("/").filter(Boolean);
 
@@ -103,16 +99,13 @@ export const MeritView = ({ id, period }: Props) => {
         variant="danger"
       />
 
+      <WarnningBanner
+        message={`แบบประเมิน Merit ประจำปี ${merit.data.meritForm?.year} : ${merit.data.preparer.fullName}`}
+        variant="blue"
+      />
+
       <main className="grow-0 shrink flex flex-col bg-background h-[calc(-44px+100vh)] max-h-full relative w-full">
         <div className="flex flex-col grow relative overflow-auto me-0 mb-0">
-          <Banner
-            title="Merit"
-            className="ps-16"
-            description="ตั้งแต่ระดับ ผู้ช่วยผู้จัดการทั่วไป ขึ้นไป (Evaluation Form of Asst. General Manager Above Level)"
-            icon={GoProject}
-            context={<SelectionBadge label={periods[period]} />}
-          />
-
           <MeritScreen 
             id={id} 
             period={period}

@@ -40,7 +40,7 @@ export const createColumns = ({
         data-select={row.getIsSelected()} 
         className="opacity-0 group-hover:opacity-100 transition-opacity data-[select=true]:opacity-100"
       >
-        <div className="absolute -start-8">
+        <div className="absolute -start-8 top-0">
           <div className="size-8 flex items-center justify-center">
             <Checkbox 
               checked={row.getIsSelected()}

@@ -85,7 +85,7 @@ export const createColumns = ({
             </Content>
           </div>
           <div className="relative after:absolute after:border-border after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t text-xs text-secondary uppercase text-center my-2">
-            <span className="uppercase z-10 bg-background relative px-2">
+            <span className="uppercase z-10 bg-background [[data-slot=table-row]:nth-child(even)_&]:bg-sidebar relative px-2">
               target
             </span>
           </div>
@@ -169,7 +169,7 @@ export const createColumns = ({
             disabled={permissions.canPerformOwner}
           />
           <div className="relative after:absolute after:border-border after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t text-xs text-secondary uppercase text-center">
-            <span className="uppercase z-10 bg-background relative px-2">
+            <span className="uppercase z-10 bg-background [[data-slot=table-row]:nth-child(even)_&]:bg-sidebar relative px-2">
               or attach with
             </span>
           </div>

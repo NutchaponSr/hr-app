@@ -22,6 +22,8 @@ import { useMeritId } from "../../hooks/use-merit-id";
 import { useCommentMerit } from "@/modules/comments/api/use-comment-merit";
 import { CultureWithInfo } from "../../type";
 import { Table } from "@/components/table";
+import { CompetencyInDraftTable } from "./competency-in-draft-table";
+import { CultureInDraftTable } from "./culture-in-draft-table";
 
 interface Props {
   canPerform: boolean;
@@ -81,7 +83,7 @@ export const CultureSection = ({ cultureRecord, ...props }: Props) => {
           </div>
         </div>
         <div className="relative mb-3 flex flex-col gap-8">
-          <Table table={table} />
+          <CultureInDraftTable table={table} />
         </div>
       </AccordionContent>
     </AccordionItem>

@@ -18,6 +18,7 @@ export const colorVariant = cva("",
         danger: "bg-destructive",
         warning: "bg-warning",
         green: "bg-green-foreground",
+        blue: "bg-marine",
       },
       dot: {
         default: "bg-gray",

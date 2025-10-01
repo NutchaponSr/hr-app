@@ -8,11 +8,13 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Loader } from "./loader";
+import { cn } from "@/lib/utils";
 
 interface Props {
   isPending: boolean;
   canPerform: boolean;
   context?: React.ReactNode;
+  className?: string;
   onCreate?: () => void;
   onDelete?: () => void;
   onUpload?: () => void;
@@ -22,11 +24,12 @@ export const Toolbar = ({
   isPending,
   canPerform, 
   context,
+  className,
   onCreate, 
   onUpload,
 }: Props) => {
   return (
-    <div className="min-h-9 px-16 sticky start-0 top-0 bg-background shrink-0 z-86">
+    <div className={cn("min-h-9 px-16 sticky start-0 top-0 bg-background shrink-0 z-86", className)}>
       <div className="relative">
         <div className="flex items-center h-9 start-16">
           <div className="flex items-center h-full grow shrink overflow-hidden w-full">

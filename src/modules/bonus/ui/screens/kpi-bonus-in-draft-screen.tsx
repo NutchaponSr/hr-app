@@ -14,7 +14,6 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 
 import { Hint } from "@/components/hint";
-import { Table } from "@/components/table";
 import { Toolbar } from "@/components/toolbar";
 import { MenuBar } from "@/components/menu-bar";
 import { SelectionBadge } from "@/components/selection-badge";
@@ -32,6 +31,10 @@ import { useUploadStore } from "@/store/use-upload-modal-store";
 import { UserProfile } from "@/modules/auth/ui/components/user-profile";
 import { Content } from "@/components/content";
 import { BsPersonFill } from "react-icons/bs";
+import { GoProject } from "react-icons/go";
+import { periods } from "../../constants";
+import { Banner } from "@/components/banner";
+import { KpiInDraftTable } from "../components/kpi-in-draft-table";
 
 interface Props {
   id: string;
@@ -115,6 +118,14 @@ export const KpiBonusInDraftScreen = ({ id, canPerform, kpiForm }: Props) => {
 
   return (
     <Form {...form}>
+      <Banner
+        title="KPI Bonus"
+        className="ps-16"
+        description="Reward employees with performance-based bonuses tied to goals and business impact."
+        icon={GoProject}
+        context={<SelectionBadge label={periods["IN_DRAFT"]} />}
+        subTitle={kpiForm.data.preparer.fullName}
+      />
       <div className="flex flex-row gap-2 px-16">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] gap-x-4 my-2 max-w-full">
           <Content label="Owner" icon={BsPersonFill}>
@@ -174,7 +185,7 @@ export const KpiBonusInDraftScreen = ({ id, canPerform, kpiForm }: Props) => {
         <div className="grow shrink-0 flex flex-col relative">
           <div className="relative float-start min-w-full select-none pb-[180px] px-16">
             <div className="relative">
-              <Table table={table} />
+              <KpiInDraftTable table={table} />
             </div>
           </div>
         </div>

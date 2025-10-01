@@ -30,7 +30,7 @@ export const MenuBar = <TData extends RowData>({
   }
 
   return (
-    <section data-select={countSelected > 0} className="sticky top-px start-24 z-999 w-fit hidden data-[select=true]:block">
+    <section data-select={countSelected > 0} className="sticky -top-0.5 start-16 z-999 w-fit hidden data-[select=true]:block">
       <ConfirmationDialog />
       <div className="absolute top-1">
         <div className="inline-flex shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(84,72,49,0.08)] dark:shadow-[0_0_0_1px_rgb(48,48,46),0_4px_12px_-2px_rgba(0,0,0,0.16)] rounded justify-center items-center h-8 bg-background">

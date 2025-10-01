@@ -18,6 +18,11 @@ import { getTotalWithWeight } from "../../util";
 import { UserProfile } from "@/modules/auth/ui/components/user-profile";
 import { RowData } from "@/components/row-data";
 import { KpiSummaryTable } from "../components/kpi-summary-table";
+import { Accordion, AccordionContent, AccordionItem } from "@/components/ui/accordion";
+import { SelectionBadge } from "@/components/selection-badge";
+import { Banner } from "@/components/banner";
+import { GoProject } from "react-icons/go";
+import { periods } from "../../constants";
 
 interface Props {
   id: string;
@@ -107,27 +112,44 @@ export const KpiBonusEvaluation1StScreen = ({ id, role, canPerform, kpiForm }: P
 
   return (
     <Form {...form}>
-      <div className="w-full max-w-full self-center px-16">
-        <div className="grid grid-cols-3 gap-8">
-          <div className="grow-0 shrink-0">
-            <div role="table" className="m-0 flex flex-col gap-1">
-              <RowData icon={BsPersonFill} label="Owner">
-                <UserProfile employee={kpiForm.data.preparer} />
-              </RowData>
-              {kpiForm.data.checker && (
-                <RowData icon={BsPersonFill} label="Checker">
-                  <UserProfile employee={kpiForm.data.checker} />
-                </RowData>
-              )}
-              <RowData icon={BsPersonFill} label="Approver">
-                <UserProfile employee={kpiForm.data.approver} />
-              </RowData>
-            </div>
-          </div>
-          <div className="grow-0 shrink-0 col-span-2">
-            <KpiSummaryTable />
-          </div>
-        </div>
+      <div className="w-full max-w-full self-center z-100 mb-5">
+        <Accordion type="multiple" defaultValue={["header"]}>
+          <AccordionItem value="header">
+            <Banner
+              trigger
+              title="KPI Bonus"
+              className="ps-16"
+              description="Reward employees with performance-based bonuses tied to goals and business impact."
+              icon={GoProject}
+              context={<SelectionBadge label={periods["EVALUATION_1ST"]} />}
+              subTitle={kpiForm.data.preparer.fullName}
+            />
+            <AccordionContent>
+              <div className="w-full max-w-full self-center px-16">
+                <div className="grid grid-cols-3 gap-8">
+                  <div className="grow-0 shrink-0">
+                    <div role="table" className="m-0 flex flex-col gap-1">
+                      <RowData icon={BsPersonFill} label="Owner">
+                        <UserProfile employee={kpiForm.data.preparer} />
+                      </RowData>
+                      {kpiForm.data.checker && (
+                        <RowData icon={BsPersonFill} label="Checker">
+                          <UserProfile employee={kpiForm.data.checker} />
+                        </RowData>
+                      )}
+                      <RowData icon={BsPersonFill} label="Approver">
+                        <UserProfile employee={kpiForm.data.approver} />
+                      </RowData>
+                    </div>
+                  </div>
+                  <div className="grow-0 shrink-0 col-span-2">
+                    <KpiSummaryTable />
+                  </div>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>  
+        </Accordion>
       </div>
       <form onSubmit={form.handleSubmit(onSubmit)} className="contents">
         <div className="min-h-9 px-16 sticky start-0 top-0 bg-background shrink-0 z-86">
