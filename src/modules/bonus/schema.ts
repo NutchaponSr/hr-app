@@ -3,7 +3,7 @@ import { z } from "zod";
 import { KpiCategory } from "@/generated/prisma";
 
 export const kpiBonusCreateSchema = z.object({
-  name: z.string().min(1, "Required"),
+  name: z.string().min(1, "Required").trim(),
   weight: z.coerce.string()
     .min(1, "Required")
     .refine((val) => {
@@ -14,14 +14,14 @@ export const kpiBonusCreateSchema = z.object({
     })
     .pipe(z.string()),
   category: z.enum(KpiCategory),
-  objective: z.string().min(1, "Required"),
-  definition: z.string().min(1, "Required"),
-  strategy: z.string().min(1, "Required"),
+  objective: z.string().min(1, "Required").trim(),
+  definition: z.string().min(1, "Required").trim(),
+  strategy: z.string().min(1, "Required").trim(),
   type: z.enum(["PROJECT", "IMPROVEMENT"]),
-  target100: z.string().min(1, "Required"),
-  target90: z.string().min(1, "Required"),
-  target80: z.string().min(1, "Required"),
-  target70: z.string().min(1, "Required"),
+  target100: z.coerce.string().min(1, "Required").trim(),
+  target90: z.coerce.string().min(1, "Required").trim(),
+  target80: z.coerce.string().min(1, "Required").trim(),
+  target70: z.coerce.string().min(1, "Required").trim(),
 });
 
 export const kpiBonusUpdateSchema = kpiBonusCreateSchema.extend({

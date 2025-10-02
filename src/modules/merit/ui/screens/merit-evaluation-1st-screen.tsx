@@ -126,7 +126,6 @@ export const MeritEvaluation1stScreen = ({
               description="ตั้งแต่ระดับ ผู้ช่วยผู้จัดการทั่วไป ขึ้นไป (Evaluation Form of Asst. General Manager Above Level)"
               icon={GoProject}
               context={<SelectionBadge label={periods["EVALUATION_1ST"]} />}
-              subTitle={merit.data.preparer.fullName}
             />
             <AccordionContent>
               <div className="w-full max-w-full self-center px-16">

@@ -122,7 +122,6 @@ export const KpiBonusEvaluation1StScreen = ({ id, role, canPerform, kpiForm }: P
               description="Reward employees with performance-based bonuses tied to goals and business impact."
               icon={GoProject}
               context={<SelectionBadge label={periods["EVALUATION_1ST"]} />}
-              subTitle={kpiForm.data.preparer.fullName}
             />
             <AccordionContent>
               <div className="w-full max-w-full self-center px-16">

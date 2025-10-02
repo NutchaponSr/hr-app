@@ -124,7 +124,6 @@ export const KpiBonusInDraftScreen = ({ id, canPerform, kpiForm }: Props) => {
         description="Reward employees with performance-based bonuses tied to goals and business impact."
         icon={GoProject}
         context={<SelectionBadge label={periods["IN_DRAFT"]} />}
-        subTitle={kpiForm.data.preparer.fullName}
       />
       <div className="flex flex-row gap-2 px-16">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,max-content))] gap-x-4 my-2 max-w-full">
