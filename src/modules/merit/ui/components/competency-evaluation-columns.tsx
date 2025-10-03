@@ -82,7 +82,7 @@ export const createColumns = ({ form, permissions }: Props): ColumnDef<Competenc
         <div className="flex flex-col gap-2">
           <FormGenerator 
             form={form}
-            name={`competencies.${row.index}.inputEvidenceChecker`}
+            name={`competencies.${row.index}.inputEvidenceOwner`}
             label="Input Evidence"
             variant="text"
             disabled={!permissions.canPerformOwner}
