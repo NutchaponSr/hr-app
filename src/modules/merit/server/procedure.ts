@@ -167,10 +167,10 @@ export const meritProcedure = createTRPCRouter({
         MANAGER_UP.includes(task.preparer.rank)
           ? (() => {
               const patternTypes: (CompetencyType | CompetencyType[])[] = [
-                CompetencyType.MC,
-                CompetencyType.MC,
                 [CompetencyType.FC, CompetencyType.TC],
                 [CompetencyType.FC, CompetencyType.TC],
+                CompetencyType.MC,
+                CompetencyType.MC,
               ];
               const records = task.meritForm?.competencyRecords ?? [];
       
