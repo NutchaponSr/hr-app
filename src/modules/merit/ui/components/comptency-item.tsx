@@ -64,30 +64,32 @@ export const CompetencyItem = ({
                   </div>
                 }
               >
-                <Command.Group>
-                  {competencies?.map((c) => (
-                    <Command.Item 
-                      key={c.id}
-                      onSelect={() => field.onChange(c.id)}
-                      className={cn(
-                        "flex rounded w-full cursor-pointer transition data-[selected=true]:bg-primary/6",
-                        field.value === c.id && "bg-primary/6",
-                      )}
-                    >
-                      <div className="flex items-center gap-2 w-full select-none min-h-7 text-sm px-2 py-1">
-                        <div className="grow shrink basis-auto min-w-0">
-                          <div className="whitespace-nowrap overflow-hidden text-ellipsis">
-                            <div className="flex flex-row items-center">
-                              <div className="whitespace-nowrap overflow-hidden text-ellipsis text-primary font-medium">
-                                {c.name}
+                <div className="max-h-[320px] min-h-0 grow z-[1] overflow-x-hidden overflow-y-auto mx-0 mb-0">
+                  <Command.Group>
+                    {competencies?.map((c) => (
+                      <Command.Item 
+                        key={c.id}
+                        onSelect={() => field.onChange(c.id)}
+                        className={cn(
+                          "flex rounded w-full cursor-pointer transition data-[selected=true]:bg-primary/6",
+                          field.value === c.id && "bg-primary/6",
+                        )}
+                      >
+                        <div className="flex items-center gap-2 w-full select-none min-h-7 text-sm px-2 py-1">
+                          <div className="grow shrink basis-auto min-w-0">
+                            <div className="whitespace-nowrap overflow-hidden text-ellipsis">
+                              <div className="flex flex-row items-center">
+                                <div className="whitespace-nowrap overflow-hidden text-ellipsis text-primary font-medium">
+                                  {c.name}
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </Command.Item>
-                  ))}
-                </Command.Group>
+                      </Command.Item>
+                    ))}
+                  </Command.Group>
+                </div>
               </CommandSearch>
             </FormControl>
             <FormMessage />

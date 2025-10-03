@@ -166,20 +166,26 @@ export const meritProcedure = createTRPCRouter({
       const competencyRecordsWithComments =
         MANAGER_UP.includes(task.preparer.rank)
           ? (() => {
-            const patternTypes: CompetencyType[] = [
-              CompetencyType.MC,
-              CompetencyType.MC,
-              CompetencyType.FC,
-              CompetencyType.FC,
-            ];
-            const records = task.meritForm?.competencyRecords ?? [];
-
-            return records.slice(0, patternTypes.length).map((record, index) => ({
-              ...record,
-              comments: competencyCommentsMap[record.id] || [],
-              type: [patternTypes[index]],
-              label: typeToName[patternTypes[index]],
-            }));
+              const patternTypes: (CompetencyType | CompetencyType[])[] = [
+                CompetencyType.MC,
+                CompetencyType.MC,
+                [CompetencyType.FC, CompetencyType.TC],
+                [CompetencyType.FC, CompetencyType.TC],
+              ];
+              const records = task.meritForm?.competencyRecords ?? [];
+      
+              return records.slice(0, patternTypes.length).map((record, index) => {
+                const types = Array.isArray(patternTypes[index])
+                  ? patternTypes[index] as CompetencyType[]
+                  : [patternTypes[index] as CompetencyType];
+      
+                return {
+                  ...record,
+                  comments: competencyCommentsMap[record.id] || [],
+                  type: types,
+                  label: types.map((t) => typeToName[t]).join(", "),
+                };
+              });
           })()
         : (() => {
             const records = task.meritForm?.competencyRecords ?? [];

@@ -2,7 +2,7 @@
 
 import { Command } from "cmdk";
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
 
