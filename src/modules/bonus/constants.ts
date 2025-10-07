@@ -1,4 +1,5 @@
 import { KpiCategory, Period, Project } from "@/generated/prisma";
+import { ExportColumn } from "@/types/upload";
 
 export const projectTypes: Record<Project, string> = {
   [Project.IMPROVEMENT]: "Improvement",
@@ -17,3 +18,38 @@ export const periods: Record<Period, string> = {
   [Period.EVALUATION_1ST]: "Evaluation 1 st",
   [Period.EVALUATION_2ND]: "Evaluation 2 nd",
 }
+
+export const columns: ExportColumn[] = [
+  {
+    key: "employeeId",
+    header: "รหัสพนักงาน",
+  },
+  {
+    key: "employeeName",
+    header: "ชื่อพนักงาน",
+  },
+  {
+    key: "employeeName",
+    header: "ชื่อพนักงาน",
+  },
+  {
+    key: "year",
+    header: "Year",
+  },
+  {
+    key: "period",
+    header: "Period",
+  },
+  {
+    key: "performer",
+    header: "Performer",
+  },
+  {
+    key: "name",
+    header: "ชื่อ KPI",
+  },
+  {
+    key: "percentage",
+    header: "Percentage (%)",
+  },
+]

@@ -4,15 +4,14 @@ import { BsPersonFill, BsSave } from "react-icons/bs";
 import { AppRouter } from "@/trpc/routers/_app";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { createColumns } from "../components/kpi-evaluation-1st-columns";
-import { useForm, type Resolver } from "react-hook-form";
-import { KpiWithEvaluation } from "../../types";
-import { kpiBonusEvaluationsSchema, KpiBonusEvaluationsSchema } from "../../schema";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { APPROVAL_STATUSES, KpiWithEvaluation } from "../../types";
+import { KpiBonusEvaluationsSchema } from "../../schema";
+import { useKpiEvaluationForm } from "../../hooks/use-kpi-evaluation-form";
 import { Form } from "@/components/ui/form";
 import { Loader } from "@/components/loader";
 import { Role } from "../../permission";
 import { useUpdateBulkKpiEvaluations } from "../../api/use-update-bulk-kpi-evaluations";
-import { useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { KpiEvaluationTable } from "../components/kpi-evaluation-table";
 import { getTotalWithWeight } from "../../util";
 import { UserProfile } from "@/modules/auth/ui/components/user-profile";
@@ -42,73 +41,37 @@ export const KpiBonusEvaluation1StScreen = ({ id, role, canPerform, kpiForm }: P
     opt: updateBulkKpiEvaluationsOpt
   } = useUpdateBulkKpiEvaluations(id);
 
-  const mapValue = (kpi: KpiWithEvaluation, userRole: Role) => {
-    const evaluation = kpi.kpiEvaluations[0];
-    
-    return {
-      id: evaluation?.id || "",
-      role: userRole,
-      fileUrl: evaluation?.fileUrl ?? null,
-      actualOwner: evaluation?.actualOwner ?? "",
-      achievementOwner: Number(evaluation?.achievementOwner ?? 0),
-      actualChecker: evaluation?.actualChecker ?? "",
-      achievementChecker: Number(evaluation?.achievementChecker ?? 0),
-      actualApprover: evaluation?.actualApprover ?? "",
-      achievementApprover: Number(evaluation?.achievementApprover ?? 0),
-    };
-  };
-
   const kpis = kpiForm.data.kpiForm.kpis;
   const hasChecker = kpiForm.permission.ctx.checkerId !== null;
 
-  const defaultValues = useMemo(() => ({
-    evaluations: (kpis || []).map(kpi => mapValue(kpi, role))
-  }), [kpis, role]);
+  const form = useKpiEvaluationForm({ kpis, role });
 
-  const form = useForm<KpiBonusEvaluationsSchema>({
-    resolver: zodResolver(kpiBonusEvaluationsSchema) as Resolver<KpiBonusEvaluationsSchema>,
-    defaultValues,
-  });
+  const permissions = useMemo(() => ({
+    canPerformOwner: !canPerform.ownerCanWrite,
+    canPerformChecker: !canPerform.checkerCanWrite,
+    canPerformApprover: !canPerform.approverCanWrite,
+  }), [canPerform.ownerCanWrite, canPerform.checkerCanWrite, canPerform.approverCanWrite]);
 
-  // create a stable columns array so cell components are not recreated on every render.
-  // This prevents input fields from losing focus / accepting one char at a time.
   const columns = useMemo(() => {
     return createColumns({
       form,
       hasChecker,
-      permissions: {
-        canPerformOwner: !canPerform.ownerCanWrite,
-        canPerformChecker: !canPerform.checkerCanWrite,
-        canPerformApprover: !canPerform.approverCanWrite,
-      },
+      permissions,
     });
-    // include only the minimal deps that affect column rendering
-  }, [form, hasChecker, canPerform.ownerCanWrite, canPerform.checkerCanWrite, canPerform.approverCanWrite]);
+  }, [form, hasChecker, permissions]);
 
-  // Create the table once using the memoized columns so the table instance is stable.
   const table = useReactTable({
     data: kpiForm.data.kpiForm.kpis || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-  // (table is ready and memoized)
 
-  const onSubmit = (data: KpiBonusEvaluationsSchema) => {
+  const onSubmit = useCallback((data: KpiBonusEvaluationsSchema) => {
     updateBulkKpiEvaluations({ evaluations: data.evaluations });
-  };
+  }, [updateBulkKpiEvaluations]);
 
   const { watch } = form;
   const evaluations = watch("evaluations");
-
-  useEffect(() => {
-    if (!kpis) return;
-    form.reset({
-      evaluations: (kpis || []).map(kpi => mapValue(kpi, role)),
-    }, {
-      keepDirty: false,
-      keepTouched: false,
-    });
-  }, [form, kpis, role]);
 
   return (
     <Form {...form}>
@@ -142,12 +105,12 @@ export const KpiBonusEvaluation1StScreen = ({ id, role, canPerform, kpiForm }: P
                     </div>
                   </div>
                   <div className="grow-0 shrink-0 col-span-2">
-                    <KpiSummaryTable />
+                    <KpiSummaryTable form={form} kpis={kpis || []} />
                   </div>
                 </div>
               </div>
             </AccordionContent>
-          </AccordionItem>  
+          </AccordionItem>
         </Accordion>
       </div>
       <form onSubmit={form.handleSubmit(onSubmit)} className="contents">
@@ -155,12 +118,12 @@ export const KpiBonusEvaluation1StScreen = ({ id, role, canPerform, kpiForm }: P
           <div className="flex items-center w-full h-full pt-0">
             <div className="grow h-full">
               <div className="flex flex-row justify-end items-center h-full gap-0.5">
-                <div 
+                <div
                   data-show={canPerform.canSubmit}
                   className="relative shrink-0 rounded overflow-hidden h-7 ml-1 data-[show=true]:inline-flex hidden"
                 >
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={updateBulkKpiEvaluationsOpt.isPending}
                     className="transition flex items-center justify-center whitespace-nowrap px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted shadow-[inset_1px_0_0_rgba(55,53,47,0.16)] gap-1.5 data-[disabled=true]:opacity-80"
                   >
@@ -184,11 +147,13 @@ export const KpiBonusEvaluation1StScreen = ({ id, role, canPerform, kpiForm }: P
         <div className="grow shrink-0 flex flex-col relative">
           <div className="relative float-start min-w-full select-none pb-[180px] px-16">
             <div className="relative">
-              <KpiEvaluationTable 
-                table={table}  
+              <KpiEvaluationTable
+                table={table}
+                hasChecker={hasChecker}
                 totalAchievementOwnerWithWeight={getTotalWithWeight(evaluations, kpis!, "achievementOwner")}
                 totalAchievementCheckerWithWeight={getTotalWithWeight(evaluations, kpis!, "achievementChecker")}
                 totalAchievementApproverWithWeight={getTotalWithWeight(evaluations, kpis!, "achievementApprover")}
+                isApprovalStatus={APPROVAL_STATUSES.includes(kpiForm.data.status) && canPerform.canSubmit}
               />
             </div>
           </div>

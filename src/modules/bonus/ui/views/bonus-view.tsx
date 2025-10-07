@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { GoProject } from "react-icons/go";
 import { usePathname } from "next/navigation";
 import { formatDistanceToNowStrict } from "date-fns";
 
-import { convertAmountFromUnit, getBannerMessage } from "@/lib/utils";
+import { convertAmountFromUnit } from "@/lib/utils";
 
 import { STATUS_RECORD } from "@/types/kpi";
 
@@ -27,9 +27,8 @@ import { Footer } from "@/components/footer";
 import { ApprovalConfirmation } from "@/modules/tasks/ui/components/approval-confirmation";
 import { useApprovalKpi } from "@/modules/tasks/api/use-approval-kpi";
 import { Period } from "@/generated/prisma";
-import { Banner } from "@/components/banner";
-import { SelectionBadge } from "@/components/selection-badge";
-import { periods } from "../../constants";
+import { useSave } from "@/hooks/use-save";
+import { toast } from "sonner";
 
 interface Props {
   id: string;
@@ -42,11 +41,11 @@ export const BonusView = ({
 }: Props) => {
   const pathname = usePathname();
 
+  const { save } = useSave();
+
   const paths: string[] = pathname.split("/").filter(Boolean);
 
-  const [error, setError] = useState("");
-
-  const kpiForm = useGetKpiForm(id);
+  const kpiForm = useGetKpiForm(id, period);
   const { mutation: startWorkflow } = useStartWorkflowKpi(id);
   const { mutation: approval, opt: approvalOption } = useApprovalKpi(id);
 
@@ -83,10 +82,8 @@ export const BonusView = ({
         <StartWorkflowButton
           perform={permissions.worflow}
           onWorkflow={() => {
-            setError("");
-
             if (totalWeight !== maxAllowedWeight) {
-              setError(`Total weight (${totalWeight}%) equal allowed for ${kpiForm.data.preparer.rank} position (${maxAllowedWeight}%)`);
+              toast.error(`Total weight (${totalWeight}%) equal allowed for ${kpiForm.data.preparer.rank} position (${maxAllowedWeight}%)`);
               return;
             }
 
@@ -95,11 +92,6 @@ export const BonusView = ({
           title="Start Evaluation KPI Bonus"
         />
       </Header>
-      <WarnningBanner
-        message={getBannerMessage(error, kpiForm.data.status)}
-        variant="danger"
-      />
-
       <WarnningBanner
         message={`แบบประเมิน KPI Bonus ประจำปี ${kpiForm.data.kpiForm?.year} : ${kpiForm.data.preparer.fullName}`}
         variant="blue"
@@ -125,8 +117,16 @@ export const BonusView = ({
       {permissions.approve && (
         <Footer>
           <ApprovalConfirmation 
+            isSaved={save}
             disabled={approvalOption.isPending}
-            onClick={(confirm) => approval({ id: kpiForm.data.id, confirm })} 
+            onClick={(confirm) => {
+              if (totalWeight !== maxAllowedWeight) {
+                toast.error(`Total weight (${totalWeight}%) equal allowed for ${kpiForm.data.preparer.rank} position (${maxAllowedWeight}%)`);
+                return;
+              }
+
+              approval({ id: kpiForm.data.id, confirm })}
+            } 
           />
         </Footer>
       )}

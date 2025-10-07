@@ -37,5 +37,9 @@ export const KpiBonusScreen = ({ period, ...props }: Props) => {
       return (
         <KpiBonusEvaluation1StScreen {...props} />
       )
+    case Period.EVALUATION_2ND:
+      return (
+        <KpiBonusEvaluation1StScreen {...props} />
+      )
   }
 }

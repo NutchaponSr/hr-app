@@ -7,12 +7,14 @@ import { useTRPC } from "@/trpc/client";
 import type { AppRouter } from "@/trpc/routers/_app";
 
 import { KpiWithComments } from "@/modules/bonus/types";
+import { usePeriod } from "@/hooks/use-period";
 
 type RequestType = inferProcedureInput<AppRouter["kpiBonus"]["deleteBulkKpi"]>;
 
 export const useDeleteBulkKpi = (table: Table<KpiWithComments>, id: string) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const { period } = usePeriod();
 
   const deleteBulkKpi = useMutation(trpc.kpiBonus.deleteBulkKpi.mutationOptions());
 
@@ -22,7 +24,7 @@ export const useDeleteBulkKpi = (table: Table<KpiWithComments>, id: string) => {
     deleteBulkKpi.mutate({ ...value }, {
       onSuccess: () => {
         queryClient.invalidateQueries(
-          trpc.kpiBonus.getById.queryOptions({ id }),
+          trpc.kpiBonus.getById.queryOptions({ id, period }),
         );
 
         table.resetRowSelection();

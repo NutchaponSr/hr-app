@@ -8,6 +8,7 @@ export const usePeriod = () => {
   const [period, setPeriod] = useQueryState<Period>("period", {
     parse: (value) => value as Period,
     serialize: (value) => value,
+    defaultValue: Period.IN_DRAFT,
   });
 
   return {

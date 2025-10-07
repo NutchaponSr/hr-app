@@ -6,8 +6,23 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { KpiBonusEvaluationsSchema } from "../../schema";
+import { UseFormReturn } from "react-hook-form";
+import { KpiWithComments } from "../../types";
+import { calculateAchievementSum, formatAchievementSum } from "../../util";
 
-export const KpiSummaryTable = () => {  
+interface Props {
+  kpis: KpiWithComments[];
+  form: UseFormReturn<KpiBonusEvaluationsSchema>;
+}
+
+export const KpiSummaryTable = ({ kpis, form }: Props) => {
+  const evaluations = form.watch("evaluations");
+  
+  const ownerSum = calculateAchievementSum(evaluations, kpis, "achievementOwner");
+  const checkerSum = calculateAchievementSum(evaluations, kpis, "achievementChecker");
+  const approverSum = calculateAchievementSum(evaluations, kpis, "achievementApprover");
+  
   return (
     <Table>
       <TableHeader className="border-[#CAD1DD] dark:border-[#3d587C] border-y-[1.25px]">
@@ -62,7 +77,7 @@ export const KpiSummaryTable = () => {
             <div className="flex items-center h-full justify-end">
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
-                  40.00
+                  50.00
                 </div>
               </div>
             </div>
@@ -71,7 +86,7 @@ export const KpiSummaryTable = () => {
             <div className="flex items-center h-full justify-end">
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
-                  TODO
+                  {formatAchievementSum(ownerSum)}
                 </div>
               </div>
             </div>
@@ -80,7 +95,7 @@ export const KpiSummaryTable = () => {
             <div className="flex items-center h-full justify-end">
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
-                  TODO
+                  {formatAchievementSum(checkerSum)}
                 </div>
               </div>
             </div>
@@ -89,7 +104,7 @@ export const KpiSummaryTable = () => {
             <div className="flex items-center h-full justify-end">
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
-                  TODO
+                  {formatAchievementSum(approverSum)}
                 </div>
               </div>
             </div>

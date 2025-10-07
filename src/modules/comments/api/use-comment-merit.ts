@@ -4,12 +4,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
 import type { AppRouter } from "@/trpc/routers/_app";
+import { usePeriod } from "@/hooks/use-period";
 
 type RequestType = inferProcedureInput<AppRouter["comment"]["create"]>;
 
 export const useCommentMerit = (id: string) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const { period } = usePeriod();
 
   const comment = useMutation(trpc.comment.create.mutationOptions());
 
@@ -18,7 +21,7 @@ export const useCommentMerit = (id: string) => {
     comment.mutate({ ...value }, {
       onSuccess: () => {
         queryClient.invalidateQueries(
-          trpc.kpiMerit.getByFormId.queryOptions({ id }),
+          trpc.kpiMerit.getByFormId.queryOptions({ id, period }),
         );
 
       },

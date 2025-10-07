@@ -4,7 +4,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
-import { convertAmountToUnit } from "@/lib/utils";
+import { convertAmountToUnit, exportExcel } from "@/lib/utils";
 
 import { readCSV } from "@/seeds/utils/csv";
 
@@ -14,6 +14,8 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { kpiBonusCreateSchema, kpiBonusEvaluationSchema } from "../schema";
 import { getUserRole, PermissionContext } from "../permission";
+import { columns } from "../constants";
+import { formatKpiExport } from "../util";
 
 export const bonusProcedure = createTRPCRouter({
   getByYear: protectedProcedure
@@ -34,11 +36,16 @@ export const bonusProcedure = createTRPCRouter({
               preparedAt: "asc",
             },
           },
+          kpis: {
+            include: {
+              kpiEvaluations: true,
+            },
+          },
         },
       });
 
       return {
-        ...kpiForm,
+        id: kpiForm?.id,
         task: {
           inDraft: kpiForm?.tasks[0],
           evaluation1st: kpiForm?.tasks[1],
@@ -50,6 +57,7 @@ export const bonusProcedure = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        period: z.enum(Period),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -65,7 +73,11 @@ export const bonusProcedure = createTRPCRouter({
             include: {
               kpis: {
                 include: {
-                  kpiEvaluations: true,
+                  kpiEvaluations: {
+                    where: {
+                      period: input.period,
+                    },
+                  },
                 },
               },
             },
@@ -396,5 +408,45 @@ export const bonusProcedure = createTRPCRouter({
       });
 
       return kpi;
+    }),
+  export: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const kpiForm = await prisma.kpiForm.findUnique({
+        where: {
+          id: input.id,
+        },
+        include: {
+          kpis: {
+            include: {
+              kpiEvaluations: true,
+            },
+          },
+          employee: true,
+        },
+      });
+
+      if (!kpiForm) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const data = formatKpiExport(kpiForm);
+
+      const file = exportExcel([
+        {
+          name: "Score Summary",
+          data,
+          columns,
+        },
+      ]);
+
+      return {
+        file,
+        id: kpiForm.id,
+      };
     })
 });

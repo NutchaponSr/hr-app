@@ -1,17 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { toast } from "sonner";
 import { GoProject } from "react-icons/go";
 import { usePathname } from "next/navigation";
 import { formatDistanceToNowStrict } from "date-fns";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { convertAmountFromUnit, getBannerMessage } from "@/lib/utils";
+import { convertAmountFromUnit } from "@/lib/utils";
 
 import { useTRPC } from "@/trpc/client";
 import { STATUS_RECORD } from "@/types/kpi";
 
 import { Period } from "@/generated/prisma";
+
+import { useSave } from "@/hooks/use-save";
 
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
@@ -37,11 +39,11 @@ export const MeritView = ({ id, period }: Props) => {
   const trpc = useTRPC();
   const pathname = usePathname();
 
+  const { save } = useSave();
+
   const paths: string[] = pathname.split("/").filter(Boolean);
 
-  const [error, setError] = useState("");
-
-  const query = trpc.kpiMerit.getByFormId.queryOptions({ id });
+  const query = trpc.kpiMerit.getByFormId.queryOptions({ id, period });
 
   const { data: merit } = useSuspenseQuery({
     ...query,
@@ -83,10 +85,8 @@ export const MeritView = ({ id, period }: Props) => {
           perform={permissions.worflow}
           title="Start Workflow Merit"
           onWorkflow={() => {
-            setError("");
-
             if (totalWeight !== 30) {
-              setError("The total competencies weight must equal 30%");
+              toast.error("The total competencies weight must equal 30%");
               return;
             }
 
@@ -94,11 +94,6 @@ export const MeritView = ({ id, period }: Props) => {
           }}
         />
       </Header>
-      <WarnningBanner
-        message={getBannerMessage(error, merit.data.status)}
-        variant="danger"
-      />
-
       <WarnningBanner
         message={`แบบประเมิน Merit ประจำปี ${merit.data.meritForm?.year} : ${merit.data.preparer.fullName}`}
         variant="blue"
@@ -120,15 +115,15 @@ export const MeritView = ({ id, period }: Props) => {
           />
         </div>
       </main>
+      
       {permissions.approve && (
         <Footer>
           <ApprovalConfirmation 
+            isSaved={save}
             disabled={approvalOption.isPending}
             onClick={(confirm) => {
-              setError("");
-
               if (totalWeight !== 30) {
-                setError("The total competencies weight must equal 30%");
+                toast.error("The total competencies weight must equal 30%");
                 return;
               }
 

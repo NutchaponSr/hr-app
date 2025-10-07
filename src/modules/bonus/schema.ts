@@ -35,12 +35,12 @@ export const kpiFormSchema = z.object({
 export const kpiBonusEvaluationSchema = z.object({
   id: z.string(),
   role: z.enum(["preparer", "checker", "approver"]),
-  actualOwner: z.string().optional(),
-  achievementOwner: z.coerce.number().optional(),
-  actualChecker: z.string().optional(),
-  achievementChecker: z.coerce.number().optional(),
-  actualApprover: z.string().optional(),
-  achievementApprover: z.coerce.number().optional(),
+  actualOwner: z.string().nullable(),
+  achievementOwner: z.coerce.number().nullable(),
+  actualChecker: z.string().nullable(),
+  achievementChecker: z.coerce.number().nullable(),
+  actualApprover: z.string().nullable(),
+  achievementApprover: z.coerce.number().nullable(),
   fileUrl: z.string().nullable(),
 }).superRefine((data, ctx) => {
   switch (data.role) {
@@ -53,7 +53,7 @@ export const kpiBonusEvaluationSchema = z.object({
         });
       }
 
-      if (data.achievementOwner === undefined || data.achievementOwner < 1) {
+      if (!data.achievementOwner) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["achievementOwner"],
@@ -71,7 +71,7 @@ export const kpiBonusEvaluationSchema = z.object({
         });
       }
 
-      if (data.achievementChecker === undefined || data.achievementChecker < 1) {
+      if (!data.achievementChecker) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["achievementChecker"],
@@ -89,7 +89,7 @@ export const kpiBonusEvaluationSchema = z.object({
         });
       }
       
-      if (data.achievementApprover === undefined || data.achievementApprover < 1) {
+      if (!data.achievementApprover) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["achievementApprover"],

@@ -26,10 +26,13 @@ import { GoProject } from "react-icons/go";
 import { SelectionBadge } from "@/components/selection-badge";
 import { periods } from "@/modules/bonus/constants";
 import { Banner } from "@/components/banner";
+import { Period } from "@/generated/prisma";
+import { useSave } from "@/hooks/use-save";
 
 
 interface Props {
   id: string;
+  period: Period;
   merit: inferProcedureOutput<AppRouter["kpiMerit"]["getByFormId"]>;
   canPerform: {
     canSubmit: boolean;
@@ -37,9 +40,11 @@ interface Props {
   };
 }
 
-export const MeritInDraftScreen = ({ id, merit, canPerform }: Props) => {
+export const MeritInDraftScreen = ({ id, merit, canPerform, period }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const { setSave } = useSave();
 
   const update = useMutation(trpc.kpiMerit.update.mutationOptions());
 
@@ -96,8 +101,10 @@ export const MeritInDraftScreen = ({ id, merit, canPerform }: Props) => {
       meritSchema: value,
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ id }));
+        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ id, period }));
         toast.success("Merit updated!", { id: "update-merit" });
+
+        setSave(true);
       },
       onError: (ctx) => {
         toast.error(ctx.message || "Merit updated!", { id: "update-merit" });

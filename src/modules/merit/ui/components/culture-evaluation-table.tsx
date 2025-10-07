@@ -15,13 +15,16 @@ import { UseFormReturn } from "react-hook-form";
 import { MeritEvaluationSchema } from "../../schema";
 
 interface Props {
+  perform: boolean;
+  hasChecker: boolean;
+  isApprovalStatus: boolean;
   form: UseFormReturn<MeritEvaluationSchema>;
   table: TB<CultureWithInfo>
 }
 
 const PROHIBIT_COLUMNS = ["comment"];
 
-export const CultureEvaluationTable = ({ form, table }: Props) => {
+export const CultureEvaluationTable = ({ perform, hasChecker, isApprovalStatus, form, table }: Props) => {
   const cultures = form.watch("cultures");
 
   return (
@@ -53,6 +56,8 @@ export const CultureEvaluationTable = ({ form, table }: Props) => {
                     key={header.id}
                     className={cn(
                       "top-9",
+                      !perform && "top-2",
+                      isApprovalStatus && "top-9",
                       isBeforeLast && "border-none",
                       width,
                     )}
@@ -77,9 +82,7 @@ export const CultureEvaluationTable = ({ form, table }: Props) => {
       <TableBody>
         {table.getRowModel().rows?.length ? (
           <>
-            {table.getRowModel().rows.map((row, rowIndex) => {
-              const isLastDataRow = rowIndex === table.getRowModel().rows.length - 1; 
-
+            {table.getRowModel().rows.map((row) => {
               return (
                 <TableRow
                   key={row.id}
@@ -124,7 +127,11 @@ export const CultureEvaluationTable = ({ form, table }: Props) => {
                 </TableRow>
               );
             })}
-            <TableRow className="sticky z-85 w-full bottom-0 grow-0 shrink basis-0 shadow-[0_1.25px_0_rgba(15,15,15,0.1),0_-1.25px_0_rgba(15,15,15,0.1)]">
+            <TableRow className={cn(
+                "sticky z-85 w-full bottom-11 grow-0 shrink basis-0 shadow-[0_1.25px_0_rgba(15,15,15,0.1),0_-1.25px_0_rgba(15,15,15,0.1)]",
+                isApprovalStatus && "bottom-[calc(115px+44px)]",
+              )}
+            >
               <TableCell colSpan={2} className="bg-marine border-r-[1.25px] border-[#2377CE]" />
               <TableCell className="border-r-[1.25px] border-[#2377CE]">
                 <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full">
@@ -153,33 +160,35 @@ export const CultureEvaluationTable = ({ form, table }: Props) => {
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="border-r-[1.25px] border-[#2377CE]">
-                <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full">
-                  <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
-                    <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
-                      Sum
-                    </span>
-                    <span className="text-white text-sm">
-                      {(() => {
-                          const rowValues = (cultures || []).map((comp, idx) => {
-                          const level = Number(comp.levelBehaviorChecker ?? 0);
-                          const row = table.getCoreRowModel().rows[idx];
-                          const weight = convertAmountFromUnit(row?.original?.weight ?? 0, 2);
+              {hasChecker && (
+                <TableCell className="border-r-[1.25px] border-[#2377CE]">
+                  <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full">
+                    <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
+                      <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
+                        Sum
+                      </span>
+                      <span className="text-white text-sm">
+                        {(() => {
+                            const rowValues = (cultures || []).map((comp, idx) => {
+                            const level = Number(comp.levelBehaviorChecker ?? 0);
+                            const row = table.getCoreRowModel().rows[idx];
+                            const weight = convertAmountFromUnit(row?.original?.weight ?? 0, 2);
 
-                          return (level / table.getRowCount()) * weight;
-                        });
+                            return (level / table.getRowCount()) * weight;
+                          });
 
-                        const sum = rowValues.reduce((acc, val) => acc + val, 0);
+                          const sum = rowValues.reduce((acc, val) => acc + val, 0);
 
-                        return sum.toLocaleString("en-US", {
-                          maximumFractionDigits: 2,
-                          minimumFractionDigits: 2,
-                        });
-                      })()}
-                    </span>
+                          return sum.toLocaleString("en-US", {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2,
+                          });
+                        })()}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </TableCell>
+                </TableCell>
+              )}
               <TableCell>
                 <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
