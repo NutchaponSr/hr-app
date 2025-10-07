@@ -14,18 +14,22 @@ import {
 import { KpiWithEvaluation } from "../../types";
 
 interface Props {
+  hasChecker: boolean;
   table: TB<KpiWithEvaluation>;
   totalAchievementOwnerWithWeight: string;
   totalAchievementCheckerWithWeight: string;
   totalAchievementApproverWithWeight: string;
+  isApprovalStatus: boolean;
 }
 
 const PROHIBIT_COLUMNS = ["action", "comment"];
 
 export const KpiEvaluationTable = ({  
+  hasChecker,
   totalAchievementOwnerWithWeight,
   totalAchievementCheckerWithWeight,
   totalAchievementApproverWithWeight,
+  isApprovalStatus,
   table 
 }: Props) => {  
   return (
@@ -129,7 +133,7 @@ export const KpiEvaluationTable = ({
                 </TableRow>
               );
             })}
-            <TableRow className="sticky z-85 w-full bottom-11 start-0 grow-0 shrink basis-0">
+            <TableRow className={cn("sticky z-85 w-full bottom-11 start-0 grow-0 shrink basis-0", isApprovalStatus && "bottom-[calc(115px+44px)]")}>
               <TableCell className="border-r-[1.25px] border-[#2377CE]">
                 <div className="inline-flex justify-end items-center bg-marine shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)] pe-1 h-12 w-full">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
@@ -153,9 +157,6 @@ export const KpiEvaluationTable = ({
               <TableCell className="border-r-[1.25px] border-[#2377CE]">
                 <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)]">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
-                    <div className="self-center start-1.5 px-1 py-0.5 bg-[#006fc817] dark:bg-[#439bff3d] text-marine rounded text-[9px] uppercase tracking-wide leading-[1.3] font-medium whitespace-nowrap w-fit me-1.5">
-                      Achievement (%) * Weight
-                    </div>
                     <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
                       Sum
                     </span>
@@ -165,27 +166,23 @@ export const KpiEvaluationTable = ({
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="border-r-[1.25px] border-[#2377CE]">
-                <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)]">
-                  <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
-                    <div className="self-center start-1.5 px-1 py-0.5 bg-[#006fc817] dark:bg-[#439bff3d] text-marine rounded text-[9px] uppercase tracking-wide leading-[1.3] font-medium whitespace-nowrap w-fit me-1.5">
-                      Achievement (%) * Weight
+              {hasChecker && (
+                <TableCell className="border-r-[1.25px] border-[#2377CE]">
+                  <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)]">
+                    <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
+                      <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
+                        Sum
+                      </span>
+                      <span className="text-white text-sm">
+                        {totalAchievementCheckerWithWeight}
+                      </span>
                     </div>
-                    <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
-                      Sum
-                    </span>
-                    <span className="text-white text-sm">
-                      {totalAchievementCheckerWithWeight}
-                    </span>
                   </div>
-                </div>
-              </TableCell>
+                </TableCell>
+              )}
               <TableCell>
                 <div className="inline-flex justify-end items-center bg-marine pe-1 h-12 w-full shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)]">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap ">
-                    <div className="self-center start-1.5 px-1 py-0.5 bg-[#006fc817] dark:bg-[#439bff3d] text-marine rounded text-[9px] uppercase tracking-wide leading-[1.3] font-medium whitespace-nowrap w-fit me-1.5">
-                      Achievement (%) * Weight
-                    </div>
                     <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
                       Sum
                     </span>

@@ -4,12 +4,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
 import type { AppRouter } from "@/trpc/routers/_app";
+import { usePeriod } from "@/hooks/use-period";
 
 type RequestType = inferProcedureInput<AppRouter["task"]["confirmation"]>;
 
 export const useApprovalMerit = (id: string) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const { period } = usePeriod();
 
   const confirmation = useMutation(trpc.task.confirmation.mutationOptions());
 
@@ -19,7 +22,7 @@ export const useApprovalMerit = (id: string) => {
     confirmation.mutate({ ...value }, {
       onSuccess: () => {
         queryClient.invalidateQueries(
-          trpc.kpiMerit.getByFormId.queryOptions({ id }),
+          trpc.kpiMerit.getByFormId.queryOptions({ id, period }),
         );
 
         toast.success("Workflow Confirmed!", { id: "approval" });

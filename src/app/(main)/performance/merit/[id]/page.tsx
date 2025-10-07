@@ -18,7 +18,7 @@ const Page = async ({ params, searchParams }: Props) => {
 
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchQuery(trpc.kpiMerit.getByFormId.queryOptions({ id }));
+  void queryClient.prefetchQuery(trpc.kpiMerit.getByFormId.queryOptions({ id, period }));
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

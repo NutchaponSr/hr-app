@@ -24,8 +24,8 @@ interface Props {
 export const MeritScreen = ({ period, ...props }: Props) => {
   switch (period) {
     case Period.IN_DRAFT: 
-      return <MeritInDraftScreen {...props} />
+      return <MeritInDraftScreen {...props} period={period} />
     case Period.EVALUATION_1ST:
-      return <MeritEvaluation1stScreen {...props} />
+      return <MeritEvaluation1stScreen {...props} period={period} />
   }
 }

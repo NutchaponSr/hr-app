@@ -4,13 +4,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
 import type { AppRouter } from "@/trpc/routers/_app";
+import { usePeriod } from "@/hooks/use-period";
 
 type RequestType = inferProcedureInput<AppRouter["kpiBonus"]["createKpi"]>;
 
 export const useCreateKpi = (id: string) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-
+  const { period } = usePeriod();
+  
   const createKpi = useMutation(trpc.kpiBonus.createKpi.mutationOptions());
 
   const mutation = (value: RequestType) => {
@@ -19,7 +21,7 @@ export const useCreateKpi = (id: string) => {
     createKpi.mutate({ ...value }, {
       onSuccess: () => {
         queryClient.invalidateQueries(
-          trpc.kpiBonus.getById.queryOptions({ id }),
+          trpc.kpiBonus.getById.queryOptions({ id, period }),
         );
 
         toast.success("KPI Created!", { id: "create-kpi" });

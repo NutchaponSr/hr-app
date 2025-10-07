@@ -2,11 +2,11 @@ import { Suspense } from "react";
 import type { SearchParams } from "nuqs/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import { loadSearchParams } from "@/search-params";
 import { getQueryClient, trpc } from "@/trpc/server";
 
 import { BonusView } from "@/modules/bonus/ui/views/bonus-view";
 import { AuthGuard } from "@/modules/auth/ui/components/auth-guard";
-import { loadSearchParams } from "@/search-params";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -19,7 +19,7 @@ const Page = async ({ params, searchParams }: Props) => {
 
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchQuery(trpc.kpiBonus.getById.queryOptions({ id }));  
+  void queryClient.prefetchQuery(trpc.kpiBonus.getById.queryOptions({ id, period }));  
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

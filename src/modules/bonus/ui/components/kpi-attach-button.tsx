@@ -8,6 +8,7 @@ import { Loader } from "@/components/loader";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useKpiFormId } from "../../hooks/use-kpi-form-id";
+import { usePeriod } from "@/hooks/use-period";
 
 interface Props {
   id: string;
@@ -20,7 +21,9 @@ export const KpiAttachButton = ({ id, value, canPerform, onChange }: Props) => {
   const trpc = useTRPC();
   const kpiFormId = useKpiFormId();
   const queryClient = useQueryClient();
+
   const { edgestore } = useEdgeStore();
+  const { period } = usePeriod();
 
   const [isUploading, setIsUploading] = useState(false);
 
@@ -67,7 +70,7 @@ export const KpiAttachButton = ({ id, value, canPerform, onChange }: Props) => {
 
       deleteFile.mutate({ id }, {
         onSuccess: () => {
-          queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id: kpiFormId }));
+          queryClient.invalidateQueries(trpc.kpiBonus.getById.queryOptions({ id: kpiFormId, period }));
         }
       })
 

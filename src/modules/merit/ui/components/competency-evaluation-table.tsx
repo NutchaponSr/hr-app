@@ -15,13 +15,16 @@ import { UseFormReturn } from "react-hook-form";
 import { MeritEvaluationSchema } from "../../schema";
 
 interface Props {
+  hasChecker: boolean;
+  perform: boolean;
   form: UseFormReturn<MeritEvaluationSchema>;
-  table: TB<CompetencyWithInfo>
+  table: TB<CompetencyWithInfo>;
+  isApprovalStatus: boolean;
 }
 
 const PROHIBIT_COLUMNS = ["comment"];
 
-export const CompetencyEvaluationTable = ({ form, table }: Props) => {
+export const CompetencyEvaluationTable = ({ perform, hasChecker, isApprovalStatus, form, table }: Props) => {
   const competencies = form.watch("competencies");
 
   return (
@@ -53,6 +56,8 @@ export const CompetencyEvaluationTable = ({ form, table }: Props) => {
                     key={header.id}
                     className={cn(
                       "top-9",
+                      !perform && "top-2",
+                      isApprovalStatus && "top-9",
                       isBeforeLast && "border-none",
                       width,
                     )}
@@ -128,7 +133,11 @@ export const CompetencyEvaluationTable = ({ form, table }: Props) => {
                 </TableRow>
               );
             })}
-            <TableRow className="sticky z-85 w-full bottom-0 start-0 grow-0 shrink basis-0">
+            <TableRow className={cn(
+                "sticky z-85 w-full bottom-11 start-0 grow-0 shrink basis-0",
+                isApprovalStatus && "bottom-[calc(115px+44px)]",
+              )}
+            >
               <TableCell className="bg-marine border-r-[1.25px] border-[#2377CE] shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)]" />
               <TableCell className="border-r-[1.25px] border-[#2377CE] shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)] bg-marine">
                 <div className="inline-flex justify-end items-center  pe-1 h-12 w-full">
@@ -176,33 +185,35 @@ export const CompetencyEvaluationTable = ({ form, table }: Props) => {
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="border-r-[1.25px] border-[#2377CE] shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)] bg-marine">
-                <div className="inline-flex justify-end items-center pe-1 h-12 w-full">
-                  <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
-                    <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
-                      Sum
-                    </span>
-                    <span className="text-white text-sm">
-                      {(() => {
-                          const rowValues = (competencies || []).map((comp, idx) => {
-                          const level = Number(comp.levelChecker ?? 0);
-                          const row = table.getCoreRowModel().rows[idx];
-                          const weight = convertAmountFromUnit(row?.original?.weight ?? 0, 2);
+              {hasChecker && (
+                <TableCell className="border-r-[1.25px] border-[#2377CE] shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)] bg-marine">
+                  <div className="inline-flex justify-end items-center pe-1 h-12 w-full">
+                    <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">
+                      <span className="font-medium text-white text-[10px] uppercase tracking-[1px] me-1 select-none">
+                        Sum
+                      </span>
+                      <span className="text-white text-sm">
+                        {(() => {
+                            const rowValues = (competencies || []).map((comp, idx) => {
+                            const level = Number(comp.levelChecker ?? 0);
+                            const row = table.getCoreRowModel().rows[idx];
+                            const weight = convertAmountFromUnit(row?.original?.weight ?? 0, 2);
 
-                          return (level / table.getRowCount()) * weight;
-                        });
+                            return (level / table.getRowCount()) * weight;
+                          });
 
-                        const sum = rowValues.reduce((acc, val) => acc + val, 0);
+                          const sum = rowValues.reduce((acc, val) => acc + val, 0);
 
-                        return sum.toLocaleString("en-US", {
-                          maximumFractionDigits: 2,
-                          minimumFractionDigits: 2,
-                        });
-                      })()}
-                    </span>
+                          return sum.toLocaleString("en-US", {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2,
+                          });
+                        })()}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </TableCell>
+                </TableCell>
+              )}
               <TableCell className="shadow-[inset_0_1.25px_0_rgba(15,15,15,0.1),inset_0_-1.25px_0_rgba(15,15,15,0.1)] bg-marine">
                 <div className="inline-flex justify-end items-center pe-1 h-12 w-full">
                   <div className="flex items-center justify-center px-1.5 overflow-hidden whitespace-nowrap">

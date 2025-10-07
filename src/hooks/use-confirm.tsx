@@ -55,7 +55,7 @@ export const useConfirm = ({
           <DialogTitle>
             {title}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-center">
             {description}
           </DialogDescription>
         </DialogHeader>

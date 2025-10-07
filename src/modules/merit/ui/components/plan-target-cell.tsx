@@ -41,7 +41,7 @@ export const PlanTargetCell = ({
       {/* Input */}
       <div ref={inputRef} className="flex flex-col gap-0.5">
         <h5 className="text-xs font-medium text-secondary"> 
-          Input
+          สิ่งที่ต้องทำได้ (แสดงความเชี่ยวชาญ/ความสามารถ) 
         </h5>
         <p className="text-xs text-primary whitespace-break-spaces">
           {row.original.input}
@@ -50,7 +50,7 @@ export const PlanTargetCell = ({
       {/* Output */}
       <div ref={outputRef} className="flex flex-col gap-0.5">
         <h5 className="text-xs font-medium text-secondary"> 
-          Output
+          ผลลัพธ์ที่ต้องทำให้สำเร็จ
         </h5>
         <p className="text-xs text-primary whitespace-break-spaces">
           {row.original.output}

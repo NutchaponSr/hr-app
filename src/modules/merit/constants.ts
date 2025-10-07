@@ -1,4 +1,5 @@
 import { CompetencyType } from "@/generated/prisma";
+import { ExportColumn } from "@/types/upload";
 
 export const competencyTypes: Record<CompetencyType, string> = {
   [CompetencyType.CC]: "Core",
@@ -52,3 +53,42 @@ export const cultureLevels = [
     content: "เป็นแบบอย่างให้พนักงานคนอื่นปฏิบัติตามพฤติกรรมที่คาดหวังของ Culture ข้อนั้นๆ",
   },
 ];
+
+export const columns: ExportColumn[] = [
+  {
+    key: "employeeId",
+    header: "รหัสพนักงาน",
+  },
+  {
+    key: "employeeName",
+    header: "ชื่อพนักงาน",
+  },
+  {
+    key: "employeeName",
+    header: "ชื่อพนักงาน",
+  },
+  {
+    key: "year",
+    header: "Year",
+  },
+  {
+    key: "period",
+    header: "Period",
+  },
+  {
+    key: "type",
+    header: "Type",
+  },
+  {
+    key: "performer",
+    header: "Performer",
+  },
+  {
+    key: "name",
+    header: "ชื่อ KPI",
+  },
+  {
+    key: "percentage",
+    header: "Percentage (%)",
+  },
+]

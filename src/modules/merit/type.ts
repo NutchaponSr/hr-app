@@ -5,6 +5,7 @@ import {
   CompetencyRecord, 
   CompetencyType, 
   Culture, 
+  CultureEvaluation, 
   CultureRecord, 
   Employee, 
   MeritForm, 
@@ -30,10 +31,16 @@ export interface CultureWithInfo extends CultureRecord {
   weight: number;
 }
 
-export interface MeritFormWithInfo extends Task {
-  meritForm: MeritForm & {
-    competencyRecords: CompetencyWithInfo[];
-  }
+export interface MeritFormWithInfo extends MeritForm {
+  competencyRecords: (CompetencyRecord & {
+    competency: Competency | null;
+    competencyEvaluations: CompetencyEvaluation[];
+  })[];
+  cultureRecords: (CultureRecord & {
+    culture: Culture;
+    cultureEvaluations: CultureEvaluation[];
+  })[];
+  employee: Employee;
 }
 
 export const MANAGER_UP: Position[] = [

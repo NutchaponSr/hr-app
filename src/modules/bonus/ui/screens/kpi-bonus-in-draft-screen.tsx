@@ -184,7 +184,9 @@ export const KpiBonusInDraftScreen = ({ id, canPerform, kpiForm }: Props) => {
         <div className="grow shrink-0 flex flex-col relative">
           <div className="relative float-start min-w-full select-none pb-[180px] px-16">
             <div className="relative">
-              <KpiInDraftTable table={table} />
+              <KpiInDraftTable 
+                table={table} 
+              />
             </div>
           </div>
         </div>

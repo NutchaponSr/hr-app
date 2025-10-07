@@ -10,9 +10,11 @@ import { App, CompetencyType, Period, Status, Task } from "@/generated/prisma";
 import { ApprovalCSVProps } from "@/types/approval";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
-import { convertAmountToUnit } from "@/lib/utils";
+import { convertAmountToUnit, exportExcel } from "@/lib/utils";
 import { competencyEvaluationSchema, cultureEvaluationSchema, meritSchema } from "../schema";
 import { MANAGER_UP } from "../type";
+import { columns } from "../constants";
+import { formatMeritExport } from "../utils";
 
 // Helper functions
 async function fetchCommentsForRecords(recordIds: string[]) {
@@ -20,11 +22,11 @@ async function fetchCommentsForRecords(recordIds: string[]) {
     where: {
       connectId: { in: recordIds },
     },
-    include: { 
-      employee: true 
+    include: {
+      employee: true
     },
-    orderBy: { 
-      createdAt: "asc" 
+    orderBy: {
+      createdAt: "asc"
     },
   });
 }
@@ -74,7 +76,7 @@ export const meritProcedure = createTRPCRouter({
       });
 
       return {
-        ...meritForm,
+        id: meritForm?.id,
         task: {
           inDraft: meritForm?.tasks[0],
           evaluation1st: meritForm?.tasks[1],
@@ -86,12 +88,33 @@ export const meritProcedure = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        period: z.enum(Period),
       }),
     )
     .query(async ({ ctx, input }) => {
       const task = await prisma.task.findUnique({
         where: {
           id: input.id,
+          meritForm: {
+            competencyRecords: {
+              some: {
+                competencyEvaluations: {
+                  some: {
+                    period: input.period,
+                  },
+                },
+              },
+            },
+            cultureRecords: {
+              some: {
+                cultureEvaluations: {
+                  some: {
+                    period: input.period,
+                  },
+                },
+              },
+            },
+          }
         },
         include: {
           preparer: true,
@@ -125,14 +148,14 @@ export const meritProcedure = createTRPCRouter({
         },
       });
 
-      
+
       if (!task) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
       const kpiForm = await prisma.kpiForm.findFirst({
         where: {
-          employeeId: ctx.user.employee.id,
+          employeeId: task.preparer.id,
           year: task.meritForm?.year,
         },
         include: {
@@ -140,7 +163,7 @@ export const meritProcedure = createTRPCRouter({
             include: {
               kpiEvaluations: {
                 where: {
-                  period: task.meritForm?.period,
+                  period: input.period,
                 },
               },
             },
@@ -166,28 +189,28 @@ export const meritProcedure = createTRPCRouter({
       const competencyRecordsWithComments =
         MANAGER_UP.includes(task.preparer.rank)
           ? (() => {
-              const patternTypes: (CompetencyType | CompetencyType[])[] = [
-                [CompetencyType.FC, CompetencyType.TC],
-                [CompetencyType.FC, CompetencyType.TC],
-                CompetencyType.MC,
-                CompetencyType.MC,
-              ];
-              const records = task.meritForm?.competencyRecords ?? [];
-      
-              return records.slice(0, patternTypes.length).map((record, index) => {
-                const types = Array.isArray(patternTypes[index])
-                  ? patternTypes[index] as CompetencyType[]
-                  : [patternTypes[index] as CompetencyType];
-      
-                return {
-                  ...record,
-                  comments: competencyCommentsMap[record.id] || [],
-                  type: types,
-                  label: types.map((t) => typeToName[t]).join(", "),
-                };
-              });
+            const patternTypes: (CompetencyType | CompetencyType[])[] = [
+              [CompetencyType.FC, CompetencyType.TC],
+              [CompetencyType.FC, CompetencyType.TC],
+              CompetencyType.MC,
+              CompetencyType.MC,
+            ];
+            const records = task.meritForm?.competencyRecords ?? [];
+
+            return records.slice(0, patternTypes.length).map((record, index) => {
+              const types = Array.isArray(patternTypes[index])
+                ? patternTypes[index] as CompetencyType[]
+                : [patternTypes[index] as CompetencyType];
+
+              return {
+                ...record,
+                comments: competencyCommentsMap[record.id] || [],
+                type: types,
+                label: types.map((t) => typeToName[t]).join(", "),
+              };
+            });
           })()
-        : (() => {
+          : (() => {
             const records = task.meritForm?.competencyRecords ?? [];
             return records.map((record) => ({
               ...record,
@@ -317,7 +340,7 @@ export const meritProcedure = createTRPCRouter({
           ...(taregetApproval.checkerEMPID && {
             checkedBy: taregetApproval.checkerEMPID,
           }),
-        }, 
+        },
       });
 
       return task;
@@ -366,7 +389,7 @@ export const meritProcedure = createTRPCRouter({
             return prisma.cultureRecord.update({
               where: { id: existingCultureRecords[index].id },
               data: {
-                evidence: culture.evidence, 
+                evidence: culture.evidence,
               }
             });
           }
@@ -377,7 +400,7 @@ export const meritProcedure = createTRPCRouter({
     }),
   updateEvaluation: protectedProcedure
     .input(
-      z.object({ 
+      z.object({
         meritEvaluationSchema: z.object({
           competencies: z.array(competencyEvaluationSchema.omit({ role: true })),
           cultures: z.array(cultureEvaluationSchema.omit({ role: true })),
@@ -386,16 +409,16 @@ export const meritProcedure = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       await Promise.all([
-        ...input.meritEvaluationSchema.competencies.map(async ({ id, ...competencies }) => 
+        ...input.meritEvaluationSchema.competencies.map(async ({ id, ...competencies }) =>
           prisma.competencyEvaluation.update({
             where: { id },
-            data: { 
-              ...competencies 
+            data: {
+              ...competencies
 
             }
           })
         ),
-        ...input.meritEvaluationSchema.cultures.map(async ({ id, ...cultures }) => 
+        ...input.meritEvaluationSchema.cultures.map(async ({ id, ...cultures }) =>
           prisma.cultureEvaluation.update({
             where: { id },
             data: { ...cultures }
@@ -404,5 +427,52 @@ export const meritProcedure = createTRPCRouter({
       ])
 
       return { success: true };
+    }),
+  export: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const meritForm = await prisma.meritForm.findUnique({
+        where: {
+          id: input.id,
+        },
+        include: {
+          competencyRecords: {
+            include: {
+              competency: true,
+              competencyEvaluations: true,
+            },
+          },
+          cultureRecords: {
+            include: {
+              culture: true,
+              cultureEvaluations: true,
+            },
+          },
+          employee: true,
+        },
+      });
+
+      if (!meritForm) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const data = formatMeritExport(meritForm);
+
+      const file = exportExcel([
+        {
+          name: "Merit Summary",
+          data,
+          columns,
+        },
+      ]);
+
+      return {
+        file,
+        id: meritForm.id,
+      };
     })
 });

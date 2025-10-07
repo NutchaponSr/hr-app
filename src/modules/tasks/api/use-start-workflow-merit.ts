@@ -4,12 +4,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
 import type { AppRouter } from "@/trpc/routers/_app";
+import { usePeriod } from "@/hooks/use-period";
 
 type RequestType = inferProcedureInput<AppRouter["task"]["startWorkflow"]>;
 
 export const useStartWorkflowMerit = (id: string) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const { period } = usePeriod();
 
   const startWorkflow = useMutation(trpc.task.startWorkflow.mutationOptions());
 
@@ -19,7 +22,7 @@ export const useStartWorkflowMerit = (id: string) => {
     startWorkflow.mutate({ ...value }, {
       onSuccess: () => {
         queryClient.invalidateQueries(
-          trpc.kpiMerit.getByFormId.queryOptions({ id }),
+          trpc.kpiMerit.getByFormId.queryOptions({ id, period }),
         );
 
         toast.success("Workflow started!", { id: "start-workflow-merit" });

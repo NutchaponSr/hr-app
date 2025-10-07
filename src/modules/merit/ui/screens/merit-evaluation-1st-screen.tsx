@@ -28,11 +28,15 @@ import { Banner } from "@/components/banner";
 import { GoProject } from "react-icons/go";
 import { SelectionBadge } from "@/components/selection-badge";
 import { periods } from "@/modules/bonus/constants";
+import { Period } from "@/generated/prisma";
+import { useSave } from "@/hooks/use-save";
+import { APPROVAL_STATUSES } from "@/modules/bonus/types";
 
 type ResponseType = inferProcedureOutput<AppRouter["kpiMerit"]["getByFormId"]>
 
 interface Props {
   id: string;
+  period: Period;
   merit: ResponseType;
   canPerform: {
     canSubmit: boolean;
@@ -45,10 +49,13 @@ interface Props {
 export const MeritEvaluation1stScreen = ({ 
   id,
   merit,
+  period,
   canPerform
 }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const { setSave } = useSave();
 
   const defaultValues = meritEvaluationMapValue(merit);
 
@@ -59,35 +66,41 @@ export const MeritEvaluation1stScreen = ({
     defaultValues,
   });
 
-  const columns = useMemo(() => {
+  const hasChecker = !!merit.permission.ctx.checkerId;
+
+  const columnsCompetency = useMemo(() => {
   return createCompetencyColumns({
     form, 
-    hasChecker: true,
+    hasChecker,
     permissions: {
       canPerformOwner: canPerform.ownerCanWrite,
       canPerformChecker: canPerform.checkerCanWrite,
       canPerformApprover: canPerform.approverCanWrite,
     },
   });
-}, [form, canPerform.ownerCanWrite, canPerform.checkerCanWrite, canPerform.approverCanWrite]);
+}, [form, canPerform.ownerCanWrite, canPerform.checkerCanWrite, canPerform.approverCanWrite, hasChecker]);
 
-  const tableCompetency = useReactTable({
-    data: merit.data.meritForm.competencyRecords,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  const tableCulture = useReactTable({
-    data: merit.data.meritForm.cultureRecords,
-    columns: createCultureColumns({ 
-      form,
-      hasChecker: merit.permission.ctx.checkerId !== null,
+  const columnsCulture = useMemo(() => {
+    return createCultureColumns({
+      form, 
+      hasChecker,
       permissions: {
         canPerformOwner: canPerform.ownerCanWrite,
         canPerformChecker: canPerform.checkerCanWrite,
         canPerformApprover: canPerform.approverCanWrite,
       },
-    }),
+    });
+  }, [form, canPerform.ownerCanWrite, canPerform.checkerCanWrite, canPerform.approverCanWrite, hasChecker]);
+
+  const tableCompetency = useReactTable({
+    data: merit.data.meritForm.competencyRecords,
+    columns: columnsCompetency,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  const tableCulture = useReactTable({
+    data: merit.data.meritForm.cultureRecords,
+    columns: columnsCulture,
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -96,8 +109,10 @@ export const MeritEvaluation1stScreen = ({
 
     updateEvaluation.mutate({ meritEvaluationSchema: data }, {
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ id }));
+        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ id, period }));
         toast.success("Merits Updated!", { id: "update-bulk-merit-evaluations" });
+
+        setSave(true);
       },
       onError: (ctx) => {
         toast.error(ctx.message || "Something went wrong", { id: "update-bulk-merit-evaluations" });
@@ -148,7 +163,7 @@ export const MeritEvaluation1stScreen = ({
                   <div className="grow-0 shrink-0 col-span-2">
                     <MeritSummaryTable 
                       form={form} 
-                      kpis={merit.data.kpiForm!.kpis}
+                      kpis={merit.data.kpiForm?.kpis || []}
                       competencyRecords={merit.data.meritForm.competencyRecords}  
                       cultureRecords={merit.data.meritForm.cultureRecords}
                     />
@@ -164,9 +179,9 @@ export const MeritEvaluation1stScreen = ({
           <div className="bg-background px-16 flex justify-end items-center sticky top-0 z-99 py-1">
             {canPerform.canSubmit && (
               <Button
+                size="sm"
                 type="submit"
                 variant="primary"
-                size="sm"
                 disabled={false}
               >
                 <BsSave className="stroke-[0.25]" />
@@ -237,7 +252,13 @@ export const MeritEvaluation1stScreen = ({
                       </div>
                     </div>
                   </div>
-                    <CompetencyEvaluationTable form={form} table={tableCompetency} />
+                    <CompetencyEvaluationTable 
+                      form={form} 
+                      table={tableCompetency} 
+                      hasChecker={hasChecker}
+                      perform={canPerform.canSubmit}
+                      isApprovalStatus={APPROVAL_STATUSES.includes(merit.data.status) && canPerform.canSubmit}
+                    />
                   </AccordionContent>
                 </div>
               </AccordionItem>
@@ -302,7 +323,13 @@ export const MeritEvaluation1stScreen = ({
                       </div>
                     </div>
                   </div>
-                    <CultureEvaluationTable form={form} table={tableCulture} />
+                    <CultureEvaluationTable 
+                      form={form} 
+                      table={tableCulture} 
+                      hasChecker={hasChecker}
+                      perform={canPerform.canSubmit}
+                      isApprovalStatus={APPROVAL_STATUSES.includes(merit.data.status) && canPerform.canSubmit}
+                    />
                   </AccordionContent>
                 </div>
               </AccordionItem>

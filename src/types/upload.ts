@@ -88,3 +88,15 @@ export const IMPORT_METHOD_OPTIONS: ImportMethodOption[] = [
 export type ExcelData = {
   [key: string]: any;
 }[];
+
+export interface ExportColumn {
+  key: string
+  header: string
+  transform?: (value: any, row: any) => any
+}
+
+export interface Worksheet {
+  name: string
+  data: any[]
+  columns?: ExportColumn[]
+}
