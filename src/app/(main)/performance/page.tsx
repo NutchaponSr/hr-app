@@ -6,6 +6,8 @@ import { loadSearchParams } from "@/search-params";
 import { getQueryClient, trpc } from "@/trpc/server";
 
 import { PerformanceView } from "@/modules/performance/ui/views/performance-view";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 interface Props {
   searchParams: Promise<SearchParams>;
@@ -13,6 +15,19 @@ interface Props {
 
 const Page = async ({ searchParams }: Props) => {
   const { year } = await loadSearchParams(searchParams);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  const canPerform = await auth.api.userHasPermission({
+    body: {
+      userId: session!.user.id,
+      role: "ADMIN",
+      permission: {
+        backend: ["access"],
+      },
+    }
+  })
 
   const queryClient = getQueryClient();
 
@@ -22,13 +37,11 @@ const Page = async ({ searchParams }: Props) => {
   void queryClient.prefetchQuery(trpc.kpiBonus.getByYear.queryOptions({ year }));
 
   return (
-    <>
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <Suspense fallback={<p>Loading</p>}>
-          <PerformanceView year={year} />
-        </Suspense>
-      </HydrationBoundary>
-    </>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <Suspense fallback={<p>Loading</p>}>
+        <PerformanceView canPerform={canPerform.success} />
+      </Suspense>
+    </HydrationBoundary>
   );
 }
 

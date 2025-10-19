@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
 import { Hint } from "@/components/hint";
-import { Table } from "@/components/table";
 import { SelectionBadge } from "@/components/selection-badge";
 
 import { MeritSchema } from "@/modules/merit/schema";
@@ -30,7 +29,7 @@ interface Props {
   competencyRecords: CompetencyWithInfo[];
 }
 
-export const CompetencySection = ({  competencyRecords, ...props }: Props) => {
+export const CompetencySection = ({ competencyRecords, ...props }: Props) => {
   const id = useMeritId();
 
   const { mutation: comment } = useCommentMerit(id);

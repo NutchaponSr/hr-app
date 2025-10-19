@@ -137,7 +137,7 @@ export const MeritEvaluation1stScreen = ({
             <Banner
               trigger
               title="Merit"
-              className="ps-16"
+              className="px-16"
               description="ตั้งแต่ระดับ ผู้ช่วยผู้จัดการทั่วไป ขึ้นไป (Evaluation Form of Asst. General Manager Above Level)"
               icon={GoProject}
               context={<SelectionBadge label={periods["EVALUATION_1ST"]} />}

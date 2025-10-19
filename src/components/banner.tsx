@@ -12,6 +12,7 @@ interface Props {
   subTitle?: string;
   context?: React.ReactNode;
   trigger?: boolean;
+  action?: React.ReactNode;
   icon: IconType;
 }
 
@@ -21,16 +22,17 @@ export const Banner = ({
   context,
   className,
   subTitle,
+  action,
   description,
   trigger,
 }: Props) => {
   return (
-    <section className="w-full flex flex-col items-center shrink-0 grow-0 h-[124px]">
+    <section className="w-full flex flex-col items-center shrink-0 grow-0">
       <div className={cn("max-w-full w-full h-full", className)}>
         <div className="flex w-full h-6" />
         {context}
         <div className="h-2" />
-        <div className="pe-16 mb-2 w-full">
+        <div className="mb-2 w-full">
           <div className="flex justify-start items-center flex-row">
             {trigger && (
               <AccordionTrigger asChild>
@@ -39,16 +41,23 @@ export const Banner = ({
                 </Button>
               </AccordionTrigger>
             )}
-            <Icon className="size-9 me-1.5 text-marine" />
-            <h1 className="max-w-full w-auto whitespace-break-spaces [word-break:break-word] text-primary text-[32px] font-bold leading-[1.2] flex items-center">
-              {title}
-            </h1>
-            {subTitle && (
-              <div className="whitespace-nowrap overflow-hidden text-ellipsis text-base inline-flex mt-1">
-                <span className="whitespace-nowrap overflow-hidden text-sm mx-[1em] text-tertiary">—</span>
-                <div className="whitespace-nowrap overflow-hidden text-base text-tertiary"> 
-                  {subTitle}
+            <div className="flex justify-start items-center flex-row">
+              <Icon className="size-9 me-2.5 text-marine" />
+              <h1 className="max-w-full w-auto whitespace-break-spaces [word-break:break-word] text-primary text-[32px] font-bold leading-[1.2] flex items-center">
+                {title}
+              </h1>
+              {subTitle && (
+                <div className="whitespace-nowrap overflow-hidden text-ellipsis text-base inline-flex mt-1">
+                  <span className="whitespace-nowrap overflow-hidden text-sm mx-[1em] text-tertiary">—</span>
+                  <div className="whitespace-nowrap overflow-hidden text-base text-tertiary"> 
+                    {subTitle}
+                  </div>
                 </div>
+              )}
+            </div>
+            {action && (
+              <div className="">
+                {action}
               </div>
             )}
           </div>

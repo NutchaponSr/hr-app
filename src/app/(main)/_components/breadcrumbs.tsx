@@ -18,8 +18,14 @@ interface Props {
   disableLastItem?: boolean;
 }
 
-export const Breadcrumbs = ({ paths, nameMap = {}, iconMap = {}, disabledPaths = [], disabledMap = {}, disableLastItem = false }: Props) => {
-  // UUID regex pattern to match UUIDs
+export const Breadcrumbs = ({ 
+  paths, 
+  nameMap = {}, 
+  iconMap = {}, 
+  disabledPaths = [], 
+  disabledMap = {}, 
+  disableLastItem = false 
+}: Props) => {
   const isUUID = (str: string) => {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     return uuidRegex.test(str);
@@ -30,12 +36,14 @@ export const Breadcrumbs = ({ paths, nameMap = {}, iconMap = {}, disabledPaths =
       <Button asChild size="xs" variant="ghost">
         <Link href="/">
           <BsAppIndicator className="stroke-[0.1]" />
-          Apps
+          Overviews
         </Link>
       </Button>
-      <span className="w-2 flex items-center justify-center m-0">
-        <HiSlash className="size-5 block shrink-0 text-[#d4d3cf] dark:text-[#494846]" />
-      </span>
+      {paths.length > 1 && (
+        <span className="w-2 flex items-center justify-center m-0">
+          <HiSlash className="size-5 block shrink-0 text-[#d4d3cf] dark:text-[#494846]" />
+        </span>
+      )}
       {paths.map((path, index) => {
         const href = "/" + paths.slice(0, index + 1).join("/");
         const displayText = nameMap[path] || (isUUID(path) ? "data" : path);

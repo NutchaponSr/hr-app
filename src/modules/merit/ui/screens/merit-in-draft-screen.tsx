@@ -16,7 +16,7 @@ import { CultureSection } from "../components/culture-section";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { BsPersonFill, BsSave } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/loader";
@@ -28,6 +28,7 @@ import { periods } from "@/modules/bonus/constants";
 import { Banner } from "@/components/banner";
 import { Period } from "@/generated/prisma";
 import { useSave } from "@/hooks/use-save";
+import { useExcelParser } from "@/hooks/use-excel-parser";
 
 
 interface Props {
@@ -45,8 +46,12 @@ export const MeritInDraftScreen = ({ id, merit, canPerform, period }: Props) => 
   const queryClient = useQueryClient();
 
   const { setSave } = useSave();
+  const { handleFileParsing } = useExcelParser();
+
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const update = useMutation(trpc.kpiMerit.update.mutationOptions());
+  const updateBulk = useMutation(trpc.kpiMerit.updateRecordBulk.mutationOptions());
 
   const buildDefaults = (merit: inferProcedureOutput<AppRouter["kpiMerit"]["getByFormId"]>): MeritSchema => ({
     competencies: merit.data.meritForm.competencyRecords?.map(record => ({
@@ -81,13 +86,13 @@ export const MeritInDraftScreen = ({ id, merit, canPerform, period }: Props) => 
     defaultValues: buildDefaults(merit),
   });
 
-  const { fields: competencyFields } = useFieldArray({  
+  const { fields: competencyFields } = useFieldArray({
     control: form.control,
     name: "competencies",
     keyName: "fieldId",
   });
 
-  const { fields: cultureFields } = useFieldArray({  
+  const { fields: cultureFields } = useFieldArray({
     control: form.control,
     name: "cultures",
     keyName: "fieldId",
@@ -129,7 +134,7 @@ export const MeritInDraftScreen = ({ id, merit, canPerform, period }: Props) => 
     <Form {...form}>
       <Banner
         title="Merit"
-        className="ps-16"
+        className="px-16"
         description="ตั้งแต่ระดับ ผู้ช่วยผู้จัดการทั่วไป ขึ้นไป (Evaluation Form of Asst. General Manager Above Level)"
         icon={GoProject}
         context={<SelectionBadge label={periods["IN_DRAFT"]} />}
@@ -149,12 +154,12 @@ export const MeritInDraftScreen = ({ id, merit, canPerform, period }: Props) => 
           </Content>
         </div>
       </div>
-      <form 
-        onSubmit={form.handleSubmit(onSubmit)} 
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
         className="contents"
       >
-        <div className="sticky top-0 z-86">
-          <div className="absolute right-24 top-1">
+        <div className="sticky top-0 z-[101]">
+          <div className="absolute right-16 top-1 flex items-center gap-1">
             {canPerform.canSubmit && (
               <Button
                 type="submit"
@@ -162,25 +167,104 @@ export const MeritInDraftScreen = ({ id, merit, canPerform, period }: Props) => 
                 size="sm"
                 disabled={update.isPending}
               >
-                {update.isPending 
+                {update.isPending
                   ? <Loader className="!text-white" />
                   : <BsSave className="stroke-[0.25]" />
                 }
                 Save
               </Button>
             )}
+            <input
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              ref={fileRef}
+              className="sr-only"
+              onChange={async (e) => {
+                const selectedFile = e.target.files?.[0];
+
+                if (!selectedFile) return;
+
+                try {
+                  const sheet1 = await handleFileParsing(selectedFile, 0);
+                  const sheet2 = await handleFileParsing(selectedFile, 1);
+
+                  const updatedCompetencies = merit.data.meritForm.competencyRecords
+                    .map((competency, index) => {
+                      const matchedData = sheet1[index];
+
+                      if (matchedData) {
+                        return {
+                          id: competency.id,
+                          competencyId: matchedData.competencyId || "",
+                          input: matchedData.input || "",
+                          output: matchedData.output || "",
+                          weight: Number(matchedData.weight || 0),
+                        };
+                      }
+                      return null;
+                    })
+                    .filter((item): item is NonNullable<typeof item> => item !== null);
+
+                  const updatedCultures = merit.data.meritForm.cultureRecords
+                    .map((culture, index) => {
+                      const matchedData = sheet2[index];
+
+                      if (matchedData) {
+                        return {
+                          id: culture.id,
+                          code: culture.culture.code,
+                          evidence: matchedData.evidence || "",
+                        };
+                      }
+                      return null;
+                    })
+                    .filter((item): item is NonNullable<typeof item> => item !== null);
+
+                  toast.loading("Updating records from Excel...", { id: "update-bulk" });
+
+                  updateBulk.mutate({
+                    competency: updatedCompetencies,
+                    culture: updatedCultures,
+                  }, {
+                    onSuccess: () => {
+                      queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ id, period }));
+                      toast.success("Records updated successfully from Excel!", { id: "update-bulk" });
+                      setSave(true);
+                    },
+                    onError: (error) => {
+                      toast.error(error.message || "Failed to update records", { id: "update-bulk" });
+                    },
+                  });
+
+                } catch (error) {
+                  if (error instanceof Error) {
+                    toast.error(error.message);
+                  } else {
+                    toast.error("Something went wrong");
+                  }
+                }
+              }}
+            />
+            <Button
+              size="sm"
+              type="button"
+              variant="primary"
+              onClick={() => fileRef.current?.click()}
+            >
+              Upload
+            </Button>
           </div>
         </div>
         <div className="grow shrink-0 flex flex-col relative">
           <div className="relative float-start min-w-full select-none pb-[180px] px-16">
             <Accordion defaultValue={["competency", "culture"]} type="multiple" className="relative">
-              <CompetencySection 
+              <CompetencySection
                 form={form}
                 fields={competencyFields}
                 canPerform={canPerform.canWrite}
-                competencyRecords={merit.data.meritForm.competencyRecords || []} 
+                competencyRecords={merit.data.meritForm.competencyRecords || []}
               />
-              <CultureSection 
+              <CultureSection
                 form={form}
                 fields={cultureFields}
                 canPerform={canPerform.canWrite}

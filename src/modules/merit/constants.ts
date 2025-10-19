@@ -64,10 +64,6 @@ export const columns: ExportColumn[] = [
     header: "ชื่อพนักงาน",
   },
   {
-    key: "employeeName",
-    header: "ชื่อพนักงาน",
-  },
-  {
     key: "year",
     header: "Year",
   },

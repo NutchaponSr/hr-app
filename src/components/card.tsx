@@ -1,11 +1,17 @@
+import { cn } from "@/lib/utils";
+
 interface Props {
   children: React.ReactNode;
+  className?: string;
 }
 
-export const Card = ({ children }: Props) => {
+export const Card = ({ children, className }: Props) => {
   return (
-    <div className="w-full relative p-4 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] hover:shadow-[inset_0_0_0_1px_rgba(0,0,0,0.086)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] dark:hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] bg-background dark:bg-sidebar rounded-sm group">
-      {children}
-    </div>
+    <article className="relative w-full flex group">
+      <div className={cn("select-none transition flex w-full h-30 flex-col justify-between rounded overflow-hidden bg-popover", className)}>
+        {children}
+      </div>
+      <div className="absolute rounded inset-0 z-1 shadow-[0_12px_32px_0_rgba(0,0,0,0.02),0_0_0_1px_rgba(0,0,0,0.05)] group-hover:shadow-[0_12px_32px_0_rgba(0,0,0,0.02),0_0_0_1px_rgba(0,0,0,0.089)] dark:shadow-[unset] group-hover:dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]" />
+    </article>
   );
 }

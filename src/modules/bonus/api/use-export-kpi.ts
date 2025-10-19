@@ -26,12 +26,13 @@ export const useExportKpi = () => {
       },
     });
 
+    // Convert base64 string back to Blob
     const byteCharacters = atob(res.file);
-    const byteNumbers = new Array(byteCharacters.length)
-      .fill(0)
-      .map((_, i) => byteCharacters.charCodeAt(i));
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
     const byteArray = new Uint8Array(byteNumbers);
-
     const blob = new Blob([byteArray], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
