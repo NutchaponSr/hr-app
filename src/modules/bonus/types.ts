@@ -24,5 +24,11 @@ export type KpiFormWithInfo = KpiForm & {
   employee: Employee;
 }
 
+export type KpiFormWithKpi = KpiForm & {
+  kpis: (Kpi & {
+    kpiEvaluations: KpiEvaluation[];
+  })[];
+}
+
 
 export const APPROVAL_STATUSES: Status[] = [Status.PENDING_APPROVER, Status.PENDING_CHECKER];

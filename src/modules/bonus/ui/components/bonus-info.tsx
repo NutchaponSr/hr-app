@@ -14,6 +14,18 @@ import { useCreateKpiForm } from "@/modules/bonus/api/use-create-kpi-form";
 import { useExportKpi } from "../../api/use-export-kpi";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
+import { ChartConfig } from "@/components/ui/chart";
+import { BarChartInfo } from "@/components/bar-chart-info";
+import { MainHeader, MainTitle } from "@/components/main";
+
+const chartConfig = {
+  evaluation1st: {
+    label: "Evaluation 1st",
+  },
+  evaluation2nd: {
+    label: "Evaluation 2nd",
+  },
+} satisfies ChartConfig;
 
 interface Props {
   year: number;
@@ -35,31 +47,34 @@ export const BonusInfo = ({ year }: Props) => {
 
   return (
     <article className="relative select-none">
-      <div className="flex justify-between shrink-0 items-center h-8 pb-3.5 ms-2">
-        <div className="flex items-center text-xs font-medium text-secondary">
-          <div className="flex items-center justify-center size-4 me-1.5">
-            <GoProject className="size-3 stroke-[0.25]" />
-          </div>
-          <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-            KPI Bonus
-          </span>
-        </div>
+        <MainHeader>
+          <div className="flex justify-between shrink-0 items-center h-8 pb-3.5 ms-2 w-full">
+            <MainTitle>
+              <GoProject className="size-3 stroke-[0.25]" />
+              <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                KPI Bonus
+              </span>
+            </MainTitle>
 
-        <Button 
-          size="xs" 
-          variant="secondary" 
-          className="text-xs"
-          disabled={exportExcelOpt.isPending}
-          onClick={() => { 
-            if (kpiBonus.id) { 
-              exportExcel({ id: kpiBonus.id }); 
-            }}
-          }
-        >
-          <BsBoxArrowUpRight className="size-3 stroke-[0.2]" />
-          Export
-        </Button>
-      </div>
+            {kpiBonus.id && (
+              <Button 
+                size="xs" 
+                variant="secondary" 
+                className="text-xs"
+                disabled={exportExcelOpt.isPending}
+                onClick={() => { 
+                  if (kpiBonus.id) { 
+                    exportExcel({ id: kpiBonus.id }); 
+                  }}
+                }
+              >
+                <BsBoxArrowUpRight className="size-3 stroke-[0.2]" />
+                Export
+              </Button>
+            )}
+          </div>
+        </MainHeader>
+
 
       <div className="basic-0 grow pt-4 px-6 text-sm text-foreground overflow-hidden">
         <div className="flex flex-col justify-center min-h-full">
@@ -114,6 +129,22 @@ export const BonusInfo = ({ year }: Props) => {
             ]}
           />
         </div>
+        <div className="h-6 w-full" />
+        
+        <MainHeader>
+          <MainTitle>
+            <GoProject className="size-3 stroke-[0.25]" />
+            <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+              Summary
+            </span>
+          </MainTitle>
+        </MainHeader>
+
+        <BarChartInfo 
+          dataKey={["period", "owner", "checker", "approver"]}
+          data={kpiBonus.chartInfo} 
+          chartConfig={chartConfig} 
+        />
       </div>
     </article>
   );

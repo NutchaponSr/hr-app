@@ -1,22 +1,22 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
-import { auth } from "@/lib/auth";
 import { getFirstNameFromFullName } from "@/lib/utils";
 
 import { SearchCommand } from "./search-command";
+import { authClient } from "@/lib/auth-client";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export const SearchHero = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+export const SearchHero = () => {
+  const session = authClient.useSession();
 
-  // TODO: Skeleton loading
-  if (!session) {
-    return redirect("/auth/sign-in");
+  const name = getFirstNameFromFullName(session.data?.user.name || "-");
+
+  if (session.isPending) {
+    return (
+      <section className="flex justify-between relative w-full isolation-auto items-center min-h-25">
+        <Skeleton className="w-100 h-8 rounded" />
+        <Skeleton className="w-40 h-8 rounded" />
+      </section>
+    );
   }
-
-  const name = getFirstNameFromFullName(session.user.name);
 
   return (
     <section className="flex justify-between relative w-full isolation-auto items-center min-h-25">

@@ -37,10 +37,10 @@ export const MainHeader = ({ children }: { children: ReactNode }) => {
   );
 }
 
-export const MainTitle = ({ children }: { children: ReactNode }) => {
+export const MainTitle = ({ children, className }: { children: ReactNode; className?: string }) => {
   return (
     <div className="flex items-center h-full grow-[10] overflow-hidden -ms-1">
-      <div className="flex items-center h-8 px-2.5 py-1.5 max-w-[220px] text-tertiary text-xs whitespace-nowrap space-x-1.5">
+      <div className={cn("flex items-center h-8 px-2.5 py-1.5 max-w-[220px] text-tertiary text-xs whitespace-nowrap space-x-1.5", className)}>
         {children}
       </div>
     </div>

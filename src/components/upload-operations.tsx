@@ -14,11 +14,6 @@ import {
 } from "@/types/upload";
 import { databases } from "@/constants";
 
-import { 
-  Popover, 
-  PopoverContent, 
-  PopoverTrigger 
-} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
 
@@ -87,7 +82,11 @@ export const UploadOperations = ({
             className="sr-only"
             onChange={onChange}
           />
-          <Button variant="secondary" onClick={() => fileRef.current?.click()} className={cn(file && "justify-between px-2")}>
+          <Button 
+            variant="secondary" 
+            onClick={() => fileRef.current?.click()} 
+            className={cn(file && "justify-between px-2")}
+          >
             {file ? (
               <>
                 <div className="flex items-center gap-2 grow shrink basis-0 min-w-0">

@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { GoSearch } from "react-icons/go";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Suspense } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -148,12 +148,14 @@ export const SearchCommand = () => {
 
       {(showPopover && popoverPos) &&
         createPortal(
-          <SearchPopover 
-            ref={popoverRef}
-            popoverPos={popoverPos}
-            filteredCategories={filteredCategories}
-            filteredApplications={filteredApplications}
-          />,
+          <Suspense>
+            <SearchPopover 
+              ref={popoverRef}
+              popoverPos={popoverPos}
+              filteredCategories={filteredCategories}
+              filteredApplications={filteredApplications}
+            />
+          </Suspense>,
           document.body
         )}
     </div>

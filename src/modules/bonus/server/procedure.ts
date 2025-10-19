@@ -4,7 +4,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
-import { convertAmountToUnit, exportExcel } from "@/lib/utils";
+import { convertAmountFromUnit, convertAmountToUnit, exportExcel } from "@/lib/utils";
 
 import { readCSV } from "@/seeds/utils/csv";
 
@@ -12,10 +12,10 @@ import { ApprovalCSVProps } from "@/types/approval";
 import { App, Period, Status } from "@/generated/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
-import { kpiBonusCreateSchema, kpiBonusEvaluationSchema } from "../schema";
-import { getUserRole, PermissionContext } from "../permission";
-import { columns } from "../constants";
-import { formatKpiExport } from "../util";
+import { kpiBonusCreateSchema, kpiBonusEvaluationSchema } from "@/modules/bonus/schema";
+import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
+import { columns } from "@/modules/bonus/constants";
+import { formatKpiExport } from "@/modules/bonus/util";
 
 export const bonusProcedure = createTRPCRouter({
   getByYear: protectedProcedure
@@ -51,6 +51,56 @@ export const bonusProcedure = createTRPCRouter({
           evaluation1st: kpiForm?.tasks[1],
           evaluation2nd: kpiForm?.tasks[2],
         },
+        chartInfo: [
+          {
+            period: "Evaluation 1st",
+            owner: convertAmountFromUnit(
+              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
+                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
+                return acc + (((evaluation?.achievementOwner ?? 0) / 100) * kpi.weight);
+              }, 0),
+              2
+            ),
+            checker: convertAmountFromUnit(
+              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
+                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
+                return acc + (((evaluation?.achievementChecker ?? 0) / 100) * kpi.weight);
+              }, 0),
+              2
+            ),
+            approver: convertAmountFromUnit(
+              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
+                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
+                return acc + (((evaluation?.achievementApprover ?? 0) / 100) * kpi.weight);
+              }, 0),
+              2
+            ),
+          },
+          {
+            period: "Evaluation 2nd",
+            owner: convertAmountFromUnit(
+              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
+                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
+                return acc + (((evaluation?.achievementOwner ?? 0) / 100) * kpi.weight);
+              }, 0),
+              2
+            ),
+            checker: convertAmountFromUnit(
+              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
+                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
+                return acc + (((evaluation?.achievementChecker ?? 0) / 100) * kpi.weight);
+              }, 0),
+              2
+            ),
+            approver: convertAmountFromUnit(
+              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
+                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
+                return acc + (((evaluation?.achievementApprover ?? 0) / 100) * kpi.weight);
+              }, 0),
+              2
+            ),
+          },
+        ],
       };
     }),
   getById: protectedProcedure
@@ -301,7 +351,7 @@ export const bonusProcedure = createTRPCRouter({
       const result = await prisma.$transaction(async (tx) => {
         const updatePromises = input.kpis.map(({ id, kpiBonusCreateSchema }) => {
           const { weight, ...otherFields } = kpiBonusCreateSchema;
-          
+
           return tx.kpi.update({
             where: { id },
             data: {
@@ -388,7 +438,7 @@ export const bonusProcedure = createTRPCRouter({
           },
         }),
       ]);
-  
+
       return null;
     }),
   deleteKpiFile: protectedProcedure

@@ -81,7 +81,7 @@ export const KpiBonusEvaluation1StScreen = ({ id, role, canPerform, kpiForm }: P
             <Banner
               trigger
               title="KPI Bonus"
-              className="ps-16"
+              className="px-16"
               description="Reward employees with performance-based bonuses tied to goals and business impact."
               icon={GoProject}
               context={<SelectionBadge label={periods["EVALUATION_1ST"]} />}

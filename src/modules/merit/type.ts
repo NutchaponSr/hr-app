@@ -10,7 +10,6 @@ import {
   Employee, 
   MeritForm, 
   Position, 
-  Task 
 } from "@/generated/prisma";
 
 export interface CompetencyWithInfo extends CompetencyRecord {

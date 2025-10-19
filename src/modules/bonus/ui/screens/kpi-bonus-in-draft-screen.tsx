@@ -120,7 +120,7 @@ export const KpiBonusInDraftScreen = ({ id, canPerform, kpiForm }: Props) => {
     <Form {...form}>
       <Banner
         title="KPI Bonus"
-        className="ps-16"
+        className="px-16"
         description="Reward employees with performance-based bonuses tied to goals and business impact."
         icon={GoProject}
         context={<SelectionBadge label={periods["IN_DRAFT"]} />}
