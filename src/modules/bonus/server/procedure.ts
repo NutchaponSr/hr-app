@@ -9,7 +9,7 @@ import { convertAmountFromUnit, convertAmountToUnit, exportExcel } from "@/lib/u
 import { readCSV } from "@/seeds/utils/csv";
 
 import { ApprovalCSVProps } from "@/types/approval";
-import { App, Period, Status } from "@/generated/prisma";
+import { App, Period, Project, Status } from "@/generated/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { kpiBonusCreateSchema, kpiBonusEvaluationSchema } from "@/modules/bonus/schema";
@@ -317,6 +317,7 @@ export const bonusProcedure = createTRPCRouter({
           ...otherFields,
           kpiFormId: input.kpiFormId,
           weight: convertAmountToUnit(Number(weight), 2),
+          type: otherFields.type ? otherFields.type as Project : null,
         };
       });
 
@@ -356,6 +357,7 @@ export const bonusProcedure = createTRPCRouter({
             where: { id },
             data: {
               ...otherFields,
+              type: otherFields.type ? otherFields.type as Project : null,
               weight: convertAmountToUnit(Number(weight), 2),
             },
           });
