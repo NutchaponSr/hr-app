@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { KpiCategory } from "@/generated/prisma";
 
+const currentYear = new Date().getFullYear();
+
 export const kpiBonusCreateSchema = z.object({
   name: z.string().min(1, "Required").trim(),
   weight: z.coerce.string()
@@ -17,7 +19,9 @@ export const kpiBonusCreateSchema = z.object({
   objective: z.string().min(1, "Required").trim(),
   definition: z.string().min(1, "Required").trim(),
   strategy: z.string().min(1, "Required").trim(),
-  type: z.enum(["PROJECT", "IMPROVEMENT"]),
+  type: currentYear === 2025
+    ? z.string().nullable()
+    : z.string("Required"),
   target100: z.coerce.string().min(1, "Required").trim(),
   target90: z.coerce.string().min(1, "Required").trim(),
   target80: z.coerce.string().min(1, "Required").trim(),

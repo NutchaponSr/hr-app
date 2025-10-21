@@ -7,7 +7,7 @@ import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { convertAmountFromUnit } from "@/lib/utils";
 
 import { AppRouter } from "@/trpc/routers/_app";
-import { Kpi, KpiCategory, Project } from "@/generated/prisma";
+import { Kpi, KpiCategory } from "@/generated/prisma";
 
 import { Form } from "@/components/ui/form";
 import { Progress } from "@/components/ui/progress";
@@ -56,7 +56,7 @@ export const KpiBonusInDraftScreen = ({ id, canPerform, kpiForm }: Props) => {
     objective: kpi.objective ?? "",
     definition: kpi.definition ?? "",
     strategy: kpi.strategy ?? "",
-    type: kpi.type ?? Project.PROJECT,
+    type: kpi.type,
     target70: kpi.target70 ?? "",
     target80: kpi.target80 ?? "",
     target90: kpi.target90 ?? "",

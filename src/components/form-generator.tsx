@@ -176,7 +176,7 @@ const Select = <TFieldValues extends FieldValues>({
           <div
             role="button"
             data-disabled={disabled}
-            className="select-none transition relative text-sm overflow-hidden rounded w-full h-7 p-1 flex items-center hover:bg-primary/6 data-[disabled=true]:-z-1"
+            className="select-none transition relative text-sm overflow-hidden rounded w-full h-7 p-1 flex items-center hover:bg-primary/6 data-[disabled=true]:-z-1 px-2"
           >
             {selectedOption ? (
               <SelectionBadge 
@@ -184,7 +184,7 @@ const Select = <TFieldValues extends FieldValues>({
                 label={selectedOption} 
               />
             ) : (
-              "Empty"
+              "-"
             )}
           </div>
         </PopoverTrigger>

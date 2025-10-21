@@ -45,7 +45,10 @@ export const KpiInfoDisplay = ({ kpi }: KpiInfoDisplayProps) => {
         </div>
         <div className="col-span-1">
           <Content label="Kpi's type">
-            <SelectionBadge label={projectTypes[kpi.type!]} />
+            {kpi.type 
+              ? <SelectionBadge label={projectTypes[kpi.type]} />
+              : "-"
+            }
           </Content>
         </div>
       </div>
