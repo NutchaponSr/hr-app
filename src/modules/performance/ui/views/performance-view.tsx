@@ -9,18 +9,10 @@ import { APPS } from "@/constants";
 import { useYear } from "@/hooks/use-year";
 import { usePaths } from "@/hooks/use-paths";
 
-import {
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 
-import { 
-  Main, 
-  MainContent 
-} from "@/components/main";
+import { Main, MainContent } from "@/components/main";
 import { Banner } from "@/components/banner";
 import { Header } from "@/components/header";
 
@@ -43,7 +35,7 @@ export const PerformanceView = ({ canPerform }: Props) => {
   return (
     <>
       <Header paths={paths} />
-      <Tabs 
+      <Tabs
         asChild
         defaultValue={String(year)}
         onValueChange={(value) => setYear(Number(value))}
@@ -65,11 +57,7 @@ export const PerformanceView = ({ canPerform }: Props) => {
               </TabsList>
 
               {canPerform && (
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="sm"
-                >
+                <Button asChild variant="ghost" size="sm">
                   <Link href="/performance/admin">
                     <BsWindowFullscreen />
                     Dashboard
@@ -98,4 +86,4 @@ export const PerformanceView = ({ canPerform }: Props) => {
       </Tabs>
     </>
   );
-}
+};

@@ -10,12 +10,12 @@ interface Props {
     label: string;
     variant: StatusVariant;
   };
-  actions?: Array<{
+  action ?: {
     label: string;
     state: boolean; 
     condition?: boolean;
     onClick: () => void;
-  }>
+  }
 }
 
 export const Stepper = ({
@@ -23,7 +23,7 @@ export const Stepper = ({
   title,
   description,
   status,
-  actions,
+  action,
 }: Props) => {
   return (
     <div className="flex flex-row not-last:pb-2.5">
@@ -51,22 +51,24 @@ export const Stepper = ({
             </div>
 
             <div className="mt-1.5 ps-2.5 flex flex-row items-center gap-1.5">
-              {actions?.map(({
-                state,
-                onClick,
-                condition = true,
-                label
-              }, idx) => (
+              {action && (
                 <button
-                  key={idx}
-                  disabled={state}
-                  onClick={onClick}
-                  data-active={condition}
+                  disabled={action?.state}
+                  onClick={action?.onClick}
+                  data-active={action?.condition}
                   className="w-fit px-2 py-1 hidden flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs data-[active=true]:flex"
                 >
-                  {label}
+                  {action?.label}
                 </button>
-              ))}
+              )}
+              {/* <button
+                disabled={action?.state}
+                onClick={action?.onClick}
+                data-active={action?.condition}
+                className="w-fit px-2 py-1 hidden flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs data-[active=true]:flex"
+              >
+                {action?.label}
+              </button> */}
             </div>
           </div>
         </div>

@@ -22,7 +22,6 @@ export const useCreateMeritForm = () => {
   
       createForm.mutate({ ...value }, {
         onSuccess: ({ id }) => {
-          
           toast.success("merit form created!", { id: "create-merit-form" });
           router.push(`/performance/merit/${id}?period=${value.period}`);
         },

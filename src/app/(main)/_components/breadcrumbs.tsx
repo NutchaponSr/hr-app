@@ -39,7 +39,7 @@ export const Breadcrumbs = ({
           Overviews
         </Link>
       </Button>
-      {paths.length > 1 && (
+      {paths.length > 0 && (
         <span className="w-2 flex items-center justify-center m-0">
           <HiSlash className="size-5 block shrink-0 text-[#d4d3cf] dark:text-[#494846]" />
         </span>

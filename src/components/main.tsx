@@ -11,7 +11,7 @@ export const Main = ({ children }: Props) => {
   return (
     <main className="grow-0 shrink flex flex-col bg-background z-1 h-full max-h-full w-full">
       <div className="w-full h-full overflow-x-hidden overflow-y-auto me-0 mb-0">
-        <div className="grid grid-cols-[minmax(20px,1fr)_minmax(auto,840px)_minmax(20px,1fr)] w-full gap-y-6 gap-x-14 pb-[30vh]">
+        <div className="grid grid-cols-[minmax(20px,1fr)_minmax(auto,970px)_minmax(20px,1fr)] w-full gap-y-6 gap-x-14 pb-[30vh]">
           {children}
         </div>
       </div>

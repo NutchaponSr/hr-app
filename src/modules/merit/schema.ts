@@ -65,32 +65,32 @@ export const meritSchema = z.object({
 export const competencyEvaluationSchema = z.object({
   id: z.string(),
   role: z.enum(["preparer", "checker", "approver"]),
-  inputEvidenceOwner: z.string().nullable(),
-  outputEvidenceOwner: z.string().nullable(),
+  actualOwner: z.string().nullable(),
   levelOwner: z.coerce.number().nullable(),
 
-  inputEvidenceChecker: z.string().nullable(),
-  outputEvidenceChecker: z.string().nullable(),
+  actualChecker: z.string().nullable(),
   levelChecker: z.coerce.number().nullable(),
 
-  inputEvidenceApprover: z.string().nullable(),
-  outputEvidenceApprover : z.string().nullable(),
+  actualApprover: z.string().nullable(),
   levelApprover: z.coerce.number().nullable(),
+
+  fileUrl: z.string().nullable(),
+  result: z.string().nullable(),
 }).superRefine((data, ctx) => {
   switch (data.role) {
     case "preparer": 
-      if (!data.inputEvidenceOwner || data.inputEvidenceOwner.length === 0) {
+      if (!data.result || data.result.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["inputEvidenceOwner"],
+          path: ["result"],
           message: "Required",
         })
       }
 
-      if (!data.outputEvidenceOwner || data.outputEvidenceOwner.length === 0) {
+      if (!data.actualOwner || data.actualOwner.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["outputEvidenceOwner"],
+          path: ["actualOwner"],
           message: "Required",
         })
       }
@@ -105,22 +105,14 @@ export const competencyEvaluationSchema = z.object({
 
       break;
     case "checker":
-      if (!data.inputEvidenceChecker || data.inputEvidenceChecker.length === 0) {
+      if (!data.actualChecker || data.actualChecker.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["inputEvidenceChecker"],
+          path: ["actualChecker"],
           message: "Required",
         })
       }
 
-      if (!data.outputEvidenceChecker || data.outputEvidenceChecker.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["outputEvidenceChecker"],
-          message: "Required",
-        })
-      }
-      
       if (!data.levelChecker || data.levelChecker < 1) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -131,22 +123,14 @@ export const competencyEvaluationSchema = z.object({
 
       break;
     case "approver":
-      if (!data.inputEvidenceApprover || data.inputEvidenceApprover.length === 0) {
+      if (!data.actualApprover || data.actualApprover.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["inputEvidenceApprover"],
+          path: ["actualApprover"],
           message: "Required",
         })
       }
 
-      if (!data.outputEvidenceApprover || data.outputEvidenceApprover.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["outputEvidenceApprover"],
-          message: "Required",
-        })
-      }
-      
       if (!data.levelApprover || data.levelApprover < 1) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -162,15 +146,25 @@ export const competencyEvaluationSchema = z.object({
 export const cultureEvaluationSchema = z.object({
   id: z.string(),
   role: z.enum(["preparer", "checker", "approver"]),
-  levelBehaviorOwner: z.coerce.number().nullable(),
-  levelBehaviorChecker: z.coerce.number().nullable(),
-  levelBehaviorApprover: z.coerce.number().nullable(),
   actualOwner: z.string().nullable(),
+  levelBehaviorOwner: z.coerce.number().nullable(),
   actualChecker: z.string().nullable(),
+  levelBehaviorChecker: z.coerce.number().nullable(),
   actualApprover: z.string().nullable(),
+  levelBehaviorApprover: z.coerce.number().nullable(),
+  fileUrl: z.string().nullable(),
+  result: z.string().nullable(),
 }).superRefine((data, ctx) => {
   switch (data.role) {
     case "preparer":
+      if (!data.result || data.result.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["result"],
+          message: "Required",
+        })
+      }
+
       if (!data.levelBehaviorOwner) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,

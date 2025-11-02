@@ -15,19 +15,22 @@ import { Period } from "@/generated/prisma";
 
 import { useSave } from "@/hooks/use-save";
 
+import { Banner } from "@/components/banner";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { StatusBadge } from "@/components/status-badge";
-import { WarnningBanner } from "@/components/warnning-banner";
+import { SelectionBadge } from "@/components/selection-badge";
 import { SavingIndicator } from "@/components/saving-indicator";
 
-import { MeritScreen } from "@/modules/merit/ui/screens/merit-screen";
+import { MeritDraftScreen } from "@/modules/merit/ui/screens/merit-draft-screen";
 import { StartWorkflowButton } from "@/modules/tasks/ui/components/start-workflow-button";
 import { ApprovalConfirmation } from "@/modules/tasks/ui/components/approval-confirmation";
+import { MeritEvaluationScreen } from "@/modules/merit/ui/screens/merit-evaluation-screen";
 
 import { useApprovalMerit } from "@/modules/tasks/api/use-approval-merit";
 import { useStartWorkflowMerit } from "@/modules/tasks/api/use-start-workflow-merit";
 
+import { periods } from "@/modules/bonus/constants";
 import { canPerformMany, Role } from "@/modules/bonus/permission";
 
 interface Props {
@@ -94,25 +97,38 @@ export const MeritView = ({ id, period }: Props) => {
           }}
         />
       </Header>
-      <WarnningBanner
-        message={`แบบประเมิน Merit ประจำปี ${merit.data.meritForm?.year} : ${merit.data.preparer.fullName}`}
-        variant="blue"
-      />
-
       <main className="grow-0 shrink flex flex-col bg-background h-[calc(-44px+100vh)] max-h-full relative w-full">
         <div className="flex flex-col grow relative overflow-auto me-0 mb-0">
-          <MeritScreen 
-            id={id} 
-            period={period}
-            merit={merit} 
-            canPerform={{
-              canWrite: permissions.write,
-              canSubmit: permissions.submit,
-              ownerCanWrite: permissions.write && merit.permission.role === "preparer",
-              checkerCanWrite: permissions.write && merit.permission.role === "checker",
-              approverCanWrite: permissions.write && merit.permission.role === "approver",
-            }}
+          <Banner
+            title="Merit"
+            className="px-16"
+            description="Evaluate employees based on their performance and achievements."
+            icon={GoProject}
+            context={<SelectionBadge label={periods[period]} />}
           />
+          {period === Period.IN_DRAFT ? (
+            <MeritDraftScreen 
+              id={id} 
+              period={period} 
+              merit={merit} 
+              canPerform={{
+                canWrite: permissions.write && merit.permission.role === "preparer",
+                canSubmit: permissions.submit,
+              }}
+            />
+          ) : (
+            <MeritEvaluationScreen 
+              id={id} 
+              period={period} 
+              merit={merit} 
+              canPerform={{
+                canSubmit: permissions.submit,
+                ownerCanWrite: permissions.write && merit.permission.role === "preparer",
+                checkerCanWrite: permissions.write && merit.permission.role === "checker",
+                approverCanWrite: permissions.write && merit.permission.role === "approver",
+              }}
+            />
+          )}
         </div>
       </main>
       

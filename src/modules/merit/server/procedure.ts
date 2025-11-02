@@ -6,15 +6,24 @@ import { TRPCError } from "@trpc/server";
 import { prisma } from "@/lib/prisma";
 
 import { readCSV } from "@/seeds/utils/csv";
-import { App, CompetencyType, Period, Status, Task } from "@/generated/prisma";
+import { App, CompetencyType, Period, Status } from "@/generated/prisma";
 import { ApprovalCSVProps } from "@/types/approval";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
-import { convertAmountFromUnit, convertAmountToUnit, exportExcel } from "@/lib/utils";
-import { competencyEvaluationSchema, cultureEvaluationSchema, meritSchema } from "../schema";
+import { getUserRole } from "@/modules/bonus/permission";
+import {
+  convertAmountFromUnit,
+  convertAmountToUnit,
+  exportExcel,
+} from "@/lib/utils";
+import {
+  competencyEvaluationSchema,
+  cultureEvaluationSchema,
+  meritSchema,
+} from "../schema";
 import { MANAGER_UP } from "../type";
 import { columns } from "../constants";
 import { formatMeritExport } from "../utils";
+import { buildPermissionContext } from "@/modules/tasks/utils";
 
 // Helper functions
 async function fetchCommentsForRecords(recordIds: string[]) {
@@ -23,34 +32,29 @@ async function fetchCommentsForRecords(recordIds: string[]) {
       connectId: { in: recordIds },
     },
     include: {
-      employee: true
+      employee: true,
     },
     orderBy: {
-      createdAt: "asc"
+      createdAt: "asc",
     },
   });
 }
 
-type CommentWithEmployee = Awaited<ReturnType<typeof fetchCommentsForRecords>>[0];
+type CommentWithEmployee = Awaited<
+  ReturnType<typeof fetchCommentsForRecords>
+>[0];
 
 function groupCommentsByRecordId(comments: CommentWithEmployee[]) {
-  return comments.reduce((acc, comment) => {
-    if (!acc[comment.connectId]) {
-      acc[comment.connectId] = [];
-    }
-    acc[comment.connectId].push(comment);
-    return acc;
-  }, {} as Record<string, CommentWithEmployee[]>);
-}
-
-function buildPermissionContext(currentEmployeeId: string, task: Task): PermissionContext {
-  return {
-    currentEmployeeId,
-    documentOwnerId: task.preparedBy,
-    checkerId: task.checkedBy,
-    approverId: task.approvedBy,
-    status: task.status,
-  };
+  return comments.reduce(
+    (acc, comment) => {
+      if (!acc[comment.connectId]) {
+        acc[comment.connectId] = [];
+      }
+      acc[comment.connectId].push(comment);
+      return acc;
+    },
+    {} as Record<string, CommentWithEmployee[]>,
+  );
 }
 
 export const meritProcedure = createTRPCRouter({
@@ -69,7 +73,7 @@ export const meritProcedure = createTRPCRouter({
         include: {
           tasks: {
             orderBy: {
-              preparedAt: "asc"
+              preparedAt: "asc",
             },
           },
           competencyRecords: {
@@ -88,9 +92,9 @@ export const meritProcedure = createTRPCRouter({
       return {
         id: meritForm?.id,
         task: {
-          inDraft: meritForm?.tasks[0],
-          evaluation1st: meritForm?.tasks[1],
-          evaluation2nd: meritForm?.tasks[2],
+          inDraft: meritForm?.tasks.find((f) => f.context === String(Period.IN_DRAFT)),
+          evaluation1st: meritForm?.tasks.find((f) => f.context === String(Period.EVALUATION_1ST)),
+          evaluation2nd: meritForm?.tasks.find((f) => f.context === String(Period.EVALUATION_2ND)),
         },
         chartInfo: [
           {
@@ -98,158 +102,242 @@ export const meritProcedure = createTRPCRouter({
             competency: {
               owner: convertAmountFromUnit(
                 (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
-                  const evaluation = kpi.competencyEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
+                  const evaluation = kpi.competencyEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_1ST,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelOwner ?? 0) / meritForm.competencyRecords.length) * kpi.weight);
+                    return (
+                      acc +
+                      ((evaluation?.levelOwner ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        kpi.weight
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
               checker: convertAmountFromUnit(
                 (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
-                  const evaluation = kpi.competencyEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
+                  const evaluation = kpi.competencyEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_1ST,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelChecker ?? 0) / meritForm.competencyRecords.length) * kpi.weight);
+                    return (
+                      acc +
+                      ((evaluation?.levelChecker ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        kpi.weight
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
               approver: convertAmountFromUnit(
                 (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
-                  const evaluation = kpi.competencyEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
+                  const evaluation = kpi.competencyEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_1ST,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelApprover ?? 0) / meritForm.competencyRecords.length) * kpi.weight);
+                    return (
+                      acc +
+                      ((evaluation?.levelApprover ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        kpi.weight
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
             },
             culture: {
               owner: convertAmountFromUnit(
                 (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
-                  const evaluation = c.cultureEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
+                  const evaluation = c.cultureEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_1ST,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelBehaviorOwner ?? 0) / meritForm.competencyRecords.length) * (30 / meritForm.competencyRecords.length));
+                    return (
+                      acc +
+                      ((evaluation?.levelBehaviorOwner ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        (30 / meritForm.competencyRecords.length)
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
               checker: convertAmountFromUnit(
                 (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
-                  const evaluation = c.cultureEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
+                  const evaluation = c.cultureEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_1ST,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelBehaviorChecker ?? 0) / meritForm.competencyRecords.length) * (30 / meritForm.competencyRecords.length));
+                    return (
+                      acc +
+                      ((evaluation?.levelBehaviorChecker ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        (30 / meritForm.competencyRecords.length)
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
               approver: convertAmountFromUnit(
                 (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
-                  const evaluation = c.cultureEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
+                  const evaluation = c.cultureEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_1ST,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelBehaviorApprover ?? 0) / meritForm.competencyRecords.length) * (30 / meritForm.competencyRecords.length));
+                    return (
+                      acc +
+                      ((evaluation?.levelBehaviorApprover ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        (30 / meritForm.competencyRecords.length)
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
-            }
+            },
           },
           {
             period: "Evaluation 2nd",
             competency: {
               owner: convertAmountFromUnit(
                 (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
-                  const evaluation = kpi.competencyEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
+                  const evaluation = kpi.competencyEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_2ND,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelOwner ?? 0) / meritForm.competencyRecords.length) * kpi.weight);
+                    return (
+                      acc +
+                      ((evaluation?.levelOwner ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        kpi.weight
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
               checker: convertAmountFromUnit(
                 (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
-                  const evaluation = kpi.competencyEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
+                  const evaluation = kpi.competencyEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_2ND,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelChecker ?? 0) / meritForm.competencyRecords.length) * kpi.weight);
+                    return (
+                      acc +
+                      ((evaluation?.levelChecker ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        kpi.weight
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
               approver: convertAmountFromUnit(
                 (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
-                  const evaluation = kpi.competencyEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
+                  const evaluation = kpi.competencyEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_2ND,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelApprover ?? 0) / meritForm.competencyRecords.length) * kpi.weight);
+                    return (
+                      acc +
+                      ((evaluation?.levelApprover ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        kpi.weight
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
             },
             culture: {
               owner: convertAmountFromUnit(
                 (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
-                  const evaluation = c.cultureEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
+                  const evaluation = c.cultureEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_2ND,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelBehaviorOwner ?? 0) / meritForm.competencyRecords.length) * (30 / meritForm.competencyRecords.length));
+                    return (
+                      acc +
+                      ((evaluation?.levelBehaviorOwner ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        (30 / meritForm.competencyRecords.length)
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
               checker: convertAmountFromUnit(
                 (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
-                  const evaluation = c.cultureEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
+                  const evaluation = c.cultureEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_2ND,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelBehaviorChecker ?? 0) / meritForm.competencyRecords.length) * (30 / meritForm.competencyRecords.length));
+                    return (
+                      acc +
+                      ((evaluation?.levelBehaviorChecker ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        (30 / meritForm.competencyRecords.length)
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
               approver: convertAmountFromUnit(
                 (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
-                  const evaluation = c.cultureEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
+                  const evaluation = c.cultureEvaluations.find(
+                    (f) => f.period === Period.EVALUATION_2ND,
+                  );
 
                   if (meritForm) {
-                    return acc + (((evaluation?.levelBehaviorApprover ?? 0) / meritForm.competencyRecords.length) * (30 / meritForm.competencyRecords.length));
+                    return (
+                      acc +
+                      ((evaluation?.levelBehaviorApprover ?? 0) /
+                        meritForm.competencyRecords.length) *
+                        (30 / meritForm.competencyRecords.length)
+                    );
                   }
 
                   return 0;
                 }, 0),
-                2
+                2,
               ),
-            }
+            },
           },
         ],
       };
@@ -275,11 +363,7 @@ export const meritProcedure = createTRPCRouter({
               competencyRecords: {
                 include: {
                   competency: true,
-                  competencyEvaluations: {
-                    where: {
-                      period: input.period,
-                    },
-                  },
+                  competencyEvaluations: true,
                 },
                 orderBy: {
                   id: "asc",
@@ -288,16 +372,12 @@ export const meritProcedure = createTRPCRouter({
               cultureRecords: {
                 include: {
                   culture: true,
-                  cultureEvaluations: {
-                    where: {
-                      period: input.period,
-                    },
-                  },
+                  cultureEvaluations: true,
                 },
                 orderBy: {
                   culture: {
                     id: "asc",
-                  }
+                  },
                 },
               },
               employee: true,
@@ -316,15 +396,7 @@ export const meritProcedure = createTRPCRouter({
           year: task.meritForm?.year,
         },
         include: {
-          kpis: {
-            include: {
-              kpiEvaluations: {
-                where: {
-                  period: input.period,
-                },
-              },
-            },
-          },
+          kpis: true,
         },
       });
 
@@ -336,16 +408,21 @@ export const meritProcedure = createTRPCRouter({
       };
 
       const [cultureComments, competencyComments] = await Promise.all([
-        fetchCommentsForRecords(task.meritForm?.cultureRecords?.map(r => r.id) ?? []),
-        fetchCommentsForRecords(task.meritForm?.competencyRecords?.map(r => r.id) ?? []),
+        fetchCommentsForRecords(
+          task.meritForm?.cultureRecords?.map((r) => r.id) ?? [],
+        ),
+        fetchCommentsForRecords(
+          task.meritForm?.competencyRecords?.map((r) => r.id) ?? [],
+        ),
       ]);
 
       const cultureCommentsMap = groupCommentsByRecordId(cultureComments);
       const competencyCommentsMap = groupCommentsByRecordId(competencyComments);
 
-      const competencyRecordsWithComments =
-        MANAGER_UP.includes(task.preparer.rank)
-          ? (() => {
+      const competencyRecordsWithComments = MANAGER_UP.includes(
+        task.preparer.rank,
+      )
+        ? (() => {
             const patternTypes: (CompetencyType | CompetencyType[])[] = [
               [CompetencyType.FC, CompetencyType.TC],
               [CompetencyType.FC, CompetencyType.TC],
@@ -354,20 +431,22 @@ export const meritProcedure = createTRPCRouter({
             ];
             const records = task.meritForm?.competencyRecords ?? [];
 
-            return records.slice(0, patternTypes.length).map((record, index) => {
-              const types = Array.isArray(patternTypes[index])
-                ? patternTypes[index] as CompetencyType[]
-                : [patternTypes[index] as CompetencyType];
+            return records
+              .slice(0, patternTypes.length)
+              .map((record, index) => {
+                const types = Array.isArray(patternTypes[index])
+                  ? (patternTypes[index] as CompetencyType[])
+                  : [patternTypes[index] as CompetencyType];
 
-              return {
-                ...record,
-                comments: competencyCommentsMap[record.id] || [],
-                type: types,
-                label: types.map((t) => typeToName[t]).join(", "),
-              };
-            });
+                return {
+                  ...record,
+                  comments: competencyCommentsMap[record.id] || [],
+                  type: types,
+                  label: types.map((t) => typeToName[t]).join(", "),
+                };
+              });
           })()
-          : (() => {
+        : (() => {
             const records = task.meritForm?.competencyRecords ?? [];
             return records.map((record) => ({
               ...record,
@@ -377,13 +456,18 @@ export const meritProcedure = createTRPCRouter({
             }));
           })();
 
-      const cultureRecordsWithComments = task.meritForm?.cultureRecords?.map(record => ({
-        ...record,
-        comments: cultureCommentsMap[record.id] || [],
-        weight: (30 / ((task.meritForm?.cultureRecords?.length ?? 1))) * 100,
-      }));
+      const cultureRecordsWithComments = task.meritForm?.cultureRecords?.map(
+        (record) => ({
+          ...record,
+          comments: cultureCommentsMap[record.id] || [],
+          weight: (30 / (task.meritForm?.cultureRecords?.length ?? 1)) * 100,
+        }),
+      );
 
-      const permissionContext = buildPermissionContext(ctx.user.employee.id, task);
+      const permissionContext = buildPermissionContext(
+        ctx.user.employee.id,
+        task,
+      );
 
       return {
         data: {
@@ -412,11 +496,75 @@ export const meritProcedure = createTRPCRouter({
       const approvalFile = path.join(process.cwd(), "src/data", "approval.csv");
       const approvalRecords = readCSV<ApprovalCSVProps>(approvalFile);
 
-      const taregetApproval = approvalRecords.find((f) => f.employeeId === ctx.user.employee.id);
+      const taregetApproval = approvalRecords.find(
+        (f) => f.employeeId === ctx.user.employee.id,
+      );
 
       if (!taregetApproval) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
+
+      const periods = [Period.IN_DRAFT, Period.EVALUATION_1ST, Period.EVALUATION_2ND] as const;
+
+      if (input.period !== Period.IN_DRAFT) {
+        const currentIndex = periods.indexOf(input.period as typeof periods[number]);
+
+        // ถ้า year >= 2025 ให้ถอย 2 step แต่ไม่ให้น้อยกว่า 0
+        const step = input.year >= 2025 ? 1 : 2;
+        const previousPeriod = currentIndex > 0
+          ? periods[Math.max(0, currentIndex - step)]
+          : Period.IN_DRAFT;
+
+        // ดึง merit task ที่ approve แล้ว
+        const approvedMeritTask = await prisma.task.findFirst({
+          where: {
+            meritForm: {
+              year: input.year,
+              employeeId: ctx.user.employee.id,
+            },
+            context: previousPeriod,
+            type: App.MERIT,
+          },
+        });
+
+        // ดึง KPI task ที่ approve แล้ว
+        const approvedKpiTask = await prisma.task.findFirst({
+          where: {
+            kpiForm: {
+              year: input.year,
+              employeeId: ctx.user.employee.id,
+            },
+            context: Period.EVALUATION, // หรือ Period.EVALUATION_1ST / 2ND ถ้าต้องการ fix เฉพาะ
+            type: App.BONUS,
+          },
+        });
+
+        console.log({ approvedMeritTask, approvedKpiTask });
+
+
+        if (input.year >= 2025) {
+          if (
+            !approvedMeritTask ||
+            approvedMeritTask.status !== Status.APPROVED
+          ) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "You must finish merit evaluation and get approved first!",
+            });
+          }
+        }
+
+        if (
+          !approvedKpiTask ||
+          approvedKpiTask.status !== Status.APPROVED
+        ) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "You must finish KPI evaluation and get approved first!",
+          });
+        }
+      }
+
 
       const cultures = await prisma.culture.findMany({
         orderBy: {
@@ -432,7 +580,7 @@ export const meritProcedure = createTRPCRouter({
         include: {
           competencyRecords: true,
           cultureRecords: true,
-        }
+        },
       });
 
       if (!meritForm) {
@@ -458,8 +606,8 @@ export const meritProcedure = createTRPCRouter({
           include: {
             competencyRecords: true,
             cultureRecords: true,
-          }
-        })
+          },
+        });
       } else {
         const meritFormUpdated = await prisma.meritForm.update({
           where: {
@@ -492,6 +640,7 @@ export const meritProcedure = createTRPCRouter({
           type: App.MERIT,
           fileId: meritForm.id,
           status: Status.IN_DRAFT,
+          context: String(input.period),
           preparedBy: ctx.user.employee.id,
           approvedBy: taregetApproval.approverEMPID,
           ...(taregetApproval.checkerEMPID && {
@@ -507,20 +656,21 @@ export const meritProcedure = createTRPCRouter({
       z.object({
         id: z.string(),
         meritSchema,
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       // First, get the existing records
-      const [existingCompetencyRecords, existingCultureRecords] = await Promise.all([
-        prisma.competencyRecord.findMany({
-          where: { meritFormId: input.id },
-          orderBy: { id: "asc" }
-        }),
-        prisma.cultureRecord.findMany({
-          where: { meritFormId: input.id },
-          orderBy: { id: "asc" }
-        })
-      ]);
+      const [existingCompetencyRecords, existingCultureRecords] =
+        await Promise.all([
+          prisma.competencyRecord.findMany({
+            where: { meritFormId: input.id },
+            orderBy: { id: "asc" },
+          }),
+          prisma.cultureRecord.findMany({
+            where: { meritFormId: input.id },
+            orderBy: { id: "asc" },
+          }),
+        ]);
 
       // Update competency records
       await Promise.all(
@@ -533,10 +683,10 @@ export const meritProcedure = createTRPCRouter({
                 input: c.input,
                 output: c.output,
                 weight: convertAmountToUnit(parseFloat(c.weight!), 2),
-              }
+              },
             });
           }
-        })
+        }),
       );
 
       // Update culture records
@@ -547,10 +697,10 @@ export const meritProcedure = createTRPCRouter({
               where: { id: existingCultureRecords[index].id },
               data: {
                 evidence: culture.evidence,
-              }
+              },
             });
           }
-        })
+        }),
       );
 
       return { success: true };
@@ -559,29 +709,32 @@ export const meritProcedure = createTRPCRouter({
     .input(
       z.object({
         meritEvaluationSchema: z.object({
-          competencies: z.array(competencyEvaluationSchema.omit({ role: true })),
+          competencies: z.array(
+            competencyEvaluationSchema.omit({ role: true }),
+          ),
           cultures: z.array(cultureEvaluationSchema.omit({ role: true })),
         }),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       await Promise.all([
-        ...input.meritEvaluationSchema.competencies.map(async ({ id, ...competencies }) =>
-          prisma.competencyEvaluation.update({
-            where: { id },
-            data: {
-              ...competencies
-
-            }
-          })
+        ...input.meritEvaluationSchema.competencies.map(
+          async ({ id, ...competencies }) =>
+            prisma.competencyEvaluation.update({
+              where: { id },
+              data: {
+                ...competencies,
+              },
+            }),
         ),
-        ...input.meritEvaluationSchema.cultures.map(async ({ id, ...cultures }) =>
-          prisma.cultureEvaluation.update({
-            where: { id },
-            data: { ...cultures }
-          })
+        ...input.meritEvaluationSchema.cultures.map(
+          async ({ id, ...cultures }) =>
+            prisma.cultureEvaluation.update({
+              where: { id },
+              data: { ...cultures },
+            }),
         ),
-      ])
+      ]);
 
       return { success: true };
     }),
@@ -635,37 +788,46 @@ export const meritProcedure = createTRPCRouter({
   updateRecordBulk: protectedProcedure
     .input(
       z.object({
-        competency: z.array(z.object({
-          id: z.string(),
-          competencyId: z.string(),
-          weight: z.coerce.number(),
-          input: z.string(),
-          output: z.string(),
-        })),
-        culture: z.array(z.object({
-          id: z.string(),
-          code: z.string(),
-          evidence: z.string(),
-        }))
-      })
+        competency: z.array(
+          z.object({
+            id: z.string(),
+            competencyId: z.string(),
+            expectedLevel: z.coerce.number(),
+            weight: z.coerce.number(),
+            input: z.string(),
+            output: z.string(),
+          }),
+        ),
+        culture: z.array(
+          z.object({
+            id: z.string(),
+            code: z.string(),
+            evidence: z.string(),
+          }),
+        ),
+      }),
     )
     .mutation(async ({ input }) => {
       const result = await prisma.$transaction(async (prisma) => {
         // Validate competencies exist before updating
-        const competencyIds = input.competency.map(c => c.competencyId);
+        const competencyIds = input.competency.map((c) => c.competencyId);
         const existingCompetencies = await prisma.competency.findMany({
           where: {
-            id: { in: competencyIds }
-          }
+            id: { in: competencyIds },
+          },
         });
 
-        const existingCompetencyIds = new Set(existingCompetencies.map(c => c.id));
-        const invalidCompetencyIds = competencyIds.filter(id => !existingCompetencyIds.has(id));
+        const existingCompetencyIds = new Set(
+          existingCompetencies.map((c) => c.id),
+        );
+        const invalidCompetencyIds = competencyIds.filter(
+          (id) => !existingCompetencyIds.has(id),
+        );
 
         if (invalidCompetencyIds.length > 0) {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: `Invalid competency IDs: ${invalidCompetencyIds.join(', ')}`
+            message: `Invalid competency IDs: ${invalidCompetencyIds.join(", ")}`,
           });
         }
 
@@ -676,12 +838,13 @@ export const meritProcedure = createTRPCRouter({
               where: { id: comp.id },
               data: {
                 competencyId: comp.competencyId,
+                expectedLevel: comp.expectedLevel,
                 weight: convertAmountToUnit(comp.weight, 2),
                 input: comp.input,
                 output: comp.output,
-              }
+              },
             });
-          })
+          }),
         );
 
         // Update culture records
@@ -691,9 +854,9 @@ export const meritProcedure = createTRPCRouter({
               where: { id: cult.id },
               data: {
                 evidence: cult.evidence,
-              }
+              },
             });
-          })
+          }),
         );
 
         return {
@@ -703,5 +866,41 @@ export const meritProcedure = createTRPCRouter({
       });
 
       return result;
-    })
+    }),
+  deleteCompetencyFile: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const kpi = await prisma.competencyEvaluation.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          fileUrl: null,
+        },
+      });
+
+      return kpi;
+    }),
+  deleteCultureFile: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const kpi = await prisma.cultureEvaluation.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          fileUrl: null,
+        },
+      });
+
+      return kpi;
+    }),
 });

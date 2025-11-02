@@ -1,6 +1,8 @@
 "use client";
 
+import { toast } from "sonner";
 import { GoProject } from "react-icons/go";
+import { getMonth, getYear } from "date-fns";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { STATUS_RECORD } from "@/types/kpi";
@@ -31,22 +33,38 @@ interface Props {
   year: number;
 }
 
+const isInDateRange = (year: number, startMonth: number, endMonth: number) => {
+  if (year <= 2025) return true;
+
+  const now = new Date();
+  const currentYear = getYear(now);
+  const currentMonth = getMonth(now) + 1; // getMonth() returns 0-11
+
+  // ถ้าปีปัจจุบันไม่ตรงกับปีที่เลือก ให้ return false
+  if (currentYear !== year) {
+    return false;
+  }
+
+  // เช็คว่าเดือนปัจจุบันอยู่ในช่วงที่กำหนดหรือไม่
+  return currentMonth >= startMonth && currentMonth <= endMonth;
+};
+
 export const BonusInfo = ({ year }: Props) => {
   const trpc = useTRPC();
 
-  const { data: kpiBonus } = useSuspenseQuery(trpc.kpiBonus.getByYear.queryOptions({ year }));
+  const { data: kpiBonus } = useSuspenseQuery(
+    trpc.kpiBonus.getByYear.queryOptions({ year }),
+  );
 
-  const {
-    mutation: createForm,
-    opt: kpiFormOption,
-  } = useCreateKpiForm();
-  const {
-    mutation: exportExcel,
-    opt: exportExcelOpt,
-  } = useExportKpi();
+  const { mutation: createForm, opt: kpiFormOption } = useCreateKpiForm();
+  const { mutation: exportExcel, opt: exportExcelOpt } = useExportKpi();
+
+  const canCreateDraft = isInDateRange(year, 1, 3);
+  const canEvaluate = isInDateRange(year, 1, 12);
 
   return (
-    <article className="relative select-none">
+    <div className="flex flex-col justify-between gap-4">
+      <article className="relative select-none">
         <MainHeader>
           <div className="flex justify-between shrink-0 items-center h-8 pb-3.5 ms-2 w-full">
             <MainTitle>
@@ -57,16 +75,16 @@ export const BonusInfo = ({ year }: Props) => {
             </MainTitle>
 
             {kpiBonus.id && (
-              <Button 
-                size="xs" 
-                variant="secondary" 
+              <Button
+                size="xs"
+                variant="secondary"
                 className="text-xs"
                 disabled={exportExcelOpt.isPending}
-                onClick={() => { 
-                  if (kpiBonus.id) { 
-                    exportExcel({ id: kpiBonus.id }); 
-                  }}
-                }
+                onClick={() => {
+                  if (kpiBonus.id) {
+                    exportExcel({ id: kpiBonus.id });
+                  }
+                }}
               >
                 <BsBoxArrowUpRight className="size-3 stroke-[0.2]" />
                 Export
@@ -75,62 +93,74 @@ export const BonusInfo = ({ year }: Props) => {
           </div>
         </MainHeader>
 
-
-      <div className="basic-0 grow pt-4 px-6 text-sm text-foreground overflow-hidden">
-        <div className="flex flex-col justify-center min-h-full">
-          <Stepper
-            date="Jan - Mar"
-            title="KPI Definition"
-            description="Define measurable goals aligned with team and company priorities"
-            status={STATUS_RECORD[kpiBonus.task.inDraft?.status || Status.NOT_STARTED]}
-            actions={[
-              {
+        <div className="basic-0 grow pt-4 px-6 text-sm text-foreground overflow-hidden">
+          <div className="flex flex-col justify-center min-h-full">
+            <Stepper
+              date="Jan - Mar"
+              title="KPI Definition"
+              description="Define measurable goals aligned with team and company priorities"
+              status={
+                STATUS_RECORD[
+                  kpiBonus.task.inDraft?.status || Status.NOT_STARTED
+                ]
+              }
+              action={{
                 label: kpiBonus.task.inDraft ? "View" : "Create",
                 state: kpiFormOption.isPending,
-                onClick: () => createForm({
-                  year,
-                  period: Period.IN_DRAFT
-                }, kpiBonus.task.inDraft)
+                condition: true,
+                onClick: () => {
+                  if (!kpiBonus.task.inDraft && !canCreateDraft) {
+                    toast.error(
+                      `You can only create KPI Definition in January - March ${year}`,
+                    );
+                    return;
+                  }
+
+                  createForm(
+                    {
+                      year,
+                      period: Period.IN_DRAFT,
+                    },
+                    kpiBonus.task.inDraft,
+                  );
+                },
+              }}
+            />
+            <Stepper
+              date="Jan - Dec"
+              title="Evaluation"
+              description="Assessment of progress towards defined KPIs"
+              status={
+                STATUS_RECORD[
+                  kpiBonus.task.evaluate?.status || Status.NOT_STARTED
+                ]
               }
-            ]}
-          />
-          <Stepper
-            date="Jan - Jun"
-            title="Evaluation 1st"
-            description="Mid-year assessment of progress towards defined KPIs"
-            status={STATUS_RECORD[kpiBonus.task.evaluation1st?.status || Status.NOT_STARTED]}
-            actions={[
-              {
+              action={{
                 label: "Evaluate",
                 state: kpiFormOption.isPending,
                 condition: kpiBonus.task.inDraft?.status === Status.APPROVED,
-                onClick: () => createForm({
-                  year,
-                  period: Period.EVALUATION_1ST,
-                }, kpiBonus.task.evaluation1st)
-              },
-            ]}
-          />
-          <Stepper
-            date="Jul - Dec"
-            title="Evaluation 2nd"
-            description="Final review of KPI performance and eligibility for bonus"
-            status={STATUS_RECORD[kpiBonus.task.evaluation2nd?.status || Status.NOT_STARTED]}
-            actions={[
-              {
-                label: "Evaluate",
-                state: kpiFormOption.isPending,
-                condition: kpiBonus.task.evaluation1st?.status === Status.APPROVED,
-                onClick: () => createForm({
-                  year,
-                  period: Period.EVALUATION_2ND,
-                }, kpiBonus.task.evaluation2nd)
-              },
-            ]}
-          />
+                onClick: () => {
+                  if (!kpiBonus.task.evaluate && !canEvaluate) {
+                    toast.error(
+                      `You can only evaluate in January - December ${year}`,
+                    );
+                    return;
+                  }
+
+                  createForm(
+                    {
+                      year,
+                      period: Period.EVALUATION,
+                    },
+                    kpiBonus.task.evaluate,
+                  );
+                },
+              }}
+            />
+          </div>
         </div>
-        <div className="h-6 w-full" />
-        
+      </article>
+      <article>
         <MainHeader>
           <MainTitle>
             <GoProject className="size-3 stroke-[0.25]" />
@@ -140,12 +170,12 @@ export const BonusInfo = ({ year }: Props) => {
           </MainTitle>
         </MainHeader>
 
-        <BarChartInfo 
-          dataKey={["period", "owner", "checker", "approver"]}
-          data={kpiBonus.chartInfo} 
-          chartConfig={chartConfig} 
+        <BarChartInfo
+          dataKey={["label", "value"]}
+          data={kpiBonus.chartInfo}
+          chartConfig={chartConfig}
         />
-      </div>
-    </article>
+      </article>
+    </div>
   );
-}
+};

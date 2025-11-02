@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
 import type { AppRouter } from "@/trpc/routers/_app";
+import { useSave } from "@/hooks/use-save";
 import { usePeriod } from "@/hooks/use-period";
 
 type RequestType = inferProcedureInput<AppRouter["kpiBonus"]["updateBulkKpi"]>;
@@ -12,6 +13,7 @@ export const useUpdateBulkKpis = (id: string) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
+  const { setSave } = useSave();
   const { period } = usePeriod();
 
   const updateBulkKpi = useMutation(trpc.kpiBonus.updateBulkKpi.mutationOptions());
@@ -25,6 +27,7 @@ export const useUpdateBulkKpis = (id: string) => {
           trpc.kpiBonus.getById.queryOptions({ id, period }),
         );
 
+        setSave(true);
         toast.success("KPIs Updated!", { id: "update-bulk-kpi" });
       },
       onError: (ctx) => {

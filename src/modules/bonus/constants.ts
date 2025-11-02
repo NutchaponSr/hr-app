@@ -15,8 +15,9 @@ export const kpiCategoies: Record<KpiCategory, string> = {
 
 export const periods: Record<Period, string> = {
   [Period.IN_DRAFT]: "In draft",
-  [Period.EVALUATION_1ST]: "Evaluation 1 st",
-  [Period.EVALUATION_2ND]: "Evaluation 2 nd",
+  [Period.EVALUATION]: "Evaluation",
+  [Period.EVALUATION_1ST]: "Evaluation 1st",
+  [Period.EVALUATION_2ND]: "Evaluation 2nd",
 }
 
 export const columns: ExportColumn[] = [

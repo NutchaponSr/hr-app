@@ -1,13 +1,16 @@
 import { Suspense } from "react";
+import { headers } from "next/headers";
 import type { SearchParams } from "nuqs/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
+import { auth } from "@/lib/auth";
 
 import { loadSearchParams } from "@/search-params";
 import { getQueryClient, trpc } from "@/trpc/server";
 
+import { HeaderSkeleton } from "@/components/header";
+
 import { PerformanceView } from "@/modules/performance/ui/views/performance-view";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 
 interface Props {
   searchParams: Promise<SearchParams>;
@@ -21,7 +24,7 @@ const Page = async ({ searchParams }: Props) => {
 
   const canPerform = await auth.api.userHasPermission({
     body: {
-      userId: session!.user.id,
+      userId: session?.user.id,
       role: "ADMIN",
       permission: {
         backend: ["access"],
@@ -38,7 +41,7 @@ const Page = async ({ searchParams }: Props) => {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<p>Loading</p>}>
+      <Suspense fallback={<HeaderSkeleton />}>
         <PerformanceView canPerform={canPerform.success} />
       </Suspense>
     </HydrationBoundary>

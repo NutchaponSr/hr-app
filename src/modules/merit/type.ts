@@ -24,6 +24,7 @@ export interface CompetencyWithInfo extends CompetencyRecord {
 
 export interface CultureWithInfo extends CultureRecord {
   culture: Culture | null
+  cultureEvaluations: CultureEvaluation[];
   comments: (Comment & {
     employee: Employee;
   })[];

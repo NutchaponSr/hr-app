@@ -54,10 +54,12 @@ export const createColumns = ({ canPerform, form, comment }: Props): ColumnDef<C
     id: "weight",
     header: "Weight",
     cell: ({ row }) => (
-      convertAmountFromUnit(row.original.weight, 2).toLocaleString("en-US", {
-        maximumFractionDigits: 2,
-        minimumFractionDigits: 2,
-      })
+      <div className="text-sm text-primary">
+        {convertAmountFromUnit(row.original.weight, 2).toLocaleString("en-US", {
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+        })}
+      </div>
     ),
     meta: {
       width: "w-[40%]",
@@ -68,7 +70,7 @@ export const createColumns = ({ canPerform, form, comment }: Props): ColumnDef<C
     cell: ({ row }) => (
       <div className="absolute top-1 left-1 shadow-[0_0_0_1px_rgba(84,72,49,0.08)] dark:shadow-[0_0_0_1px_rgb(48,48,46)] rounded-sm p-0.5 bg-background">
         <CommentPopover 
-          canPerform 
+          canPerform={canPerform} 
           comments={row.original.comments} 
           onCreate={(content) => comment({ connectId: row.original.id, content })}
         />

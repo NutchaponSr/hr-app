@@ -70,7 +70,12 @@ export const Toolbar = ({
                   </PopoverTrigger>
                   <PopoverContent align="end" className="w-[260px] p-1">
                     <h3 className="text-sm data-[inset]:pl-8 select-none flex items-center min-h-7 ps-1 font-medium text-primary">Import</h3>
-                    <Button variant="ghost" className="h-auto px-2 w-full" onClick={onUpload}>
+                    <Button 
+                      type="button"
+                      variant="ghost" 
+                      className="h-auto px-2 w-full" 
+                      onClick={onUpload}
+                    >
                       <div className="flex items-center justify-center min-w-5 min-h-5 self-start">
                         <BsFiletypeCsv className="!stroke-[0.15] size-5 mt-0.5" />
                       </div>

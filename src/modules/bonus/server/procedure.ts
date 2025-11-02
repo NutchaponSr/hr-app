@@ -12,10 +12,14 @@ import { ApprovalCSVProps } from "@/types/approval";
 import { App, Period, Project, Status } from "@/generated/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
-import { kpiBonusCreateSchema, kpiBonusEvaluationSchema } from "@/modules/bonus/schema";
-import { getUserRole, PermissionContext } from "@/modules/bonus/permission";
 import { columns } from "@/modules/bonus/constants";
-import { formatKpiExport } from "@/modules/bonus/util";
+import { getUserRole } from "@/modules/bonus/permission";
+import { buildPermissionContext } from "@/modules/tasks/utils";
+import { calculateAchievementScore, formatKpiExport } from "@/modules/bonus/util";
+import {
+  kpiBonusCreateSchema,
+  kpiBonusEvaluationSchema,
+} from "@/modules/bonus/schema";
 
 export const bonusProcedure = createTRPCRouter({
   getByYear: protectedProcedure
@@ -36,71 +40,42 @@ export const bonusProcedure = createTRPCRouter({
               preparedAt: "asc",
             },
           },
-          kpis: {
-            include: {
-              kpiEvaluations: true,
-            },
-          },
+          kpis: true,
         },
       });
 
       return {
         id: kpiForm?.id,
         task: {
-          inDraft: kpiForm?.tasks[0],
-          evaluation1st: kpiForm?.tasks[1],
-          evaluation2nd: kpiForm?.tasks[2],
+          inDraft: kpiForm?.tasks.find((f) => f.context === String(Period.IN_DRAFT)),
+          evaluate: kpiForm?.tasks.find((f) => f.context === String(Period.EVALUATION)),
         },
         chartInfo: [
           {
-            period: "Evaluation 1st",
-            owner: convertAmountFromUnit(
-              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
-                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
-                return acc + (((evaluation?.achievementOwner ?? 0) / 100) * kpi.weight);
-              }, 0),
-              2
-            ),
-            checker: convertAmountFromUnit(
-              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
-                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
-                return acc + (((evaluation?.achievementChecker ?? 0) / 100) * kpi.weight);
-              }, 0),
-              2
-            ),
-            approver: convertAmountFromUnit(
-              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
-                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_1ST);
-                return acc + (((evaluation?.achievementApprover ?? 0) / 100) * kpi.weight);
-              }, 0),
-              2
-            ),
+            label: "Owner",
+            value: convertAmountFromUnit(
+              kpiForm?.kpis.reduce((acc, kpi) => {
+                return acc + (((kpi.achievementOwner ?? 0) as number) / 100) * (kpi.weight ?? 0);
+              }, 0) ?? 0,
+              2),
           },
           {
-            period: "Evaluation 2nd",
-            owner: convertAmountFromUnit(
-              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
-                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
-                return acc + (((evaluation?.achievementOwner ?? 0) / 100) * kpi.weight);
-              }, 0),
-              2
-            ),
-            checker: convertAmountFromUnit(
-              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
-                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
-                return acc + (((evaluation?.achievementChecker ?? 0) / 100) * kpi.weight);
-              }, 0),
-              2
-            ),
-            approver: convertAmountFromUnit(
-              (kpiForm?.kpis ?? []).reduce((acc, kpi) => {
-                const evaluation = kpi.kpiEvaluations.find((f) => f.period === Period.EVALUATION_2ND);
-                return acc + (((evaluation?.achievementApprover ?? 0) / 100) * kpi.weight);
-              }, 0),
-              2
-            ),
+            label: "Checker",
+            value: convertAmountFromUnit(
+              kpiForm?.kpis.reduce((acc, kpi) => {
+                return acc + (((kpi.achievementChecker ?? 0) as number) / 100) * (kpi.weight ?? 0);
+              }, 0) ?? 0,
+              2),
           },
-        ],
+          {
+            label: "Approver",
+            value: convertAmountFromUnit(
+              kpiForm?.kpis.reduce((acc, kpi) => {
+                return acc + (((kpi.achievementApprover ?? 0) as number) / 100) * (kpi.weight ?? 0);
+              }, 0) ?? 0,
+              2),
+          },
+        ]
       };
     }),
   getById: protectedProcedure
@@ -121,15 +96,7 @@ export const bonusProcedure = createTRPCRouter({
           approver: true,
           kpiForm: {
             include: {
-              kpis: {
-                include: {
-                  kpiEvaluations: {
-                    where: {
-                      period: input.period,
-                    },
-                  },
-                },
-              },
+              kpis: true,
             },
           },
         },
@@ -142,8 +109,8 @@ export const bonusProcedure = createTRPCRouter({
       const kpiWithComments = await prisma.comment.findMany({
         where: {
           connectId: {
-            in: task.kpiForm?.kpis.map((kpi) => kpi.id)
-          }
+            in: task.kpiForm?.kpis.map((kpi) => kpi.id),
+          },
         },
         include: {
           employee: true,
@@ -153,26 +120,23 @@ export const bonusProcedure = createTRPCRouter({
         },
       });
 
-      const commentsByKpiId = kpiWithComments.reduce((acc, comment) => {
-        if (!acc[comment.connectId]) {
-          acc[comment.connectId] = [];
-        }
-        acc[comment.connectId].push(comment);
-        return acc;
-      }, {} as Record<string, typeof kpiWithComments>);
+      const commentsByKpiId = kpiWithComments.reduce(
+        (acc, comment) => {
+          if (!acc[comment.connectId]) {
+            acc[comment.connectId] = [];
+          }
+          acc[comment.connectId].push(comment);
+          return acc;
+        },
+        {} as Record<string, typeof kpiWithComments>,
+      );
 
-      const kpisWithComments = task.kpiForm?.kpis.map(kpi => ({
+      const kpisWithComments = task.kpiForm?.kpis.map((kpi) => ({
         ...kpi,
         comments: commentsByKpiId[kpi.id] || [],
       }));
 
-      const permissionContext: PermissionContext = {
-        currentEmployeeId: ctx.user.employee.id,
-        documentOwnerId: task.preparedBy,
-        checkerId: task.checkedBy,
-        approverId: task.approvedBy,
-        status: task.status,
-      };
+      const permission = buildPermissionContext(ctx.user.employee.id, task);
 
       return {
         data: {
@@ -183,29 +147,10 @@ export const bonusProcedure = createTRPCRouter({
           },
         },
         permission: {
-          ctx: permissionContext,
-          role: getUserRole(permissionContext),
+          ctx: permission,
+          role: getUserRole(permission),
         },
       };
-    }),
-  getKpiById: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-      })
-    )
-    .query(async ({ input }) => {
-      const res = await prisma.kpi.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (!res) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      return res;
     }),
   createForm: protectedProcedure
     .input(
@@ -218,7 +163,29 @@ export const bonusProcedure = createTRPCRouter({
       const approvalFile = path.join(process.cwd(), "src/data", "approval.csv");
       const approvalRecords = readCSV<ApprovalCSVProps>(approvalFile);
 
-      const targetApproval = approvalRecords.find((f) => f.employeeId === ctx.user.employee.id);
+      const targetApproval = approvalRecords.find(
+        (f) => f.employeeId === ctx.user.employee.id,
+      );
+
+      if (input.period === Period.EVALUATION_2ND) {
+        const meritTask = await prisma.task.findFirst({
+          where: {
+            meritForm: {
+              year: input.year,
+              employeeId: ctx.user.employee.id,
+            },
+            context: Period.EVALUATION_1ST,
+            type: App.MERIT,
+          },
+        });
+
+        if (!meritTask || meritTask.status !== Status.APPROVED) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "You must finish merit evaluation and get approved first!",
+          });
+        }
+      }
 
       if (!targetApproval) {
         throw new TRPCError({ code: "NOT_FOUND" });
@@ -245,23 +212,14 @@ export const bonusProcedure = createTRPCRouter({
           },
         });
       } else {
-        const kpiFormUpdated = await prisma.kpiForm.update({
+        await prisma.kpiForm.update({
           where: {
             id: kpiForm.id,
           },
           data: {
-            period: input.period,
+            period: Period.EVALUATION,
           },
         });
-
-        if (kpiFormUpdated && kpiFormUpdated.period !== Period.IN_DRAFT) {
-          await prisma.kpiEvaluation.createMany({
-            data: kpiForm.kpis.map((kpi) => ({
-              kpiId: kpi.id,
-              period: kpiFormUpdated.period,
-            })),
-          });
-        }
       }
 
       const task = await prisma.task.create({
@@ -269,6 +227,7 @@ export const bonusProcedure = createTRPCRouter({
           type: App.BONUS,
           fileId: kpiForm.id,
           status: Status.IN_DRAFT,
+          context: String(input.period),
           preparedBy: ctx.user.employee.id,
           approvedBy: targetApproval.approverEMPID,
           ...(targetApproval.checkerEMPID && {
@@ -277,7 +236,9 @@ export const bonusProcedure = createTRPCRouter({
         },
       });
 
-      return task;
+      return {
+        id: task.id,
+      };
     }),
   createKpi: protectedProcedure
     .input(
@@ -286,7 +247,7 @@ export const bonusProcedure = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      const res = await prisma.kpi.create({
+      await prisma.kpi.create({
         data: {
           kpiFormId: input.kpiFormId,
         },
@@ -301,14 +262,14 @@ export const bonusProcedure = createTRPCRouter({
         },
       });
 
-      return res;
+      return { success: true };
     }),
   createBulkKpi: protectedProcedure
     .input(
       z.object({
         kpiFormId: z.string(),
         kpis: z.array(kpiBonusCreateSchema),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const data = input.kpis.map((k) => {
@@ -317,7 +278,7 @@ export const bonusProcedure = createTRPCRouter({
           ...otherFields,
           kpiFormId: input.kpiFormId,
           weight: convertAmountToUnit(Number(weight), 2),
-          type: otherFields.type ? otherFields.type as Project : null,
+          type: otherFields.type ? (otherFields.type as Project) : null,
         };
       });
 
@@ -325,7 +286,7 @@ export const bonusProcedure = createTRPCRouter({
         data,
       });
 
-      const res = await prisma.kpiForm.update({
+      await prisma.kpiForm.update({
         where: {
           id: input.kpiFormId,
         },
@@ -334,7 +295,7 @@ export const bonusProcedure = createTRPCRouter({
         },
       });
 
-      return res;
+      return { success: true };
     }),
   updateBulkKpi: protectedProcedure
     .input(
@@ -343,25 +304,27 @@ export const bonusProcedure = createTRPCRouter({
           z.object({
             id: z.string(),
             kpiBonusCreateSchema,
-          })
+          }),
         ),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       // Use transaction to ensure all updates succeed or fail together
       const result = await prisma.$transaction(async (tx) => {
-        const updatePromises = input.kpis.map(({ id, kpiBonusCreateSchema }) => {
-          const { weight, ...otherFields } = kpiBonusCreateSchema;
+        const updatePromises = input.kpis.map(
+          ({ id, kpiBonusCreateSchema }) => {
+            const { weight, ...otherFields } = kpiBonusCreateSchema;
 
-          return tx.kpi.update({
-            where: { id },
-            data: {
-              ...otherFields,
-              type: otherFields.type ? otherFields.type as Project : null,
-              weight: convertAmountToUnit(Number(weight), 2),
-            },
-          });
-        });
+            return tx.kpi.update({
+              where: { id },
+              data: {
+                ...otherFields,
+                type: otherFields.type ? (otherFields.type as Project) : null,
+                weight: convertAmountToUnit(Number(weight), 2),
+              },
+            });
+          },
+        );
 
         const updatedKpis = await Promise.all(updatePromises);
 
@@ -386,24 +349,36 @@ export const bonusProcedure = createTRPCRouter({
     .input(
       z.object({
         evaluations: z.array(kpiBonusEvaluationSchema.omit({ role: true })),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const updates = await Promise.all(
         input.evaluations.map(async ({ id, ...evaluation }) =>
-          prisma.kpiEvaluation.update({
+          prisma.kpi.update({
             where: { id },
             data: {
               fileUrl: evaluation.fileUrl,
-              actualOwner: evaluation.actualOwner ? evaluation.actualOwner : null,
-              achievementOwner: evaluation.achievementOwner ? evaluation.achievementOwner : null,
-              actualChecker: evaluation.actualChecker ? evaluation.actualChecker : null,
-              achievementChecker: evaluation.achievementChecker ? evaluation.achievementChecker : null,
-              actualApprover: evaluation.actualApprover ? evaluation.actualApprover : null,
-              achievementApprover: evaluation.achievementApprover ? evaluation.achievementApprover : null,
+              actualOwner: evaluation.actualOwner
+                ? evaluation.actualOwner
+                : null,
+              achievementOwner: evaluation.achievementOwner
+                ? evaluation.achievementOwner
+                : null,
+              actualChecker: evaluation.actualChecker
+                ? evaluation.actualChecker
+                : null,
+              achievementChecker: evaluation.achievementChecker
+                ? evaluation.achievementChecker
+                : null,
+              actualApprover: evaluation.actualApprover
+                ? evaluation.actualApprover
+                : null,
+              achievementApprover: evaluation.achievementApprover
+                ? evaluation.achievementApprover
+                : null,
             },
-          })
-        )
+          }),
+        ),
       );
 
       return updates;
@@ -450,7 +425,7 @@ export const bonusProcedure = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      const kpi = await prisma.kpiEvaluation.update({
+      const kpi = await prisma.kpi.update({
         where: {
           id: input.id,
         },
@@ -473,11 +448,7 @@ export const bonusProcedure = createTRPCRouter({
           id: input.id,
         },
         include: {
-          kpis: {
-            include: {
-              kpiEvaluations: true,
-            },
-          },
+          kpis: true,
           employee: true,
         },
       });
@@ -500,5 +471,5 @@ export const bonusProcedure = createTRPCRouter({
         file,
         id: kpiForm.id,
       };
-    })
+    }),
 });
