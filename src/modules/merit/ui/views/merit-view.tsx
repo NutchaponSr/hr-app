@@ -121,6 +121,7 @@ export const MeritView = ({ id, period }: Props) => {
               id={id} 
               period={period} 
               merit={merit} 
+              hasChecker={!!merit.permission.ctx?.checkerId}
               canPerform={{
                 canSubmit: permissions.submit,
                 ownerCanWrite: permissions.write && merit.permission.role === "preparer",

@@ -241,6 +241,7 @@ export const taskProcedure = createTRPCRouter({
             include: {
               checker: true,
               approver: true,
+              preparer: true,
             },
           });
         } else {
@@ -254,6 +255,7 @@ export const taskProcedure = createTRPCRouter({
             include: {
               checker: true,
               approver: true,
+              preparer: true,
             },
           });
         }
@@ -270,6 +272,7 @@ export const taskProcedure = createTRPCRouter({
             include: {
               checker: true,
               approver: true,
+              preparer: true,
             },
           });
         } else {
@@ -281,6 +284,7 @@ export const taskProcedure = createTRPCRouter({
               status: Status.REJECTED_BY_APPROVER,
             },
             include: {
+              preparer: true,
               checker: true,
               approver: true,
             },
@@ -294,7 +298,7 @@ export const taskProcedure = createTRPCRouter({
 
       return {
         id: res.id,
-        email: res.checker?.email || res.approver?.email,
+        emails: [res.preparer.email, res.checker?.email, res.approver?.email],
         isApproved: res.status === Status.APPROVED,
       };
     }),

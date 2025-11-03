@@ -27,9 +27,10 @@ interface Props {
     canPerformChecker: boolean;
     canPerformApprover: boolean;
   },
+  hasChecker: boolean;
 }
 
-export const CompetencyCard = ({ index, form, record, permissions }: Props) => {
+export const CompetencyCard = ({ index, form, record, permissions, hasChecker }: Props) => {
   const trpc = useTRPC();
   const id = useMeritId();
   const queryClient = useQueryClient();
@@ -70,6 +71,7 @@ export const CompetencyCard = ({ index, form, record, permissions }: Props) => {
       permissions,
       index,
       period,
+      hasChecker,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -88,7 +90,7 @@ export const CompetencyCard = ({ index, form, record, permissions }: Props) => {
   });
   
   return (
-    <Card className="p-4 h-max">
+    <Card className="p-4 h-auto relative" cardNumber={<SelectionBadge label={String(index + 1)} color="red" />}>
       <div className="w-full relative z-80 flex flex-col gap-4">
         <div className="grid grid-cols-7 gap-4">
           <CardInfo label="Competency" className="col-span-2 h-auto">

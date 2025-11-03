@@ -366,7 +366,7 @@ export const meritProcedure = createTRPCRouter({
                   competencyEvaluations: true,
                 },
                 orderBy: {
-                  id: "asc",
+                  createdAt: "asc",
                 },
               },
               cultureRecords: {

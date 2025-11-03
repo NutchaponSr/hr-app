@@ -29,9 +29,10 @@ interface Props {
   },
   index: number;
   period: Period;
+  hasChecker: boolean;
 }
 
-export const createColumns = ({ form, permissions, index, period }: Props): ColumnDef<CompetencyResult>[] => [
+export const createColumns = ({ form, permissions, index, period, hasChecker }: Props): ColumnDef<CompetencyResult>[] => [
   {
     id: "round",
     header: "รอบการประเมิน",
@@ -63,7 +64,7 @@ export const createColumns = ({ form, permissions, index, period }: Props): Colu
       </p>
     )),
     meta: {
-      width: "w-[45%]",
+      width: hasChecker ? "w-[45%]" : "w-[60%]",
     },
   },
   {
@@ -120,60 +121,64 @@ export const createColumns = ({ form, permissions, index, period }: Props): Colu
       width: "w-[15%]",
     },
   },
-  {
-    id: "Checker",
-    header: "Checker",
-    cell: ({ table, row }) => (
-      period === row.original.period ? (
-      <FormField
-        control={form.control}
-        name={`cultures.${index}.levelBehaviorChecker`}
-        render={({ field }) => (
-          <FormItem className="grow w-full">
-            <Select 
-              onValueChange={field.onChange} 
-              defaultValue={String(field.value)} 
-              disabled={!permissions.canPerformChecker}
-            >
-              <FormControl>
-                <SelectTrigger size="sm" className="w-full">
-                  <div className="whitespace-nowrap overflow-hidden text-ellipsis">
-                    <SelectValue placeholder="Empty" />
-                  </div>
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="1">Level 1</SelectItem>
-                <SelectItem value="2">Level 2</SelectItem>
-                <SelectItem value="3">Level 3</SelectItem>
-                <SelectItem value="4">Level 4</SelectItem>
-                <SelectItem value="5">Level 5</SelectItem>
-              </SelectContent>
-            </Select>
-            <Content label="Level * Weight">
-              <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-                {(((Number(field.value) || 0) / table.getRowCount()) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                  minimumFractionDigits: 2
-                })}
-              </p>
-            </Content>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    ) : (
-      <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-        {(((Number(row.original.checker) || 0) / table.getRowCount()) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
-          maximumFractionDigits: 2,
-          minimumFractionDigits: 2
-        })}
-      </p>
-    )),
-    meta: {
-      width: "w-[15%]",
-    },
-  },
+  ...(hasChecker
+    ? [
+        {
+          id: "Checker",
+          header: "Checker",
+          cell: ({ table, row }) => (
+            period === row.original.period ? (
+            <FormField
+              control={form.control}
+              name={`cultures.${index}.levelBehaviorChecker`}
+              render={({ field }) => (
+                <FormItem className="grow w-full">
+                  <Select 
+                    onValueChange={field.onChange} 
+                    defaultValue={String(field.value)} 
+                    disabled={!permissions.canPerformChecker}
+                  >
+                    <FormControl>
+                      <SelectTrigger size="sm" className="w-full">
+                        <div className="whitespace-nowrap overflow-hidden text-ellipsis">
+                          <SelectValue placeholder="Empty" />
+                        </div>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="1">Level 1</SelectItem>
+                      <SelectItem value="2">Level 2</SelectItem>
+                      <SelectItem value="3">Level 3</SelectItem>
+                      <SelectItem value="4">Level 4</SelectItem>
+                      <SelectItem value="5">Level 5</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Content label="Level * Weight">
+                    <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
+                      {(((Number(field.value) || 0) / table.getRowCount()) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2
+                      })}
+                    </p>
+                  </Content>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : (
+            <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
+              {(((Number(row.original.checker) || 0) / table.getRowCount()) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+              })}
+            </p>
+          )),
+          meta: {
+            width: "w-[15%]",
+          },
+        } as ColumnDef<CompetencyResult>,
+      ]
+    : []),
   {
     id: "Approver",
     header: "Approver",

@@ -119,6 +119,7 @@ export const BonusView = ({
               id={id}
               kpiForm={kpiForm}
               role={kpiForm.permission.role as Role}
+              hasChecker={!!kpiForm.permission.ctx?.checkerId}
               canPerform={{
                 ownerCanWrite: permissions.write && kpiForm.permission.role === "preparer",
                 checkerCanWrite: permissions.write && kpiForm.permission.role === "checker",

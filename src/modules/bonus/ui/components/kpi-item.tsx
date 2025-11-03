@@ -27,9 +27,10 @@ interface Props {
     canPerformChecker: boolean;
     canPerformApprover: boolean;
   };
+  hasChecker: boolean;
 }
 
-export const KpiItem = ({ form, index, kpi, permissions }: Props) => {
+export const KpiItem = ({ form, index, kpi, permissions, hasChecker }: Props) => {
   const targetPopulated = useMemo(() => {
     return [
       {
@@ -57,12 +58,18 @@ export const KpiItem = ({ form, index, kpi, permissions }: Props) => {
 
   const table = useReactTable({
     data: targetPopulated,
-    columns: createColumns({ form, index, permissions, kpi }),
+    columns: createColumns({ 
+      form, 
+      index, 
+      permissions, 
+      kpi, 
+      hasChecker,
+    }),
     getCoreRowModel: getCoreRowModel(),
   });
 
   return (
-    <Card className="p-4 h-max">
+    <Card className="p-4 h-auto relative" cardNumber={<SelectionBadge label={String(index + 1)} color="red" />}>
       <div className="w-full relative z-80 flex flex-col gap-4">
         <div className="grid grid-cols-5 gap-4">
           <CardInfo label="Individual KPI" className="h-auto">

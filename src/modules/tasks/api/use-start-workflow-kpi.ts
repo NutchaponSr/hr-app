@@ -30,19 +30,16 @@ export const useStartWorkflowKpi = (id: string) => {
 
           toast.success("Workflow started!", { id: "start-workflow-kpi" });
 
-          const recipientEmail =
-            process.env.NODE_ENV === "development"
-              ? "pondpopza5@gmail.com"
-              : (data.checker?.email ?? data.approver?.email);
+          const recipientEmail = "pondpopza5@gmail.com";
 
-          // if (recipientEmail) {
-          //   await sendEmail({
-          //     to: recipientEmail,
-          //     subject: "Workflow Started",
-          //     description: "Your workflow has been started. Please check it out.",
-          //     url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${data.id}?period=${period}`,
-          //   });
-          // }
+          if (recipientEmail) {
+            await sendEmail({
+              to: process.env.IMPLEMENT_EMAIL! || recipientEmail,
+              subject: "Workflow Started",
+              description: "Your workflow has been started. Please check it out.",
+              url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${data.id}?period=${period}`,
+            });
+          }
         },
         onError: (ctx) => {
           toast.error(ctx.message || "Something went wrong", {
