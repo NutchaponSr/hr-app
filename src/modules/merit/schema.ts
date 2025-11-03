@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { CompetencyType, Division, Position } from "@/generated/prisma";
+import { CompetencyType, Division, Period, Position } from "@/generated/prisma";
 import { kpiBonusEvaluationSchema } from "../bonus/schema";
 
 export const commentSchema = z.object({
@@ -225,8 +225,7 @@ export const cultureEvaluationSchema = z.object({
 export const meritEvaluationSchema = z.object({
   competencies: z.array(competencyEvaluationSchema),
   cultures: z.array(cultureEvaluationSchema),
-  kpis: z.array(kpiBonusEvaluationSchema),
-});
+})
 
 export type MeritEvaluationSchema = z.infer<typeof meritEvaluationSchema>;
 export type MeritSchema = z.infer<typeof meritSchema>;

@@ -114,7 +114,7 @@ export const MeritEvaluationScreen = ({ id, period, merit, hasChecker, canPerfor
             <div className="grow-0 shrink-0 col-span-2">
               <MeritSummaryTable 
                 form={form} 
-                kpis={merit.data.kpiForm?.kpis || []} 
+                kpi={merit.data.kpiForm?.kpi} 
                 competencyRecords={merit.data.meritForm.competencyRecords}
                 cultureRecords={merit.data.meritForm.cultureRecords}
               />
@@ -124,14 +124,14 @@ export const MeritEvaluationScreen = ({ id, period, merit, hasChecker, canPerfor
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="contents">
           <div data-disabled={!canPerform.canSubmit} className="data-[disabled=false]:z-100 min-h-9 px-16 sticky start-0 top-0 bg-background shrink-0 flex items-center -z-1">
-              <div className="absolute right-16 top-1 flex items-center gap-1">
-                <div className="flex items-end gap-1">
-                  <Button type="submit" variant="primary" size="sm" disabled={updateEvaluation.isPending}>
-                    <BsSave className="stroke-[0.25]" />
-                    Save
-                  </Button>
-                </div>
+            <div className="absolute right-16 top-1 flex items-center gap-1">
+              <div className="flex items-end gap-1">
+                <Button type="submit" variant="primary" size="sm" disabled={updateEvaluation.isPending}>
+                  <BsSave className="stroke-[0.25]" />
+                  Save
+                </Button>
               </div>
+            </div>
           </div>
 
           <div className="grow shrink-0 flex flex-col relative">

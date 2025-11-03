@@ -38,7 +38,7 @@ export interface CommentWithOwner extends Comment {
   employee: Employee;
 }
 
-export const STATUS_RECORD: Record<Status | "DONE" | "EVALUATION_1ST" | "EVALUATION_2ND", { label: string; variant: StatusVariant }> = {
+export const STATUS_RECORD: Record<Status | "DONE" | "EVALUATION_1ST" | "EVALUATION_2ND" | "EVALUATION" , { label: string; variant: StatusVariant }> = {
   [Status.NOT_STARTED]: { label: "Not Started", variant: "purple" },
   [Status.IN_DRAFT]: { label: "In Draft", variant: "orange" },
   [Status.PENDING_CHECKER]: { label: "Pending Checker", variant: "default" },
@@ -49,4 +49,5 @@ export const STATUS_RECORD: Record<Status | "DONE" | "EVALUATION_1ST" | "EVALUAT
   DONE: { label: "Done", variant: "green" },
   EVALUATION_1ST: { label: "Evaluation 1st", variant: "default" },
   EVALUATION_2ND: { label: "Evaluation 2nd", variant: "default" },
+  EVALUATION: { label: "Evaluation", variant: "default" },
 };

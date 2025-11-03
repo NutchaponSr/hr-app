@@ -32,12 +32,14 @@ export const useStartWorkflowKpi = (id: string) => {
 
           const recipientEmail = "pondpopza5@gmail.com";
 
-          await sendEmail({
-            to: "weerawat.m@somboon.co.th",
-            subject: "Workflow Started",
-            description: "Your workflow has been started. Please check it out.",
-            url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${data.id}?period=${period}`,
-          });
+          if (process.env.NODE_ENV === "production") {
+            await sendEmail({
+              to: "weerawat.m@somboon.co.th",
+              subject: "Workflow Started",
+              description: "Your workflow has been started. Please check it out.",
+              url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${data.id}?period=${period}`,
+            });
+          }
         },
         onError: (ctx) => {
           toast.error(ctx.message || "Something went wrong", {

@@ -477,7 +477,32 @@ export const meritProcedure = createTRPCRouter({
             competencyRecords: competencyRecordsWithComments,
             cultureRecords: cultureRecordsWithComments || [],
           },
-          kpiForm,
+          kpiForm: {
+            kpi: task.meritForm?.period === Period.EVALUATION_2ND ? {
+              owner: kpiForm?.kpis.reduce((acc, comp, idx) => {
+                const level = Number(comp.achievementOwner ?? 0);
+                const weight = convertAmountFromUnit(kpiForm?.kpis[idx]?.weight ?? 0, 2);
+                
+                return acc + (level / 100) * weight;
+              }, 0) || 0,
+              checker: kpiForm?.kpis.reduce((acc, comp, idx) => {
+                const level = Number(comp.achievementChecker ?? 0);
+                const weight = convertAmountFromUnit(kpiForm?.kpis[idx]?.weight ?? 0, 2);
+                
+                return acc + ((level / 100) * weight);
+              }, 0) || 0,
+              approver: kpiForm?.kpis.reduce((acc, comp, idx) => {
+                const level = Number(comp.achievementApprover ?? 0);
+                const weight = convertAmountFromUnit(kpiForm?.kpis[idx]?.weight ?? 0, 2);
+                
+                return acc + ((level / 100) * weight);
+              }, 0) || 0,
+            } : {
+              owner: 0,
+              checker: 0,
+              approver: 0,
+            },
+          },
         },
         permission: {
           ctx: permissionContext,
@@ -525,6 +550,9 @@ export const meritProcedure = createTRPCRouter({
             context: previousPeriod,
             type: App.MERIT,
           },
+          include: {
+            meritForm: true,
+          },
         });
 
         // ดึง KPI task ที่ approve แล้ว
@@ -539,9 +567,6 @@ export const meritProcedure = createTRPCRouter({
           },
         });
 
-        console.log({ approvedMeritTask, approvedKpiTask });
-
-
         if (input.year >= 2025) {
           if (
             !approvedMeritTask ||
@@ -555,8 +580,7 @@ export const meritProcedure = createTRPCRouter({
         }
 
         if (
-          !approvedKpiTask ||
-          approvedKpiTask.status !== Status.APPROVED
+          (!approvedKpiTask || approvedKpiTask.status !== Status.APPROVED) && approvedMeritTask?.meritForm?.period === Period.EVALUATION_1ST
         ) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",

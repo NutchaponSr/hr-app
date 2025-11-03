@@ -90,7 +90,7 @@ export const CultureCard = ({ index, form, record, permissions, hasChecker }: Pr
   });
   
   return (
-    <Card className="p-4 h-max">
+    <Card className="p-4 h-auto min-h-max" cardNumber={<SelectionBadge label={String(index + 1)} color="red" />}>
       <div className="w-full relative z-80 flex flex-col gap-4">
         <div className="grid grid-cols-7 gap-4">
           <CardInfo label="Culture" className="col-span-2 h-auto">

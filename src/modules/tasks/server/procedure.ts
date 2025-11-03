@@ -24,6 +24,10 @@ function getAppStatus(
     return Period.IN_DRAFT as string;
   }
 
+  if (form.period === Period.EVALUATION) {
+    return Period.EVALUATION as string;
+  }
+
   if (form.period === Period.EVALUATION_1ST) {
     return Period.EVALUATION_1ST as string;
   }

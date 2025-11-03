@@ -85,25 +85,10 @@ export function meritEvaluationMapValue(merit: inferProcedureOutput<AppRouter["k
     };
   });
 
-  const kpis = merit.data.kpiForm?.kpis.map((kpi) => {
-
-    return {
-      role,
-      id: kpi?.id,
-      actualOwner: kpi?.actualOwner,
-      achievementOwner: kpi?.achievementOwner,
-      actualChecker: kpi?.actualChecker,
-      achievementChecker: kpi?.achievementChecker,
-      actualApprover: kpi?.actualApprover,
-      achievementApprover: kpi?.achievementApprover,
-      fileUrl: kpi?.fileUrl,
-    }
-  })
-
   return {
     competencies,
     cultures,
-    kpis
+    period: merit.data.meritForm.period,
   }
 }
 

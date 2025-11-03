@@ -76,8 +76,8 @@ export const MeritInfo = ({ year }: Props) => {
     trpc.kpiMerit.getByYear.queryOptions({ year }),
   );
 
-  const { mutation: createForm, opt: meritFormOption } = useCreateMeritForm();
   const { mutation: exportExcel, opt: exportExcelOpt } = useExportMerit();
+  const { mutation: createForm, opt: meritFormOption } = useCreateMeritForm();
 
   // Transform nested data for chart based on selected category
   const chartData = merit.chartInfo.map((item) => ({
