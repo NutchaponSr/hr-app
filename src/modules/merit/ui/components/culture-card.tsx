@@ -27,9 +27,10 @@ interface Props {
     canPerformChecker: boolean;
     canPerformApprover: boolean;
   },
+  hasChecker: boolean;
 }
 
-export const CultureCard = ({ index, form, record, permissions }: Props) => {
+export const CultureCard = ({ index, form, record, permissions, hasChecker }: Props) => {
   const trpc = useTRPC();
   const id = useMeritId();
   const queryClient = useQueryClient();
@@ -70,6 +71,7 @@ export const CultureCard = ({ index, form, record, permissions }: Props) => {
       permissions,
       index,
       period,
+      hasChecker,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

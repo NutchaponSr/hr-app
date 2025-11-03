@@ -33,23 +33,20 @@ export const useApprovalMerit = (id: string) => {
             { id: "approval" },
           );
 
-          const recipientEmail =
-            process.env.NODE_ENV === "development"
-              ? "pondpopza5@gmail.com"
-              : data.email;
+          const recipientEmail = "pondpopza5@gmail.com";
 
-          // if (recipientEmail) {
-          //   await sendEmail({
-          //     to: recipientEmail,
-          //     subject: data.isApproved ? "Workflow Finished!" : value.confirm ? "Workflow Approved!" : "Workflow Rejected!",
-          //     description: data.isApproved
-          //       ? "Your workflow has been finished. Please check it out."
-          //       : value.confirm
-          //         ? "Your workflow has been approved. Please check it out."
-          //         : "Your workflow has been rejected. Please check it out.",
-          //     url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/merit/${data.id}?period=${period}`,
-          //   });
-          // }
+          if (recipientEmail) {
+            await sendEmail({
+              to: process.env.IMPLEMENT_EMAIL! || recipientEmail,
+              subject: data.isApproved ? "Workflow Finished!" : value.confirm ? "Workflow Approved!" : "Workflow Rejected!",
+              description: data.isApproved
+                ? "Your workflow has been finished. Please check it out."
+                : value.confirm
+                  ? "Your workflow has been approved. Please check it out."
+                  : "Your workflow has been rejected. Please check it out.",
+              url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/merit/${data.id}?period=${period}`,
+            });
+          }
         },
         onError: (ctx) => {
           toast.error(ctx.message || "Something went wrong", {

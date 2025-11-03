@@ -99,7 +99,7 @@ export const MeritInfo = ({ year }: Props) => {
             <MainTitle>
               <GoProject className="size-3 stroke-[0.25]" />
               <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                KPI Bonus
+                Merit
               </span>
             </MainTitle>
 
@@ -153,39 +153,37 @@ export const MeritInfo = ({ year }: Props) => {
                 },
               }}
             />
-            {year > 2025 && (
-              <Stepper
-                date="Jan - Jun"
-                title="Evaluation 1st"
-                description="Mid-year merit review to assess progress and performance"
-                status={
-                  STATUS_RECORD[
-                    merit.task.evaluation1st?.status || Status.NOT_STARTED
-                  ]
-                }
-                action={{
-                  label: "Evaluate",
-                  state: meritFormOption.isPending,
-                  condition: merit.task.inDraft?.status === Status.APPROVED,
-                  onClick: () => {
-                    if (!merit.task.evaluation2nd && !canEvaluate1st) {
-                      toast.error(
-                        `You can only evaluate in January - June ${year}`,
-                      );
-                      return;
-                    }
-
-                    createForm(
-                      {
-                        year,
-                        period: Period.EVALUATION_1ST,
-                      },
-                      merit.task.evaluation1st,
+            <Stepper
+              date="Jan - Jun"
+              title="Evaluation 1st"
+              description="Mid-year merit review to assess progress and performance"
+              status={
+                STATUS_RECORD[
+                  merit.task.evaluation1st?.status || Status.NOT_STARTED
+                ]
+              }
+              action={{
+                label: "Evaluate",
+                state: meritFormOption.isPending,
+                condition: merit.task.inDraft?.status === Status.APPROVED,
+                onClick: () => {
+                  if (!merit.task.evaluation2nd && !canEvaluate1st) {
+                    toast.error(
+                      `You can only evaluate in January - June ${year}`,
                     );
-                  },
-                }}
-              />
-            )}
+                    return;
+                  }
+
+                  createForm(
+                    {
+                      year,
+                      period: Period.EVALUATION_1ST,
+                    },
+                    merit.task.evaluation1st,
+                  );
+                },
+              }}
+            />
             <Stepper
               date="Jul - Dec"
               title="Evaluation 2nd"
@@ -198,10 +196,7 @@ export const MeritInfo = ({ year }: Props) => {
               action={{
                 label: "Evaluate",
                 state: meritFormOption.isPending,
-                condition:
-                  year >= 2025
-                    ? merit.task.inDraft?.status === Status.APPROVED
-                    : merit.task.evaluation1st?.status === Status.APPROVED,
+                condition: merit.task.evaluation1st?.status === Status.APPROVED,
                 onClick: () => {
                   if (!merit.task.evaluation2nd && !canEvaluate2nd) {
                     toast.error(

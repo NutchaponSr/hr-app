@@ -15,6 +15,8 @@ import { useUpdateBulkKpiEvaluations } from "../../api/use-update-bulk-kpi-evalu
 import { KpiBonusEvaluationsSchema } from "../../schema";
 import { Button } from "@/components/ui/button";
 import { Loader } from "lucide-react";
+import React from "react";
+import { Separator } from "@/components/ui/separator";
 
 interface Props {
   id: string;
@@ -26,6 +28,7 @@ interface Props {
     approverCanWrite: boolean;
   };
   role: Role;
+  hasChecker: boolean;
 }
 
 export const BonusEvaluationScreen = ({
@@ -33,6 +36,7 @@ export const BonusEvaluationScreen = ({
   kpiForm,
   canPerform,
   role,
+  hasChecker,
 }: Props) => {
   const {
     mutation: updateBulkKpiEvaluations,
@@ -108,17 +112,22 @@ export const BonusEvaluationScreen = ({
           <div className="grow shrink-0 flex flex-col relative pb-[180px]">
             <div className="relative float-start min-w-full select-none px-16 space-y-4">
               {kpiForm.data.kpiForm.kpis?.map((kpi, index) => (
-                <KpiItem 
-                  key={kpi.id} 
-                  index={index}
-                  form={form}
-                  kpi={kpi}   
-                  permissions={{
-                    canPerformOwner: canPerform.ownerCanWrite,
-                    canPerformChecker: canPerform.checkerCanWrite,
-                    canPerformApprover: canPerform.approverCanWrite,
-                  }}
-                />
+                <React.Fragment key={kpi.id}>
+                  <KpiItem 
+                    index={index}
+                    form={form}
+                    kpi={kpi}   
+                    permissions={{
+                      canPerformOwner: canPerform.ownerCanWrite,
+                      canPerformChecker: canPerform.checkerCanWrite,
+                      canPerformApprover: canPerform.approverCanWrite,
+                    }}
+                    hasChecker={hasChecker}
+                  />
+                  {index !== kpiForm.data.kpiForm.kpis!.length - 1 && (
+                    <Separator className="!h-[1.25px]" />
+                  )}
+                </React.Fragment>
               ))} 
             </div>
           </div>

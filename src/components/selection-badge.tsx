@@ -8,7 +8,7 @@ export const badgeVariant = cva("inline-flex items-center shrink max-w-full w-fi
     variants: {
       color: {
         default: "bg-gray-foreground text-gray-muted dark:text-gray-neutral",
-        red: "bg-red-foreground text-red-muted",
+        red: "bg-red-foreground text-red-muted dark:text-red-neutral",
         orange: "bg-orange-foreground text-orange-muted dark:text-orange-neutral",
         blue: "bg-blue-foreground text-blue-muted",
       },

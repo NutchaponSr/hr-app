@@ -18,6 +18,7 @@ type TargetRow = {
 interface Props {
   form: UseFormReturn<KpiBonusEvaluationsSchema>;
   kpi: KpiWithEvaluation;
+  hasChecker: boolean;
   permissions: {
     canPerformOwner: boolean;
     canPerformChecker: boolean;
@@ -26,7 +27,7 @@ interface Props {
   index: number;
 }
 
-export const createColumns = ({ form, permissions, index, kpi }: Props): ColumnDef<TargetRow>[] => {
+export const createColumns = ({ form, permissions, index, kpi, hasChecker }: Props): ColumnDef<TargetRow>[] => {
   const ownerValue = form.watch(`evaluations.${index}.achievementOwner`);
   const checkerValue = form.watch(`evaluations.${index}.achievementChecker`);
   const approverValue = form.watch(`evaluations.${index}.achievementApprover`);
@@ -54,7 +55,7 @@ export const createColumns = ({ form, permissions, index, kpi }: Props): ColumnD
         </div>
       ),
       meta: {
-        width: "w-[60%]",
+        width: hasChecker ? "w-[60%]" : "w-[70%]",
       },
     },
     {
@@ -119,68 +120,72 @@ export const createColumns = ({ form, permissions, index, kpi }: Props): ColumnD
         width: "w-[10%]",
       },
     },
-    {
-      id: "checker",
-      header: "Checker",
-      cell: ({ row }) => {
-        const valueStr = checkerValue == null ? undefined : String(checkerValue);
-        return (
-          <RadioGroup
-            className="items-center"
-            value={valueStr}
-            disabled={!permissions.canPerformChecker}
-            onValueChange={(v) =>
-              form.setValue(
-                `evaluations.${index}.achievementChecker`,
-                v ? parseFloat(v) : null,
-                { shouldDirty: true, shouldTouch: true, shouldValidate: true }
-              )
-            }
-          >
-            {(() => {
-              const id = `checker-${index}-${row.original.id}`;
-              const checked = valueStr === row.original.id;
+    ...(hasChecker
+      ? [
+          {
+            id: "checker",
+            header: "Checker",
+            cell: ({ row }) => {
+              const valueStr = checkerValue == null ? undefined : String(checkerValue);
               return (
-                <div className="flex items-center justify-center">
-                  <RadioGroupItem
-                    id={id}
-                    value={row.original.id}
-                    aria-label={id}
-                    className="sr-only"
-                    disabled={!permissions.canPerformChecker}
-                  />
-                  <label
-                    htmlFor={id}
-                    className={cn(
-                      "size-5 rounded-xs border-[1.25px] border-foreground grid place-items-center cursor-pointer bg-background",
-                      checked && "bg-marine text-white border-marine",
-                      !permissions.canPerformChecker && "opacity-50 cursor-not-allowed"
-                    )}
-                  >
-                    <CheckIcon className={cn("size-4", checked ? "opacity-100" : "opacity-0")} />
-                  </label>
-                </div>
+                <RadioGroup
+                  className="items-center"
+                  value={valueStr}
+                  disabled={!permissions.canPerformChecker}
+                  onValueChange={(v) =>
+                    form.setValue(
+                      `evaluations.${index}.achievementChecker`,
+                      v ? parseFloat(v) : null,
+                      { shouldDirty: true, shouldTouch: true, shouldValidate: true }
+                    )
+                  }
+                >
+                  {(() => {
+                    const id = `checker-${index}-${row.original.id}`;
+                    const checked = valueStr === row.original.id;
+                    return (
+                      <div className="flex items-center justify-center">
+                        <RadioGroupItem
+                          id={id}
+                          value={row.original.id}
+                          aria-label={id}
+                          className="sr-only"
+                          disabled={!permissions.canPerformChecker}
+                        />
+                        <label
+                          htmlFor={id}
+                          className={cn(
+                            "size-5 rounded-xs border-[1.25px] border-foreground grid place-items-center cursor-pointer bg-background",
+                            checked && "bg-marine text-white border-marine",
+                            !permissions.canPerformChecker && "opacity-50 cursor-not-allowed"
+                          )}
+                        >
+                          <CheckIcon className={cn("size-4", checked ? "opacity-100" : "opacity-0")} />
+                        </label>
+                      </div>
+                    );
+                  })()}
+                </RadioGroup>
               );
-            })()}
-          </RadioGroup>
-        );
-      },
-      footer: () => (
-        <div className="flex items-center justify-end overflow-hidden whitespace-nowrap">
-          <div className="flex items-center">
-            <span className="font-medium text-tertiary text-[10px] uppercase tracking-[1px] me-1 select-none mt-px">
-              Value
-            </span>
-            <span className="text-xs text-secondary">
-              {Number(form.watch(`evaluations.${index}.achievementChecker`)) / 100 * convertAmountFromUnit(kpi.weight, 2)} %
-            </span>
-          </div>
-        </div>
-      ),
-      meta: {
-        width: "w-[10%]",
-      },
-    },
+            },
+            footer: () => (
+              <div className="flex items-center justify-end overflow-hidden whitespace-nowrap">
+                <div className="flex items-center">
+                  <span className="font-medium text-tertiary text-[10px] uppercase tracking-[1px] me-1 select-none mt-px">
+                    Value
+                  </span>
+                  <span className="text-xs text-secondary">
+                    {Number(form.watch(`evaluations.${index}.achievementChecker`)) / 100 * convertAmountFromUnit(kpi.weight, 2)} %
+                  </span>
+                </div>
+              </div>
+            ),
+            meta: {
+              width: "w-[10%]",
+            },
+          } as ColumnDef<TargetRow>,
+        ]
+      : []),
     {
       id: "approver",
       header: "Approver",

@@ -27,16 +27,18 @@ import { competencyLevels, cultureLevels } from "../../constants";
 import { Card } from "@/components/card";
 import { CompetencyCard } from "../components/competency-card";
 import { CultureCard } from "../components/culture-card";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { toast } from "sonner";
 import { useSave } from "@/hooks/use-save";
+import { Separator } from "@/components/ui/separator";
 
 interface Props {
   id: string;
   period: Period;
   merit: inferProcedureOutput<AppRouter["kpiMerit"]["getByFormId"]>;
+  hasChecker: boolean;
   canPerform: {
     canSubmit: boolean;
     ownerCanWrite: boolean;
@@ -45,7 +47,7 @@ interface Props {
   };
 }
 
-export const MeritEvaluationScreen = ({ id, period, merit, canPerform }: Props) => {
+export const MeritEvaluationScreen = ({ id, period, merit, hasChecker, canPerform }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -203,17 +205,23 @@ export const MeritEvaluationScreen = ({ id, period, merit, canPerform }: Props) 
 
                     <div className="flex flex-col gap-4">
                       {merit.data.meritForm.competencyRecords.map((record, index) => (
-                        <CompetencyCard 
-                          key={record.id} 
-                          record={record} 
-                          index={index}
-                          form={form}
-                          permissions={{
-                            canPerformOwner: canPerform.ownerCanWrite,
-                            canPerformChecker: canPerform.checkerCanWrite,
-                            canPerformApprover: canPerform.approverCanWrite,
-                          }}
-                        />
+                        <React.Fragment key={record.id}>
+                          <CompetencyCard 
+                            key={record.id} 
+                            record={record} 
+                            index={index}
+                            form={form}
+                            permissions={{
+                              canPerformOwner: canPerform.ownerCanWrite,
+                              canPerformChecker: canPerform.checkerCanWrite,
+                              canPerformApprover: canPerform.approverCanWrite,
+                            }}
+                            hasChecker={hasChecker}   
+                          />
+                          {index !== merit.data.meritForm.competencyRecords.length - 1 && (
+                            <Separator className="!h-[1.25px]" />
+                          )}
+                        </React.Fragment>
                       ))}
                     </div>
                   </AccordionContent>
@@ -282,17 +290,23 @@ export const MeritEvaluationScreen = ({ id, period, merit, canPerform }: Props) 
 
                     <div className="flex flex-col gap-4">
                       {merit.data.meritForm.cultureRecords.map((record, index) => (
-                        <CultureCard 
-                          key={record.id} 
-                          record={record} 
-                          index={index}
-                          form={form}
-                          permissions={{
-                            canPerformOwner: canPerform.ownerCanWrite,
-                            canPerformChecker: canPerform.checkerCanWrite,
-                            canPerformApprover: canPerform.approverCanWrite,
-                          }}
-                        />
+                        <React.Fragment key={record.id}>
+                          <CultureCard 
+                            key={record.id} 
+                            record={record} 
+                            index={index}
+                            form={form}
+                            permissions={{
+                              canPerformOwner: canPerform.ownerCanWrite,
+                              canPerformChecker: canPerform.checkerCanWrite,
+                              canPerformApprover: canPerform.approverCanWrite,
+                            }}
+                            hasChecker={hasChecker}
+                          />
+                          {index !== merit.data.meritForm.cultureRecords.length - 1 && (
+                            <Separator className="!h-[1.25px]" />
+                          )}
+                        </React.Fragment>
                       ))}
                     </div>
                   </AccordionContent>

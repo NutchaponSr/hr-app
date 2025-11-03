@@ -3,11 +3,15 @@ import { cn } from "@/lib/utils";
 interface Props {
   children: React.ReactNode;
   className?: string;
+  cardNumber?: React.ReactNode;
 }
 
-export const Card = ({ children, className }: Props) => {
+export const Card = ({ children, className, cardNumber }: Props) => {
   return (
     <article className="relative w-full flex group h-full">
+      <div className="absolute -top-3 -left-3 z-101">
+        {cardNumber}
+      </div>
       <div className={cn("select-none transition flex w-full h-30 flex-col justify-between rounded overflow-hidden bg-popover", className)}>
         {children}
       </div>

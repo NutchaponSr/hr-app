@@ -119,7 +119,11 @@ export const bonusProcedure = createTRPCRouter({
           approver: true,
           kpiForm: {
             include: {
-              kpis: true,
+              kpis: {
+                orderBy: {
+                  createdAt: "asc",
+                },
+              },
             },
           },
         },
