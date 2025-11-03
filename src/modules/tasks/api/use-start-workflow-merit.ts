@@ -32,14 +32,12 @@ export const useStartWorkflowMerit = (id: string) => {
 
           const recipientEmail = "pondpopza5@gmail.com";
 
-          if (recipientEmail) {
-            await sendEmail({
-              to: process.env.IMPLEMENT_EMAIL! || recipientEmail,
-              subject: "Workflow Started",
-              description: "Your workflow has been started. Please check it out.",
-              url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/merit/${data.id}?period=${period}`,
-            });
-          }
+          await sendEmail({
+            to: "weerawat.m@somboon.co.th",
+            subject: "Workflow Started",
+            description: "Your workflow has been started. Please check it out.",
+            url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/merit/${data.id}?period=${period}`,
+          });
         },
         onError: (ctx) => {
           toast.error(ctx.message || "Something went wrong", {
