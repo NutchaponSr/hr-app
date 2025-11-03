@@ -7,6 +7,10 @@ export const cleanUpDatabase = async () => {
   await prisma.employee.deleteMany();
   await prisma.competency.deleteMany();
   await prisma.culture.deleteMany();
+
+  await prisma.kpiForm.deleteMany();
+  await prisma.meritForm.deleteMany();
+  await prisma.comment.deleteMany();
   
   console.log("✅ Cleanup completed");
 };

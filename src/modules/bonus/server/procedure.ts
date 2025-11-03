@@ -4,7 +4,11 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
-import { convertAmountFromUnit, convertAmountToUnit, exportExcel } from "@/lib/utils";
+import {
+  convertAmountFromUnit,
+  convertAmountToUnit,
+  exportExcel,
+} from "@/lib/utils";
 
 import { readCSV } from "@/seeds/utils/csv";
 
@@ -15,7 +19,7 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { columns } from "@/modules/bonus/constants";
 import { getUserRole } from "@/modules/bonus/permission";
 import { buildPermissionContext } from "@/modules/tasks/utils";
-import { calculateAchievementScore, formatKpiExport } from "@/modules/bonus/util";
+import { formatKpiExport } from "@/modules/bonus/util";
 import {
   kpiBonusCreateSchema,
   kpiBonusEvaluationSchema,
@@ -47,35 +51,54 @@ export const bonusProcedure = createTRPCRouter({
       return {
         id: kpiForm?.id,
         task: {
-          inDraft: kpiForm?.tasks.find((f) => f.context === String(Period.IN_DRAFT)),
-          evaluate: kpiForm?.tasks.find((f) => f.context === String(Period.EVALUATION)),
+          inDraft: kpiForm?.tasks.find(
+            (f) => f.context === String(Period.IN_DRAFT),
+          ),
+          evaluate: kpiForm?.tasks.find(
+            (f) => f.context === String(Period.EVALUATION),
+          ),
         },
         chartInfo: [
           {
             label: "Owner",
             value: convertAmountFromUnit(
               kpiForm?.kpis.reduce((acc, kpi) => {
-                return acc + (((kpi.achievementOwner ?? 0) as number) / 100) * (kpi.weight ?? 0);
+                return (
+                  acc +
+                  (((kpi.achievementOwner ?? 0) as number) / 100) *
+                    (kpi.weight ?? 0)
+                );
               }, 0) ?? 0,
-              2),
+              2,
+            ),
           },
           {
             label: "Checker",
             value: convertAmountFromUnit(
               kpiForm?.kpis.reduce((acc, kpi) => {
-                return acc + (((kpi.achievementChecker ?? 0) as number) / 100) * (kpi.weight ?? 0);
+                return (
+                  acc +
+                  (((kpi.achievementChecker ?? 0) as number) / 100) *
+                    (kpi.weight ?? 0)
+                );
               }, 0) ?? 0,
-              2),
+              2,
+            ),
           },
           {
             label: "Approver",
             value: convertAmountFromUnit(
               kpiForm?.kpis.reduce((acc, kpi) => {
-                return acc + (((kpi.achievementApprover ?? 0) as number) / 100) * (kpi.weight ?? 0);
+                return (
+                  acc +
+                  (((kpi.achievementApprover ?? 0) as number) / 100) *
+                    (kpi.weight ?? 0)
+                );
               }, 0) ?? 0,
-              2),
+              2,
+            ),
           },
-        ]
+        ],
       };
     }),
   getById: protectedProcedure

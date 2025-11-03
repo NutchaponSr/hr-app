@@ -26,7 +26,9 @@ export function validateWeight(position: Position) {
   }
 }
 
-export const getEditableFields = (role: "preparer" | "checker" | "approver") => {
+export const getEditableFields = (
+  role: "preparer" | "checker" | "approver",
+) => {
   switch (role) {
     case "preparer":
       return ["actualOwner", "achievementOwner"];
@@ -42,16 +44,13 @@ export const getEditableFields = (role: "preparer" | "checker" | "approver") => 
 export function getTotalWithWeight(
   evaluations: KpiBonusEvaluationSchema[],
   kpis: KpiWithEvaluation[],
-  key: "achievementOwner" | "achievementChecker" | "achievementApprover"
+  key: "achievementOwner" | "achievementChecker" | "achievementApprover",
 ) {
   const total = (evaluations || []).reduce((sum, evalItem, idx) => {
-    const weight = convertAmountFromUnit(
-      (kpis?.[idx]?.weight ?? 0),
-      2
-    );
+    const weight = convertAmountFromUnit(kpis?.[idx]?.weight ?? 0, 2);
     const achievement = Number(evalItem?.[key] ?? 0);
 
-    return sum + ((achievement / 100) * weight);
+    return sum + (achievement / 100) * weight;
   }, 0);
 
   return total.toLocaleString("en-US", {
@@ -63,12 +62,12 @@ export function getTotalWithWeight(
 export function calculateAchievementSum(
   evaluations: KpiBonusEvaluationSchema[],
   kpis: { weight?: number }[],
-  key: "achievementOwner" | "achievementChecker" | "achievementApprover"
+  key: "achievementOwner" | "achievementChecker" | "achievementApprover",
 ): number {
   return (evaluations || []).reduce((acc, comp, idx) => {
     const level = Number(comp[key] ?? 0);
     const weight = convertAmountFromUnit(kpis[idx]?.weight ?? 0, 2);
-    
+
     return acc + (level / 100) * weight;
   }, 0);
 }
@@ -91,21 +90,28 @@ export function calculateAchievementScore(
     }>;
   }>,
   period: Period,
-  role: "achievementOwner" | "achievementChecker" | "achievementApprover"
+  role: "achievementOwner" | "achievementChecker" | "achievementApprover",
 ): number {
   return convertAmountFromUnit(
     kpis.reduce((acc, kpi) => {
       const evaluation = kpi.kpiEvaluations.find((f) => f.period === period);
       const achievement = evaluation?.[role] ?? 0;
-      return acc + ((achievement / 100) * kpi.weight);
+      return acc + (achievement / 100) * kpi.weight;
     }, 0),
-    2
+    2,
   );
 }
 
 export function formatKpiExport(kpiForm: KpiFormWithInfo) {
-  const calcPercentage = (weight: number, decimal: number, achievement: number) =>
-    (convertAmountFromUnit(weight, decimal) * ((achievement ?? 0) / 100)).toLocaleString("en-US", {
+  const calcPercentage = (
+    weight: number,
+    decimal: number,
+    achievement: number,
+  ) =>
+    (
+      convertAmountFromUnit(weight, decimal) *
+      ((achievement ?? 0) / 100)
+    ).toLocaleString("en-US", {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2,
     });
@@ -165,10 +171,11 @@ export function bonusEvaluationMapValue(kpi: KpiWithComments) {
     objective: kpi.objective ?? "",
     definition: kpi.definition ?? "",
     strategy: kpi.strategy ?? "",
+    method: kpi.method ?? "",
     type: kpi.type,
     target70: kpi.target70 ?? "",
     target80: kpi.target80 ?? "",
     target90: kpi.target90 ?? "",
     target100: kpi.target100 ?? "",
-  }
+  };
 }
