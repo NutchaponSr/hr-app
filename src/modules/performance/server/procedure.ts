@@ -2,6 +2,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { convertAmountFromUnit } from "@/lib/utils";
+
 import { KpiFormWithKpi } from "@/modules/bonus/types";
 import { Period, Status } from "@/generated/prisma";
 
@@ -20,26 +21,17 @@ export const performanceProcedure = createTRPCRouter({
             },
           },
           include: {
-            kpis: {
-              include: {
-                kpiEvaluations: true,
-              },
-            },
+            kpis: true,
             tasks: true,
           },
         });
   
         const calcAchievementSum = (
           forms: KpiFormWithKpi[],
-          period: "EVALUATION_1ST" | "EVALUATION_2ND"
         ) =>
           forms.reduce((total, form) => {
             const formTotal = form.kpis.reduce((sum, kpi) => {
-              const evalData = kpi.kpiEvaluations.find((e) => e.period === period);
-              if (evalData?.achievementApprover) {
-                return sum + (evalData.achievementApprover / 100) * kpi.weight;
-              }
-              return sum;
+              return sum + kpi.weight;
             }, 0);
             return total + formTotal;
           }, 0);
@@ -55,7 +47,7 @@ export const performanceProcedure = createTRPCRouter({
       
         // ฟังก์ชันคำนวณ finalScore สำหรับชุดฟอร์ม
         const calcFinalScore = (targetForms: KpiFormWithKpi[]) => {
-          const sumAchievement2nd = calcAchievementSum(targetForms, "EVALUATION_2ND");
+          const sumAchievement2nd = calcAchievementSum(targetForms);
           return avg(sumAchievement2nd, targetForms.length);
         };
       
@@ -71,18 +63,18 @@ export const performanceProcedure = createTRPCRouter({
           0
         );
       
-        const sumAchievement1st = calcAchievementSum(currentForms, "EVALUATION_1ST");
-        const sumAchievement2nd = calcAchievementSum(currentForms, "EVALUATION_2ND");
+        const sumAchievement1st = calcAchievementSum(currentForms);
       
         const formsEvaluted = currentForms.filter(
           (f) =>
-            f.tasks.length === 3 &&
+            f.tasks.length === 2 &&
             f.tasks.every((t) => t.status === Status.APPROVED) &&
-            f.period === Period.EVALUATION_2ND
+            f.period === Period.EVALUATION
         ).length;
       
         const formsEvaluting = currentForms.filter((f) =>
-          f.tasks.every((t) => t.status !== Status.APPROVED)
+          f.tasks.some((t) => t.status !== Status.APPROVED) &&
+          f.period === Period.EVALUATION
         ).length;
       
         return {
@@ -93,12 +85,8 @@ export const performanceProcedure = createTRPCRouter({
               value: avg(sumWeight, currentForms.length),
             },
             {
-              period: "Evaluation 1st",
+              period: "Evaluation",
               value: avg(sumAchievement1st, currentForms.length),
-            },
-            {
-              period: "Evaluation 2nd",
-              value: avg(sumAchievement2nd, currentForms.length),
             },
           ],
           formCount: currentForms.length,
@@ -129,25 +117,17 @@ export const performanceProcedure = createTRPCRouter({
           },
         },
         include: {
-          kpis: {
-            include: {
-              kpiEvaluations: true,
-            },
-          },
+          kpis: true,
         },
         orderBy: {
           year: "desc",
         },
       });
 
-      const calcAchievementSum = (forms: KpiFormWithKpi[], period: "EVALUATION_1ST" | "EVALUATION_2ND") =>
+      const calcAchievementSum = (forms: KpiFormWithKpi[]) =>
         forms.reduce((total, form) => {
           const formTotal = form.kpis.reduce((sum, kpi) => {
-            const evalData = kpi.kpiEvaluations.find((e) => e.period === period);
-            if (evalData?.achievementApprover) {
-              return sum + (evalData.achievementApprover / 100) * kpi.weight;
-            }
-            return sum;
+            return sum + kpi.weight;
           }, 0);
           return total + formTotal;
         }, 0);
@@ -173,8 +153,7 @@ export const performanceProcedure = createTRPCRouter({
             0
           );
     
-          const sumAchievement1st = calcAchievementSum(yearForms, "EVALUATION_1ST");
-          const sumAchievement2nd = calcAchievementSum(yearForms, "EVALUATION_2ND");
+          const sumAchievement1st = calcAchievementSum(yearForms);
     
           const avg = (val: number) =>
             Math.round(
@@ -185,7 +164,6 @@ export const performanceProcedure = createTRPCRouter({
             year,
             inDraft: avg(sumWeight),
             evaluation1st: avg(sumAchievement1st),
-            evaluation2nd: avg(sumAchievement2nd),
           });
         }
     

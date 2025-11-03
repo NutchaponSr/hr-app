@@ -61,12 +61,12 @@ export const APP_CATEGORIES: AppCategory[] = [
         description: "Track and manage employee performance reviews and goals",
         icon: BsArrowUpSquareFill,
       },
-      {
-        title: "Requests & Tasks",
-        href: "/requests-tasks",
-        description: "Submit and manage various workplace requests and tasks",
-        icon: BsFillInboxFill,
-      },
+      // {
+      //   title: "Requests & Tasks",
+      //   href: "/requests-tasks",
+      //   description: "Submit and manage various workplace requests and tasks",
+      //   icon: BsFillInboxFill,
+      // },
     ],
     border: "warning",
     background: "warning",
@@ -76,24 +76,24 @@ export const APP_CATEGORIES: AppCategory[] = [
   {
     title: "People Management",
     items: [
-      {
-        title: "Employees",
-        href: "/employees",
-        description: "Manage employee profiles, roles, and organizational structure",
-        icon: BsPersonSquare,
-      },
-      {
-        title: "Recruitment",
-        href: "/recruitment",
-        description: "Handle job postings, applications, and hiring processes",
-        icon: BsFillPersonPlusFill,
-      },
-      {
-        title: "HR Documents",
-        href: "/hr-documents",
-        description: "Access and manage important HR documents and policies",
-        icon: BsFileEarmarkTextFill,
-      },
+      // {
+      //   title: "Employees",
+      //   href: "/employees",
+      //   description: "Manage employee profiles, roles, and organizational structure",
+      //   icon: BsPersonSquare,
+      // },
+      // {
+      //   title: "Recruitment",
+      //   href: "/recruitment",
+      //   description: "Handle job postings, applications, and hiring processes",
+      //   icon: BsFillPersonPlusFill,
+      // },
+      // {
+      //   title: "HR Documents",
+      //   href: "/hr-documents",
+      //   description: "Access and manage important HR documents and policies",
+      //   icon: BsFileEarmarkTextFill,
+      // },
     ],
     border: "marine",
     background: "marine",
@@ -103,18 +103,18 @@ export const APP_CATEGORIES: AppCategory[] = [
   {
     title: "Compensation & Benefits",
     items: [
-      {
-        title: "Compensation",
-        href: "/compensation",
-        description: "View salary information, bonuses, and compensation details",
-        icon: BsCashCoin,
-      },
-      {
-        title: "Reimbursement",
-        href: "/reimbursement",
-        description: "Submit and track expense reimbursements and claims",
-        icon: BsCashCoin,
-      },
+      // {
+      //   title: "Compensation",
+      //   href: "/compensation",
+      //   description: "View salary information, bonuses, and compensation details",
+      //   icon: BsCashCoin,
+      // },
+      // {
+      //   title: "Reimbursement",
+      //   href: "/reimbursement",
+      //   description: "Submit and track expense reimbursements and claims",
+      //   icon: BsCashCoin,
+      // },
     ],
     border: "danger",
     background: "danger",
@@ -124,18 +124,18 @@ export const APP_CATEGORIES: AppCategory[] = [
   {
     title: "Workplace & Culture",
     items: [
-      {
-        title: "Vibe",
-        href: "/vibe",
-        description: "Share feedback, participate in surveys, and build company culture",
-        icon: BsEasel2Fill,
-      },
-      {
-        title: "Attendance",
-        href: "/attendance",
-        description: "Track work hours, time off, and attendance records",
-        icon: IoBarChartSharp,
-      },
+      // {
+      //   title: "Vibe",
+      //   href: "/vibe",
+      //   description: "Share feedback, participate in surveys, and build company culture",
+      //   icon: BsEasel2Fill,
+      // },
+      // {
+      //   title: "Attendance",
+      //   href: "/attendance",
+      //   description: "Track work hours, time off, and attendance records",
+      //   icon: IoBarChartSharp,
+      // },
     ],
     border: "sunset",
     background: "sunset",
@@ -145,18 +145,18 @@ export const APP_CATEGORIES: AppCategory[] = [
   {
     title: "Tools & Planning",
     items: [
-      {
-        title: "Calendar",
-        href: "/calendar",
-        description: "Schedule meetings, events, and manage your work calendar",
-        icon: BsCalendar2DateFill,
-      },
-      {
-        title: "Project",
-        href: "/project",
-        description: "Collaborate on projects, track progress, and manage deadlines",
-        icon: BsFolderFill,
-      },
+      // {
+      //   title: "Calendar",
+      //   href: "/calendar",
+      //   description: "Schedule meetings, events, and manage your work calendar",
+      //   icon: BsCalendar2DateFill,
+      // },
+      // {
+      //   title: "Project",
+      //   href: "/project",
+      //   description: "Collaborate on projects, track progress, and manage deadlines",
+      //   icon: BsFolderFill,
+      // },
     ],
     border: "warning",
     background: "warning",

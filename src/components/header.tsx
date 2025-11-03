@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/toggle-mode";
 
 import { Breadcrumbs } from "@/app/(main)/_components/breadcrumbs";
+import { Skeleton } from "./ui/skeleton";
 
 interface Props {
   paths: string[];
@@ -43,6 +44,19 @@ export const Header = ({ children, ...props }: Props) => {
           </div>
 
           <ModeToggle /> 
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function HeaderSkeleton() {
+  return (
+    <header className="max-w-screen z-100 bg-background">
+      <div className="w-[calc(100%-0px)] max-w-screen h-11 relative">
+        <div className="flex justify-between items-center overflow-hidden h-11 px-3">
+          <Skeleton className="w-60 h-7 rounded" />
+          <Skeleton className="w-40 h-7 rounded" />
         </div>
       </div>
     </header>

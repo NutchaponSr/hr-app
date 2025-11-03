@@ -1,6 +1,6 @@
-import { Period, Position } from "@/generated/prisma";
+import { Kpi, KpiCategory, Period, Position } from "@/generated/prisma";
 import { KpiBonusEvaluationSchema } from "./schema";
-import { KpiFormWithInfo, KpiWithEvaluation } from "./types";
+import { KpiFormWithInfo, KpiWithComments, KpiWithEvaluation } from "./types";
 import { convertAmountFromUnit } from "@/lib/utils";
 import { periods } from "./constants";
 
@@ -80,6 +80,29 @@ export function formatAchievementSum(sum: number): string {
   });
 }
 
+export function calculateAchievementScore(
+  kpis: Array<{
+    weight: number;
+    kpiEvaluations: Array<{
+      period: Period;
+      achievementOwner?: number | null;
+      achievementChecker?: number | null;
+      achievementApprover?: number | null;
+    }>;
+  }>,
+  period: Period,
+  role: "achievementOwner" | "achievementChecker" | "achievementApprover"
+): number {
+  return convertAmountFromUnit(
+    kpis.reduce((acc, kpi) => {
+      const evaluation = kpi.kpiEvaluations.find((f) => f.period === period);
+      const achievement = evaluation?.[role] ?? 0;
+      return acc + ((achievement / 100) * kpi.weight);
+    }, 0),
+    2
+  );
+}
+
 export function formatKpiExport(kpiForm: KpiFormWithInfo) {
   const calcPercentage = (weight: number, decimal: number, achievement: number) =>
     (convertAmountFromUnit(weight, decimal) * ((achievement ?? 0) / 100)).toLocaleString("en-US", {
@@ -100,24 +123,20 @@ export function formatKpiExport(kpiForm: KpiFormWithInfo) {
     }),
   }));
 
-  const createEvaluationData = (period: Period) =>
+  const createEvaluationData = () =>
     kpiForm.kpis.flatMap((kpi) => {
-      const evaluation = kpi.kpiEvaluations.find(
-        (f) => f.period === period
-      );
-
       const base = {
         employeeId: kpiForm.employeeId,
         employeeName: kpiForm.employee.fullName,
+        period: "Evaluation",
         year: kpiForm.year,
-        period: periods[period],
         name: kpi.name,
       };
 
       const performers = [
-        { performer: "Owner", score: evaluation?.achievementOwner },
-        { performer: "Checker", score: evaluation?.achievementChecker },
-        { performer: "Approver", score: evaluation?.achievementApprover },
+        { performer: "Owner", score: kpi.achievementOwner },
+        { performer: "Checker", score: kpi.achievementChecker },
+        { performer: "Approver", score: kpi.achievementApprover },
       ];
 
       return performers.map((p) => ({
@@ -127,16 +146,29 @@ export function formatKpiExport(kpiForm: KpiFormWithInfo) {
       }));
     });
 
-  const evaluation1st = createEvaluationData(Period.EVALUATION_1ST);
-  const evaluation2nd = createEvaluationData(Period.EVALUATION_2ND);
-
   const performerOrder = ["Owner", "Checker", "Approver"];
 
   const sortByPerformer = (data: Array<{ performer: string }>) =>
     performerOrder.flatMap((role) => data.filter((d) => d.performer === role));
 
-  const sortedEval1st = sortByPerformer(evaluation1st);
-  const sortedEval2nd = sortByPerformer(evaluation2nd);
+  const sortedEvaluate = sortByPerformer(createEvaluationData());
 
-  return [...inDraft, ...sortedEval1st, ...sortedEval2nd];
+  return [...inDraft, ...sortedEvaluate];
+}
+
+export function bonusEvaluationMapValue(kpi: KpiWithComments) {
+  return {
+    id: kpi.id,
+    name: kpi.name ?? "",
+    weight: String(convertAmountFromUnit(kpi.weight, 2)),
+    category: kpi.category ?? KpiCategory.FP,
+    objective: kpi.objective ?? "",
+    definition: kpi.definition ?? "",
+    strategy: kpi.strategy ?? "",
+    type: kpi.type,
+    target70: kpi.target70 ?? "",
+    target80: kpi.target80 ?? "",
+    target90: kpi.target90 ?? "",
+    target100: kpi.target100 ?? "",
+  }
 }

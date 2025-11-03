@@ -10,11 +10,11 @@ import { MeritEvaluationSchema } from "../../schema";
 import { UseFormReturn } from "react-hook-form";
 import { CompetencyWithInfo, CultureWithInfo } from "../../type";
 import { convertAmountFromUnit } from "@/lib/utils";
-import { KpiWithInfo } from "@/modules/bonus/types";
+import { Kpi } from "@/generated/prisma";
 
 interface Props {
   form: UseFormReturn<MeritEvaluationSchema>;
-  kpis: KpiWithInfo[];
+  kpis: Kpi[];
   competencyRecords: CompetencyWithInfo[];
   cultureRecords: CultureWithInfo[];
 }

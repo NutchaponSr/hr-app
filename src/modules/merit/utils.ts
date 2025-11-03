@@ -18,64 +18,85 @@ export function getAvailableCompetencyTypes(position: Position) {
   return [];
 }
 
-export function meritEvaluationMapValue(merit: inferProcedureOutput<AppRouter["kpiMerit"]["getByFormId"]>) {
+export function meritDraftMapValue(merit: inferProcedureOutput<AppRouter["kpiMerit"]["getByFormId"]>) {
+  return {
+    competencies: merit.data.meritForm.competencyRecords?.map(record => ({
+      id: record.id,
+      competencyId: record.competencyId || "",
+      input: record.input || "",
+      output: record.output || "",
+      weight: convertAmountFromUnit(record.weight, 2).toString(),
+      types: record.type,
+      label: record.label,
+      t1: record.competency?.t1,
+      t2: record.competency?.t2,
+      t3: record.competency?.t3,
+      t4: record.competency?.t4,
+      t5: record.competency?.t5,
+      comments: record.comments,
+    })) || [],
+    cultures: merit.data.meritForm.cultureRecords?.map(record => ({
+      id: record.id,
+      cultureId: record.cultureId,
+      evidence: record.evidence || "",
+      code: record.culture.code,
+      name: record.culture.name,
+      description: record.culture.description,
+      weight: convertAmountFromUnit(record.weight, 2).toString(),
+      comments: record.comments,
+    })) || [],
+  }
+}
+
+export function meritEvaluationMapValue(merit: inferProcedureOutput<AppRouter["kpiMerit"]["getByFormId"]>, period: Period) {
   const role = merit.permission.role || "preparer";
 
   const competencies = merit.data.meritForm.competencyRecords.map((record) => {
-    const evaluation = record.competencyEvaluations[0];
+    const evaluation = record.competencyEvaluations.find((evaluation) => evaluation.period === period);
     
     return {
-      id: evaluation.id, // or evaluation.id, depending on your data structure
+      id: evaluation?.id, // or evaluation.id, depending on your data structure
       role: role,
-      
-      // Owner fields
-      inputEvidenceOwner: evaluation.inputEvidenceOwner,
-      outputEvidenceOwner: evaluation.outputEvidenceOwner,
-      levelOwner: evaluation.levelOwner,
-      
-      // Checker fields
-      inputEvidenceChecker: evaluation.inputEvidenceChecker,
-      outputEvidenceChecker: evaluation.outputEvidenceChecker,
-      levelChecker: evaluation.levelChecker,
-      
-      // Approver fields
-      inputEvidenceApprover: evaluation.inputEvidenceApprover,
-      outputEvidenceApprover: evaluation.outputEvidenceApprover,
-      levelApprover: evaluation.levelApprover,
+      result: evaluation?.result,
+      fileUrl: evaluation?.fileUrl,
+      actualOwner: evaluation?.actualOwner,  
+      levelOwner: evaluation?.levelOwner,
+      actualChecker: evaluation?.actualChecker,
+      levelChecker: evaluation?.levelChecker,
+      actualApprover: evaluation?.actualApprover,
+      levelApprover: evaluation?.levelApprover,
     };
   }); 
 
   const cultures = merit.data.meritForm.cultureRecords.map((record) => {
-    // Get the first evaluation (or handle multiple evaluations as needed)
-    const evaluation = record.cultureEvaluations[0];
+    const evaluation = record.cultureEvaluations.find((evaluation) => evaluation.period === period);
     
     return {
-      id: evaluation.id, // or evaluation.id, depending on your data structure
+      id: evaluation?.id,
       role: role,
-      
-      // Behavior level fields for each role
-      levelBehaviorOwner: evaluation.levelBehaviorOwner,
-      levelBehaviorChecker:evaluation.levelBehaviorChecker,
-      levelBehaviorApprover: evaluation.levelBehaviorApprover,
-      actualOwner: evaluation.actualOwner,
-      actualChecker: evaluation.actualChecker,
-      actualApprover: evaluation.actualApprover,
+      result: evaluation?.result,
+      fileUrl: evaluation?.fileUrl,
+      actualOwner: evaluation?.actualOwner,
+      levelBehaviorOwner: evaluation?.levelBehaviorOwner,
+      actualChecker: evaluation?.actualChecker,
+      levelBehaviorChecker:evaluation?.levelBehaviorChecker,
+      actualApprover: evaluation?.actualApprover,
+      levelBehaviorApprover: evaluation?.levelBehaviorApprover,
     };
   });
 
   const kpis = merit.data.kpiForm?.kpis.map((kpi) => {
-    const evaluation = kpi.kpiEvaluations[0];
 
     return {
       role,
-      id: evaluation.id,
-      actualOwner: evaluation.actualOwner,
-      achievementOwner: evaluation.achievementOwner,
-      actualChecker: evaluation.actualChecker,
-      achievementChecker: evaluation.achievementChecker,
-      actualApprover: evaluation.actualApprover,
-      achievementApprover: evaluation.achievementApprover,
-      fileUrl: evaluation.fileUrl,
+      id: kpi?.id,
+      actualOwner: kpi?.actualOwner,
+      achievementOwner: kpi?.achievementOwner,
+      actualChecker: kpi?.actualChecker,
+      achievementChecker: kpi?.achievementChecker,
+      actualApprover: kpi?.actualApprover,
+      achievementApprover: kpi?.achievementApprover,
+      fileUrl: kpi?.fileUrl,
     }
   })
 

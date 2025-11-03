@@ -50,7 +50,7 @@ export const createColumns = ({ canPerform, form, comment }: Props): ColumnDef<C
   {
     id: "expectedLevel",
     header: "Expected Level",
-    cell: () => (
+    cell: ({ row }) => (
       // TODO: Expected level determine
       <div className="flex flex-col">
         <div className="flex flex-row w-full relative mb-1">
@@ -59,9 +59,9 @@ export const createColumns = ({ canPerform, form, comment }: Props): ColumnDef<C
           </div>
           <div className="flex h-full grow shrink basis-auto ms-1 min-w-0">
             <div className="flex items-center h-full min-w-0 ms-1 w-full">
-              <div className="transition relative text-sm overflow-hidden inline-block rounded w-full min-h-8 p-1.5 hover:bg-primary/6 ring ring-marine">
+              <div data-selected={row.original.expectedLevel === 1} className="transition relative text-sm overflow-hidden inline-block rounded w-full min-h-8 p-1.5 hover:bg-primary/6 ring-marine data-[selected=true]:ring-[1.25px]">
                 <div className="text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-                  
+                  {row.original.competency?.t1}
                 </div>
               </div>
             </div>
@@ -73,9 +73,9 @@ export const createColumns = ({ canPerform, form, comment }: Props): ColumnDef<C
           </div>
           <div className="flex h-full grow shrink basis-auto ms-1 min-w-0">
             <div className="flex items-center h-full min-w-0 ms-1 w-full">
-              <div className="transition relative text-sm overflow-hidden inline-block rounded w-full min-h-8 p-1.5 hover:bg-primary/6">
+              <div data-selected={row.original.expectedLevel === 2} className="transition relative text-sm overflow-hidden inline-block rounded w-full min-h-8 p-1.5 hover:bg-primary/6 ring-marine data-[selected=true]:ring-[1.25px]">
                 <div className="text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-                  
+                  {row.original.competency?.t2}
                 </div>
               </div>
             </div>
@@ -87,9 +87,9 @@ export const createColumns = ({ canPerform, form, comment }: Props): ColumnDef<C
           </div>
           <div className="flex h-full grow shrink basis-auto ms-1 min-w-0">
             <div className="flex items-center h-full min-w-0 ms-1 w-full">
-              <div className="transition relative text-sm overflow-hidden inline-block rounded w-full min-h-8 p-1.5 hover:bg-primary/6">
+              <div data-selected={row.original.expectedLevel === 3} className="transition relative text-sm overflow-hidden inline-block rounded w-full min-h-8 p-1.5 hover:bg-primary/6 ring-marine data-[selected=true]:ring-[1.25px]">
                 <div className="text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-                  
+                  {row.original.competency?.t3}
                 </div>
               </div>
             </div>
@@ -101,9 +101,9 @@ export const createColumns = ({ canPerform, form, comment }: Props): ColumnDef<C
           </div>
           <div className="flex h-full grow shrink basis-auto ms-1 min-w-0">
             <div className="flex items-center h-full min-w-0 ms-1 w-full">
-              <div className="transition relative text-sm overflow-hidden inline-block rounded w-full min-h-8 p-1.5 hover:bg-primary/6">
+              <div data-selected={row.original.expectedLevel === 4} className="transition relative text-sm overflow-hidden inline-block rounded w-full min-h-8 p-1.5 hover:bg-primary/6 ring-marine data-[selected=true]:ring-[1.25px]">
                 <div className="text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-                  
+                  {row.original.competency?.t4}
                 </div>
               </div>
             </div>
@@ -115,9 +115,9 @@ export const createColumns = ({ canPerform, form, comment }: Props): ColumnDef<C
           </div>
           <div className="flex h-full grow shrink basis-auto ms-1 min-w-0">
             <div className="flex items-center h-full min-w-0 ms-1 w-full">
-              <div className="transition relative text-sm overflow-hidden inline-block rounded w-full min-h-8 p-1.5 hover:bg-primary/6">
+              <div data-selected={row.original.expectedLevel === 5} className="transition relative text-sm overflow-hidden inline-block rounded w-full min-h-8 p-1.5 hover:bg-primary/6 ring-marine data-[selected=true]:ring-[1.25px]">
                 <div className="text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-                  
+                  {row.original.competency?.t5}
                 </div>
               </div>
             </div>
@@ -159,7 +159,7 @@ export const createColumns = ({ canPerform, form, comment }: Props): ColumnDef<C
     cell: ({ row }) => (
       <div className="absolute top-1 left-1 shadow-[0_0_0_1px_rgba(84,72,49,0.08)] dark:shadow-[0_0_0_1px_rgb(48,48,46)] rounded-sm p-0.5 bg-background">
         <CommentPopover 
-          canPerform 
+          canPerform={canPerform}
           comments={row.original.comments} 
           onCreate={(content) => comment({ connectId: row.original.id, content })}
         />

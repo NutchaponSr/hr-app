@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import type { AppRouter } from "@/trpc/routers/_app";
 import { usePeriod } from "@/hooks/use-period";
+import { sendEmail } from "@/actions/send-email";
 
 type RequestType = inferProcedureInput<AppRouter["task"]["startWorkflow"]>;
 
@@ -19,19 +20,38 @@ export const useStartWorkflowMerit = (id: string) => {
   const mutation = (value: RequestType) => {
     toast.loading("Starting workflow...", { id: "start-workflow-merit" });
 
-    startWorkflow.mutate({ ...value }, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(
-          trpc.kpiMerit.getByFormId.queryOptions({ id, period }),
-        );
+    startWorkflow.mutate(
+      { ...value },
+      {
+        onSuccess: async (data) => {
+          queryClient.invalidateQueries(
+            trpc.kpiMerit.getByFormId.queryOptions({ id, period }),
+          );
 
-        toast.success("Workflow started!", { id: "start-workflow-merit" });
+          toast.success("Workflow started!", { id: "start-workflow-merit" });
+
+          const recipientEmail =
+            process.env.NODE_ENV === "development"
+              ? "pondpopza5@gmail.com"
+              : (data.checker?.email ?? data.approver?.email);
+
+          // if (recipientEmail) {
+          //   await sendEmail({
+          //     to: recipientEmail,
+          //     subject: "Workflow Started",
+          //     description: "Your workflow has been started. Please check it out.",
+          //     url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/merit/${data.id}?period=${period}`,
+          //   });
+          // }
+        },
+        onError: (ctx) => {
+          toast.error(ctx.message || "Something went wrong", {
+            id: "start-workflow-merit",
+          });
+        },
       },
-      onError: (ctx) => {
-        toast.error(ctx.message || "Something went wrong", { id: "start-workflow-merit" });
-      },
-    });
-  }
+    );
+  };
 
   return { mutation, opt: startWorkflow };
-}
+};

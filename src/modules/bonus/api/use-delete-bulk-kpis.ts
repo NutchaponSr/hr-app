@@ -11,7 +11,7 @@ import { usePeriod } from "@/hooks/use-period";
 
 type RequestType = inferProcedureInput<AppRouter["kpiBonus"]["deleteBulkKpi"]>;
 
-export const useDeleteBulkKpi = (table: Table<KpiWithComments>, id: string) => {
+export const useDeleteBulkKpis = (table: Table<KpiWithComments>, id: string) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const { period } = usePeriod();

@@ -157,6 +157,7 @@ enum Status {
 
 enum Period {
   IN_DRAFT
+  EVALUATION
   EVALUATION_1ST
   EVALUATION_2ND
 }
@@ -180,8 +181,9 @@ model Comment {
 model Task {
   id String @id @default(uuid())
   fileId String
-  
+
   type App
+  context String?
   status Status @default(NOT_STARTED)
 
   preparedBy String
@@ -216,7 +218,7 @@ model KpiForm {
   updatedAt DateTime @updatedAt
 
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  
+
   tasks Task[]
   kpis Kpi[]
 
@@ -245,25 +247,6 @@ model MeritForm {
   @@map("meritForm")
 }
 
-model KpiEvaluation {
-  id String @id @default(uuid())
-  period Period
-
-  actualOwner String?
-  achievementOwner Int?
-  actualChecker String?
-  achievementChecker Int?
-  actualApprover String?
-  achievementApprover Int?
-  fileUrl String?
-
-  kpiId String
-  kpi Kpi @relation(fields: [kpiId], references: [id], onDelete: Cascade)
-
-  @@index([kpiId])
-  @@map("kpiEvaluation")
-}
-
 enum KpiCategory {
   FP
   CP
@@ -278,6 +261,7 @@ model Kpi {
   weight Int @default(0)
   objective String? @db.Text
   strategy String?
+  method String?
 
   target100 String? @db.Text
   target80 String? @db.Text
@@ -289,10 +273,17 @@ model Kpi {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  result String?
+  actualOwner String?
+  achievementOwner Int?
+  actualChecker String?
+  achievementChecker Int?
+  actualApprover String?
+  achievementApprover Int?
+  fileUrl String?
+
   kpiFormId String
   kpiForm KpiForm @relation(fields: [kpiFormId], references: [id], onDelete: Cascade)
-
-  kpiEvaluations KpiEvaluation[]
 
   @@index([kpiFormId])
   @@map("kpi")
@@ -300,7 +291,7 @@ model Kpi {
 
 model CultureRecord {
   id String @id @default(uuid())
-  cultureId Int 
+  cultureId Int
   meritFormId String
   evidence String? @db.Text
 
@@ -316,8 +307,10 @@ model CultureRecord {
 
 model CultureEvaluation {
   id  String  @id @default(uuid())
-  cultureRecordId String 
+  cultureRecordId String
   period  Period
+
+  result String?
   levelBehaviorOwner Int?
   levelBehaviorChecker Int?
   levelBehaviorApprover Int?
@@ -325,6 +318,7 @@ model CultureEvaluation {
   actualOwner String? @db.Text
   actualChecker String? @db.Text
   actualApprover String? @db.Text
+  fileUrl String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -378,7 +372,7 @@ model CompetencyRecord {
   competencyId String?
   meritFormId String
   weight Int @default(0)
-  expectedLevel String? @db.VarChar(1)
+  expectedLevel Int?
   input String? @db.Text
   output String? @db.Text
 
@@ -398,19 +392,19 @@ model CompetencyRecord {
 model CompetencyEvaluation {
   id String @id @default(uuid())
   period Period
-  inputEvidenceOwner String? @db.Text
-  outputEvidenceOwner String? @db.Text
+
+  result String?
+  actualOwner String? @db.Text
   levelOwner Int?
 
-  inputEvidenceChecker String? @db.Text
-  outputEvidenceChecker String? @db.Text
+  actualChecker String? @db.Text
   levelChecker Int?
 
-  inputEvidenceApprover String? @db.Text
-  outputEvidenceApprover String? @db.Text
+  actualApprover String? @db.Text
   levelApprover Int?
 
   createdAt DateTime @default(now())
+  fileUrl String?
 
   competencyRecordId String
   competencyRecord CompetencyRecord @relation(fields: [competencyRecordId], references: [id], onDelete: Cascade)

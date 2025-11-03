@@ -48,7 +48,7 @@ const statusPermissions: Record<Status, Record<Role, Action[]>> = {
 }
 
 export interface PermissionContext {
-  currentEmployeeId: string;
+  employeeId: string;
   documentOwnerId: string;
   checkerId: string | null;
   approverId: string;
@@ -61,17 +61,17 @@ export function canPerform(role: Role, action: Action[], status: Status): boolea
 }
 
 export function getUserRole(context: PermissionContext): Role | null {
-  const { currentEmployeeId, documentOwnerId, checkerId, approverId } = context;
+  const { employeeId, documentOwnerId, checkerId, approverId } = context;
 
-  if (currentEmployeeId === documentOwnerId) {
+  if (employeeId === documentOwnerId) {
     return "preparer";
   }
 
-  if (checkerId && currentEmployeeId === checkerId) {
+  if (checkerId && employeeId === checkerId) {
     return "checker";
   }
 
-  if (currentEmployeeId === approverId) {
+  if (employeeId === approverId) {
     return "approver";
   }
 
