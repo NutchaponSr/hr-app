@@ -99,7 +99,7 @@ export const createColumns = ({ form, permissions, index, period, hasChecker }: 
             </Select>
             <Content label="Level * Weight">
               <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-                {(((Number(field.value) || 0) / table.getRowCount()) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+                {(((Number(field.value) || 0) / 5) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
                   maximumFractionDigits: 2,
                   minimumFractionDigits: 2
                 })}
@@ -111,7 +111,7 @@ export const createColumns = ({ form, permissions, index, period, hasChecker }: 
       />
     ) : (
       <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-        {(((Number(row.original.owner) || 0) / table.getRowCount()) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+        {(((Number(row.original.owner) || 0) / 5) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
           maximumFractionDigits: 2,
           minimumFractionDigits: 2
         })}
@@ -155,7 +155,7 @@ export const createColumns = ({ form, permissions, index, period, hasChecker }: 
                   </Select>
                   <Content label="Level * Weight">
                     <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-                      {(((Number(field.value) || 0) / table.getRowCount()) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+                      {(((Number(field.value) || 0) / 5) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
                         maximumFractionDigits: 2,
                         minimumFractionDigits: 2
                       })}
@@ -167,7 +167,7 @@ export const createColumns = ({ form, permissions, index, period, hasChecker }: 
             />
           ) : (
             <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-              {(((Number(row.original.checker) || 0) / table.getRowCount()) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+              {(((Number(row.original.checker) || 0) / 5) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
                 maximumFractionDigits: 2,
                 minimumFractionDigits: 2
               })}
@@ -211,7 +211,7 @@ export const createColumns = ({ form, permissions, index, period, hasChecker }: 
             </Select>
             <Content label="Level * Weight">
               <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-                {(((Number(field.value) || 0) / table.getRowCount()) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+                {(((Number(field.value) || 0) / 5) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
                   maximumFractionDigits: 2,
                   minimumFractionDigits: 2
                 })}
@@ -223,7 +223,7 @@ export const createColumns = ({ form, permissions, index, period, hasChecker }: 
       />
     ) : (
       <p className="text-sm text-primary whitespace-break-spaces [word-break:break-word] text-ellipsis text-4.5 overflow-hidden">
-        {(((Number(row.original.approver) || 0) / table.getRowCount()) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
+        {(((Number(row.original.approver) || 0) / 5) * convertAmountFromUnit(row.original.weight, 2)).toLocaleString("en-US", {
           maximumFractionDigits: 2,
           minimumFractionDigits: 2
         })}

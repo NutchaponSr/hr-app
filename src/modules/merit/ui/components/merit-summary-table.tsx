@@ -10,7 +10,6 @@ import { MeritEvaluationSchema } from "../../schema";
 import { UseFormReturn } from "react-hook-form";
 import { CompetencyWithInfo, CultureWithInfo } from "../../type";
 import { convertAmountFromUnit } from "@/lib/utils";
-import { Kpi } from "@/generated/prisma";
 
 interface Props {
   form: UseFormReturn<MeritEvaluationSchema>;
@@ -146,7 +145,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                       const level = Number(comp.levelOwner ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
                       
-                      return acc + ((level / competencyRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
                     
                     return sum.toLocaleString("en-US", {
@@ -167,7 +166,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                       const level = Number(comp.levelChecker ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
                       
-                      return acc + ((level / competencyRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
                     
                     return sum.toLocaleString("en-US", {
@@ -188,7 +187,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                       const level = Number(comp.levelApprover ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
                       
-                      return acc + ((level / competencyRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
                     
                     return sum.toLocaleString("en-US", {
@@ -227,7 +226,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                       const level = Number(comp.levelBehaviorOwner ?? 0);
                       const weight = convertAmountFromUnit(cultureRecords[idx]?.weight ?? 0, 2);
                       
-                      return acc + ((level / cultureRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
                     
                     return sum.toLocaleString("en-US", {
@@ -248,7 +247,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                       const level = Number(comp.levelBehaviorChecker ?? 0);
                       const weight = convertAmountFromUnit(cultureRecords[idx]?.weight ?? 0, 2);
                       
-                      return acc + ((level / cultureRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
                     
                     return sum.toLocaleString("en-US", {
@@ -269,7 +268,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                       const level = Number(comp.levelBehaviorApprover ?? 0);
                       const weight = convertAmountFromUnit(cultureRecords[idx]?.weight ?? 0, 2);
                       
-                      return acc + ((level / cultureRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
                     
                     return sum.toLocaleString("en-US", {
@@ -301,12 +300,12 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                     const compOwner = form.watch("competencies")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelOwner ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
-                      return acc + ((level / competencyRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
                     const cultOwner = form.watch("cultures")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelBehaviorOwner ?? 0);
                       const weight = convertAmountFromUnit(cultureRecords[idx]?.weight ?? 0, 2);
-                      return acc + ((level / cultureRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
 
                     const sum = kpiOwner + compOwner + cultOwner;
@@ -325,12 +324,12 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                     const compOwner = form.watch("competencies")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelChecker ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
-                      return acc + ((level / competencyRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
                     const cultOwner = form.watch("cultures")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelBehaviorChecker ?? 0);
                       const weight = convertAmountFromUnit(cultureRecords[idx]?.weight ?? 0, 2);
-                      return acc + ((level / cultureRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
 
                     const sum = kpiOwner + compOwner + cultOwner;
@@ -349,12 +348,12 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                     const compOwner = form.watch("competencies")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelApprover ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
-                      return acc + ((level / competencyRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
                     const cultOwner = form.watch("cultures")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelBehaviorApprover ?? 0);
                       const weight = convertAmountFromUnit(cultureRecords[idx]?.weight ?? 0, 2);
-                      return acc + ((level / cultureRecords.length) * weight);
+                      return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
 
                     const sum = kpiOwner + compOwner + cultOwner;

@@ -3,7 +3,7 @@
 import toast from "react-hot-toast";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,8 @@ import { signIn } from "@/modules/auth/actions/sign-in";
 
 export const SignInForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const [password, setPassword] = useState("");
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -33,7 +35,7 @@ export const SignInForm = () => {
     } else {
       toast.success("Login successfully");
 
-      router.push("/");
+      router.push(callbackUrl || "/");
     }
 
     setIsPending(false);

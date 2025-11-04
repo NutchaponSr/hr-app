@@ -76,11 +76,13 @@ export const taskProcedure = createTRPCRouter({
       },
     });
 
+    console.log(tasks);
+
     return tasks.map((task) => ({
       taskId: task.id,
       app: task.type,
       status: task.status,
-      fileId: task.id,
+      fileId: task.fileId,
       year: task.kpiForm?.year || task.meritForm?.year,
       owner: task.preparer,
       updatedAt: task.updatedAt,
@@ -201,10 +203,14 @@ export const taskProcedure = createTRPCRouter({
         include: {
           checker: true,
           approver: true,
+          preparer: true,
         },
       });
 
-      return res;
+      return {
+        id: res.id,
+        emails: [res.preparer.email, res.checker?.email, res.approver?.email],
+      };
     }),
   confirmation: protectedProcedure
     .input(
