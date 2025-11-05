@@ -1,15 +1,15 @@
-import { 
-  Comment, 
-  Competency, 
-  CompetencyEvaluation, 
-  CompetencyRecord, 
-  CompetencyType, 
-  Culture, 
-  CultureEvaluation, 
-  CultureRecord, 
-  Employee, 
-  MeritForm, 
-  Position, 
+import {
+  Comment,
+  Competency,
+  CompetencyEvaluation,
+  CompetencyRecord,
+  CompetencyType,
+  Culture,
+  CultureEvaluation,
+  CultureRecord,
+  Employee,
+  MeritForm,
+  Position,
 } from "@/generated/prisma";
 
 export interface CompetencyWithInfo extends CompetencyRecord {
@@ -23,7 +23,7 @@ export interface CompetencyWithInfo extends CompetencyRecord {
 }
 
 export interface CultureWithInfo extends CultureRecord {
-  culture: Culture | null
+  culture: Culture | null;
   cultureEvaluations: CultureEvaluation[];
   comments: (Comment & {
     employee: Employee;
@@ -44,13 +44,13 @@ export interface MeritFormWithInfo extends MeritForm {
 }
 
 export const MANAGER_UP: Position[] = [
-  Position.President, 
-  Position.MD, 
+  Position.President,
+  Position.MD,
   Position.VP,
   Position.GM,
   Position.AGM,
   Position.MGR,
-  Position.SMGR
+  Position.SMGR,
 ];
 
 export const CHIEF_DOWN: Position[] = [
@@ -60,3 +60,10 @@ export const CHIEF_DOWN: Position[] = [
   Position.Worker,
   Position.Officer,
 ];
+
+export const typeToName: Record<CompetencyType, string> = {
+  [CompetencyType.MC]: "Managerial Competency",
+  [CompetencyType.FC]: "Functional Competency",
+  [CompetencyType.TC]: "Technical Competency",
+  [CompetencyType.CC]: "Core Competency",
+};

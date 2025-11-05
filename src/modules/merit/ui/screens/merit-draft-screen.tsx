@@ -1,17 +1,11 @@
-import { 
-  useMutation, 
-  useQueryClient 
-} from "@tanstack/react-query";
-import { 
-  getCoreRowModel,
-  useReactTable 
-} from "@tanstack/react-table";
-import { 
-  BsPersonFill, 
-  BsSave, 
-  BsTriangleFill, 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import {
+  BsPersonFill,
+  BsSave,
+  BsTriangleFill,
   BsDownload,
-  BsFiletypeCsv
+  BsFiletypeCsv,
 } from "react-icons/bs";
 import { toast } from "sonner";
 import { useEffect, useRef } from "react";
@@ -28,16 +22,16 @@ import { AppRouter } from "@/trpc/routers/_app";
 import { useSave } from "@/hooks/use-save";
 import { useExcelParser } from "@/hooks/use-excel-parser";
 
-import { 
-  Accordion, 
-  AccordionItem, 
-  AccordionContent, 
-  AccordionTrigger 
+import {
+  Accordion,
+  AccordionItem,
+  AccordionContent,
+  AccordionTrigger,
 } from "@/components/ui/accordion";
-import { 
+import {
   Popover,
   PopoverTrigger,
-  PopoverContent
+  PopoverContent,
 } from "@/components/ui/popover";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -71,12 +65,14 @@ interface Props {
 export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  
+
   const { setSave } = useSave();
   const { mutation: comment } = useCommentMerit(id);
-  
+
   const update = useMutation(trpc.kpiMerit.update.mutationOptions());
-  const updateBulk = useMutation(trpc.kpiMerit.updateRecordBulk.mutationOptions());
+  const updateBulk = useMutation(
+    trpc.kpiMerit.updateRecordBulk.mutationOptions(),
+  );
 
   const { handleFileParsing } = useExcelParser();
 
@@ -88,41 +84,63 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
   });
 
   const totalCompetenciesWeight = convertAmountFromUnit(
-    merit.data.meritForm.competencyRecords?.reduce((acc, kpi) => acc + kpi.weight, 0) || 0, 2
+    merit.data.meritForm.competencyRecords?.reduce(
+      (acc, kpi) => acc + kpi.weight,
+      0,
+    ) || 0,
+    2,
   );
   const totalCultureWeight = convertAmountFromUnit(
-    merit.data.meritForm.cultureRecords?.reduce((acc, kpi) => acc + kpi.weight, 0) || 0, 2
+    merit.data.meritForm.cultureRecords?.reduce(
+      (acc, kpi) => acc + kpi.weight,
+      0,
+    ) || 0,
+    2,
   );
 
   const competencyTb = useReactTable({
     data: merit.data.meritForm.competencyRecords || [],
-    columns: createCompetencyColumns({ form, comment, canPerform: canPerform.canWrite }),
+    columns: createCompetencyColumns({
+      form,
+      comment,
+      canPerform: canPerform.canWrite,
+      ownerLevel: merit.data.preparer.rank,
+    }),
     getCoreRowModel: getCoreRowModel(),
   });
   const cultureTb = useReactTable({
     data: merit.data.meritForm.cultureRecords || [],
-    columns: createCultureColumns({ form, comment, canPerform: canPerform.canWrite }),
+    columns: createCultureColumns({
+      form,
+      comment,
+      canPerform: canPerform.canWrite,
+    }),
     getCoreRowModel: getCoreRowModel(),
   });
 
   const onSubmit = (values: MeritSchema) => {
     toast.loading("Updating merit...", { id: "update-merit" });
 
-    update.mutate({
-      id: merit.data.meritForm.id!,
-      meritSchema: values,
-    }, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ id, period }));
-        toast.success("Merit updated!", { id: "update-merit" });
+    update.mutate(
+      {
+        id: merit.data.meritForm.id!,
+        meritSchema: values,
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries(
+            trpc.kpiMerit.getByFormId.queryOptions({ id, period }),
+          );
+          toast.success("Merit updated!", { id: "update-merit" });
 
-        setSave(true);
+          setSave(true);
+        },
+        onError: (ctx) => {
+          toast.error(ctx.message || "Merit updated!", { id: "update-merit" });
+        },
       },
-      onError: (ctx) => {
-        toast.error(ctx.message || "Merit updated!", { id: "update-merit" });
-      },
-    });
-  }
+    );
+  };
 
   const handleChangeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -168,20 +186,28 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
 
       toast.loading("Updating records from Excel...", { id: "update-bulk" });
 
-      updateBulk.mutate({
-        competency: updatedCompetencies,
-        culture: updatedCultures,
-      }, {
-        onSuccess: () => {
-          queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ id, period }));
-          toast.success("Records updated successfully from Excel!", { id: "update-bulk" });
-          setSave(true);
+      updateBulk.mutate(
+        {
+          competency: updatedCompetencies,
+          culture: updatedCultures,
         },
-        onError: (error) => {
-          toast.error(error.message || "Failed to update records", { id: "update-bulk" });
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries(
+              trpc.kpiMerit.getByFormId.queryOptions({ id, period }),
+            );
+            toast.success("Records updated successfully from Excel!", {
+              id: "update-bulk",
+            });
+            setSave(true);
+          },
+          onError: (error) => {
+            toast.error(error.message || "Failed to update records", {
+              id: "update-bulk",
+            });
+          },
         },
-      });
-
+      );
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -189,7 +215,7 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
         toast.error("Something went wrong");
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (!merit.data.meritForm) return;
@@ -203,7 +229,7 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
   return (
     <Form {...form}>
       <div className="flex flex-col gap-4">
-        <EmployeeEvaluateInfo 
+        <EmployeeEvaluateInfo
           name={merit.data.preparer.fullName}
           position={merit.data.preparer.position}
           division={merit.data.preparer.division}
@@ -235,7 +261,10 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
             className="sr-only"
             onChange={handleChangeUpload}
           />
-          <div data-disabled={!canPerform.canSubmit} className="data-[disabled=false]:z-[101] sticky top-0 -z-1">
+          <div
+            data-disabled={!canPerform.canSubmit}
+            className="data-[disabled=false]:z-[101] sticky top-0 -z-1"
+          >
             <div className="absolute right-16 top-1 flex items-center gap-1">
               <Button type="submit" variant="primary" size="sm">
                 <BsSave className="stroke-[0.25]" />
@@ -249,19 +278,25 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-[260px] p-1">
-                  <h3 className="text-sm data-[inset]:pl-8 select-none flex items-center min-h-7 ps-1 font-medium text-primary">Import</h3>
-                  <Button 
+                  <h3 className="text-sm data-[inset]:pl-8 select-none flex items-center min-h-7 ps-1 font-medium text-primary">
+                    Import
+                  </h3>
+                  <Button
                     type="button"
-                    variant="ghost" 
-                    className="h-auto px-2 w-full" 
+                    variant="ghost"
+                    className="h-auto px-2 w-full"
                     onClick={() => fileRef.current?.click()}
                   >
                     <div className="flex items-center justify-center min-w-5 min-h-5 self-start">
                       <BsFiletypeCsv className="!stroke-[0.15] size-5 mt-0.5" />
                     </div>
                     <div className="grow shrink basis-auto">
-                      <h5 className="whitespace-nowrap overflow-hidden text-ellipsis font-medium text-start">CSV</h5>
-                      <p className="text-xs text-tertiary break-words text-start">Upload and process a CSV file</p>
+                      <h5 className="whitespace-nowrap overflow-hidden text-ellipsis font-medium text-start">
+                        CSV
+                      </h5>
+                      <p className="text-xs text-tertiary break-words text-start">
+                        Upload and process a CSV file
+                      </p>
                     </div>
                   </Button>
                 </PopoverContent>
@@ -280,7 +315,12 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
                     <div className="flex items-center h-full pt-0 mb-2">
                       <div className="flex items-center h-full overflow-hidden gap-1">
                         <AccordionTrigger asChild>
-                          <Button type="button" variant="ghost" size="iconXs" className="group">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="iconXs"
+                            className="group"
+                          >
                             <BsTriangleFill className="text-primary rotate-90 size-3 transition-transform group-data-[state=open]:rotate-180" />
                           </Button>
                         </AccordionTrigger>
@@ -305,7 +345,10 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
                         <Hint label={`${totalCompetenciesWeight} / 30`}>
                           <Progress
                             className="h-1 w-40"
-                            value={Math.min((totalCompetenciesWeight / 30) * 100, 100)}
+                            value={Math.min(
+                              (totalCompetenciesWeight / 30) * 100,
+                              100,
+                            )}
                           />
                         </Hint>
                       </div>
@@ -320,7 +363,12 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
                     <div className="flex items-center h-full pt-0 mb-2">
                       <div className="flex items-center h-full overflow-hidden gap-1">
                         <AccordionTrigger asChild>
-                          <Button type="button" variant="ghost" size="iconXs" className="group">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="iconXs"
+                            className="group"
+                          >
                             <BsTriangleFill className="text-primary rotate-90 size-3 transition-transform group-data-[state=open]:rotate-180" />
                           </Button>
                         </AccordionTrigger>
@@ -345,7 +393,10 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
                         <Hint label={`${totalCultureWeight} / 30`}>
                           <Progress
                             className="h-1 w-40"
-                            value={Math.min((totalCultureWeight / 30) * 100, 100)}
+                            value={Math.min(
+                              (totalCultureWeight / 30) * 100,
+                              100,
+                            )}
                           />
                         </Hint>
                       </div>
@@ -362,4 +413,4 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
       </div>
     </Form>
   );
-}
+};
