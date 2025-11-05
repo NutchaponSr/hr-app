@@ -45,7 +45,7 @@ export const CultureCard = ({ index, form, record, permissions, hasChecker }: Pr
   const resultPopulated = useMemo(() => {
     return [
       {
-        round: "1",
+        round: "ครั้งที่ 1 (ม.ค. - มิ.ย.)",
         result: resultEva1st?.result,
         owner: resultEva1st?.levelBehaviorOwner,
         checker: resultEva1st?.levelBehaviorChecker,
@@ -54,7 +54,7 @@ export const CultureCard = ({ index, form, record, permissions, hasChecker }: Pr
         period: Period.EVALUATION_1ST,
       },
       {
-        round: "2",
+        round: "ครั้งที่ 2 (ก.ค. - ธ.ค.)",
         result: resultEva2nd?.result,
         owner: resultEva2nd?.levelBehaviorOwner,
         checker: resultEva2nd?.levelBehaviorChecker,

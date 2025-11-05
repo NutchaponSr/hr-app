@@ -12,6 +12,7 @@ const kpiAllowedColumns = [
   "target90",
   "target80",
   "target70",
+  "target120",
   "type",
   "definition",
   "kpiFormId",
@@ -25,10 +26,6 @@ const kpiRequiredColumns: ReadonlyArray<(typeof kpiAllowedColumns)[number]> = [
   "type",
   "weight",
   "definition",
-  "target70",
-  "target80",
-  "target90",
-  "target100"
 ];
 
 export type KpiCsvValidationResult = {

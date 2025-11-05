@@ -1,5 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, CellContext } from "@tanstack/react-table";
 
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -15,12 +15,14 @@ interface Props {
   canPerform: boolean;
   form: UseFormReturn<KpiFormSchema>;
   comment: (value: { content: string; connectId: string }) => void;
+  year: number;
 }
 
 export const createColumns = ({
   canPerform,
   form,
   comment,
+  year,
 }: Props): ColumnDef<KpiWithComments>[] => [
   {
     id: "action",
@@ -151,13 +153,13 @@ export const createColumns = ({
       );
     },
     meta: {
-      width: "w-[40%]",
+      width: "40%",
       sticky: true,
     },
   },
   {
     id: "70%",
-    header: () => "Need Improve (< 70%)",
+    header: () => year >= 2025 ? "Need Improve (< 80%)" : "Need Improve (< 70%)",
     cell: ({ row }) => (
       <FormGenerator
         form={form}
@@ -171,12 +173,12 @@ export const createColumns = ({
       />
     ),
     meta: {
-      width: "w-[15%]",
+      width: year >= 2025 ? "12%" : "15%",
     },
   },
   {
     id: "80%",
-    header: () => "Level 2 (80%)",
+    header: () => year >= 2025 ? "Level 2 (90%)" : "Level 2 (80%)",
     cell: ({ row }) => (
       <FormGenerator
         form={form}
@@ -190,12 +192,12 @@ export const createColumns = ({
       />
     ),
     meta: {
-      width: "w-[15%]",
+      width: year >= 2025 ? "12%" : "15%",
     },
   },
   {
     id: "90%",
-    header: () => "Level 3 (90%)",
+    header: () => year >= 2025 ? "Meet expert (100%)" : "Level 3 (90%)",
     cell: ({ row }) => (
       <FormGenerator
         form={form}
@@ -209,12 +211,12 @@ export const createColumns = ({
       />
     ),
     meta: {
-      width: "w-[15%]",
+      width: year >= 2025 ? "12%" : "15%",
     },
   },
   {
     id: "100%",
-    header: () => "Meet expert (100%)",
+    header: () => year >= 2025 ? "Level 4 (110%)" : "Meet expert (100%)",
     cell: ({ row }) => (
       <FormGenerator
         form={form}
@@ -228,9 +230,32 @@ export const createColumns = ({
       />
     ),
     meta: {
-      width: "w-[15%]",
+      width: year >= 2025 ? "12%" : "15%",
     },
   },
+  ...(year >= 2025
+    ? [
+        {
+          id: "120%",
+          header: "Outstand (120%)",
+          cell: ({ row }: CellContext<KpiWithComments, unknown>) => (
+            <FormGenerator
+              form={form}
+              disabled={canPerform}
+              name={`kpis.${row.index}.target120`}
+              variant="text"
+              className={{
+                form: "grow",
+                input: "h-[192px] min-h-[192px]",
+              }}
+            />
+          ),
+          meta: {
+            width: year >= 2025 ? "12%" : "15%",
+          },
+        },
+      ]
+    : []),
   {
     id: "comment",
     cell: ({ row }) => (
@@ -245,4 +270,5 @@ export const createColumns = ({
       </div>
     ),
   },
+  
 ];

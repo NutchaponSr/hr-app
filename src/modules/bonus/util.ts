@@ -1,4 +1,4 @@
-import { Kpi, KpiCategory, Period, Position } from "@/generated/prisma";
+import { KpiCategory, Period, Position } from "@/generated/prisma";
 import { KpiBonusEvaluationSchema } from "./schema";
 import { KpiFormWithInfo, KpiWithComments, KpiWithEvaluation } from "./types";
 import { convertAmountFromUnit } from "@/lib/utils";
@@ -173,6 +173,7 @@ export function bonusEvaluationMapValue(kpi: KpiWithComments) {
     strategy: kpi.strategy ?? "",
     method: kpi.method ?? "",
     type: kpi.type,
+    target120: kpi.target120 ?? "",
     target70: kpi.target70 ?? "",
     target80: kpi.target80 ?? "",
     target90: kpi.target90 ?? "",

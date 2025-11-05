@@ -28,33 +28,67 @@ interface Props {
     canPerformApprover: boolean;
   };
   hasChecker: boolean;
+  year: number;
 }
 
-export const KpiItem = ({ form, index, kpi, permissions, hasChecker }: Props) => {
+export const KpiItem = ({ form, index, kpi, permissions, hasChecker, year }: Props) => {
   const targetPopulated = useMemo(() => {
-    return [
-      {
-        id: "70",
-        title: "< 70%",
-        detail: kpi.target70,
-      },
-      {
-        id: "80",
-        title: "> 70% <= 80%",
-        detail: kpi.target80,
-      },
-      {
-        id: "90",
-        title: "> 80% <= 90%",
-        detail: kpi.target90,
-      },
-      {
-        id: "100",
-        title: "> 90% <= 100%",
-        detail: kpi.target100,
-      },
-    ];
-  }, [kpi.target70, kpi.target80, kpi.target90, kpi.target100]);
+    const targets = year >= 2025
+      ? [
+          {
+            id: "70",
+            title: "< 80%",
+            detail: kpi.target70,
+          },
+          {
+            id: "80",
+            title: "> 80% <= 90%",
+            detail: kpi.target80,
+          },
+          {
+            id: "90",
+            title: "> 90% <= 100%",
+            detail: kpi.target90,
+          },
+          {
+            id: "100",
+            title: "> 100% <= 110%",
+            detail: kpi.target100,
+          },
+          ...(kpi.target120
+            ? [
+                {
+                  id: "120",
+                  title: "> 110% <= 120%",
+                  detail: kpi.target120,
+                },
+              ]
+            : []),
+        ]
+      : [
+          {
+            id: "70",
+            title: "< 70%",
+            detail: kpi.target70,
+          },
+          {
+            id: "80",
+            title: "> 70% <= 80%",
+            detail: kpi.target80,
+          },
+          {
+            id: "90",
+            title: "> 80% <= 90%",
+            detail: kpi.target90,
+          },
+          {
+            id: "100",
+            title: "> 90% <= 100%",
+            detail: kpi.target100,
+          },
+        ];
+    return targets;
+  }, [kpi.target70, kpi.target80, kpi.target90, kpi.target100, kpi.target120, year]);
 
   const table = useReactTable({
     data: targetPopulated,
@@ -64,6 +98,7 @@ export const KpiItem = ({ form, index, kpi, permissions, hasChecker }: Props) =>
       permissions, 
       kpi, 
       hasChecker,
+      year,
     }),
     getCoreRowModel: getCoreRowModel(),
   });

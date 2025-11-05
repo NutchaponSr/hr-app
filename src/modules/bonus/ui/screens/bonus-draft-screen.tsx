@@ -40,8 +40,8 @@ interface Props {
 
 export const BonusDraftScreen = ({ 
   id, 
-  kpiForm,
-  canPerform
+  kpiForm,      
+  canPerform,
 }: Props) => {
   const { mutation: comment } = useCommentKpi(id);
   const { mutation: createKpi } = useCreateKpi(id);
@@ -70,6 +70,7 @@ export const BonusDraftScreen = ({
       form,
       comment,
       canPerform: !canPerform.canWrite,
+      year: kpiForm.data.kpiForm.year ?? new Date().getFullYear(),
     }),
     getCoreRowModel: getCoreRowModel(),
   });

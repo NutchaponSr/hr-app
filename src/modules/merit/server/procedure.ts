@@ -24,6 +24,7 @@ import { MANAGER_UP, typeToName } from "../type";
 import { columns } from "../constants";
 import { formatMeritExport } from "../utils";
 import { buildPermissionContext } from "@/modules/tasks/utils";
+import { validateWeight } from "@/modules/bonus/util";
 
 // Helper functions
 async function fetchCommentsForRecords(recordIds: string[]) {
@@ -473,6 +474,8 @@ export const meritProcedure = createTRPCRouter({
         task,
       );
 
+      const portion = validateWeight(task.preparer.rank);
+
       return {
         data: {
           ...task,
@@ -485,8 +488,8 @@ export const meritProcedure = createTRPCRouter({
             kpi:
               task.meritForm?.period === Period.EVALUATION_2ND
                 ? {
-                    owner:
-                      kpiForm?.kpis.reduce((acc, comp, idx) => {
+                    owner: (() => {
+                      const sum = kpiForm?.kpis.reduce((acc, comp, idx) => {
                         const level = Number(comp.achievementOwner ?? 0);
                         const weight = convertAmountFromUnit(
                           kpiForm?.kpis[idx]?.weight ?? 0,
@@ -494,9 +497,12 @@ export const meritProcedure = createTRPCRouter({
                         );
 
                         return acc + (level / 100) * weight;
-                      }, 0) || 0,
-                    checker:
-                      kpiForm?.kpis.reduce((acc, comp, idx) => {
+                      }, 0) || 0;
+
+                      return (sum * 40) / portion;
+                    })(),
+                    checker: (() => {
+                      const sum = kpiForm?.kpis.reduce((acc, comp, idx) => {  
                         const level = Number(comp.achievementChecker ?? 0);
                         const weight = convertAmountFromUnit(
                           kpiForm?.kpis[idx]?.weight ?? 0,
@@ -504,9 +510,12 @@ export const meritProcedure = createTRPCRouter({
                         );
 
                         return acc + (level / 100) * weight;
-                      }, 0) || 0,
-                    approver:
-                      kpiForm?.kpis.reduce((acc, comp, idx) => {
+                      }, 0) || 0;
+
+                      return (sum * 40) / portion;
+                    })(),
+                    approver: (() => {
+                      const sum = kpiForm?.kpis.reduce((acc, comp, idx) => {
                         const level = Number(comp.achievementApprover ?? 0);
                         const weight = convertAmountFromUnit(
                           kpiForm?.kpis[idx]?.weight ?? 0,
@@ -514,7 +523,10 @@ export const meritProcedure = createTRPCRouter({
                         );
 
                         return acc + (level / 100) * weight;
-                      }, 0) || 0,
+                      }, 0) || 0;
+
+                      return (sum * 40) / portion;
+                    })(),
                   }
                 : {
                     owner: 0,

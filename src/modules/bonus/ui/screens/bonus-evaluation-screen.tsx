@@ -123,6 +123,7 @@ export const BonusEvaluationScreen = ({
                       canPerformApprover: canPerform.approverCanWrite,
                     }}
                     hasChecker={hasChecker}
+                    year={kpiForm.data.kpiForm.year ?? new Date().getFullYear()}
                   />
                   {index !== kpiForm.data.kpiForm.kpis!.length - 1 && (
                     <Separator className="!h-[1.25px]" />

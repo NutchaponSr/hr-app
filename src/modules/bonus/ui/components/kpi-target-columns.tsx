@@ -24,10 +24,11 @@ interface Props {
     canPerformChecker: boolean;
     canPerformApprover: boolean;
   },
+  year: number;
   index: number;
 }
 
-export const createColumns = ({ form, permissions, index, kpi, hasChecker }: Props): ColumnDef<TargetRow>[] => {
+export const createColumns = ({ form, permissions, index, kpi, hasChecker, year }: Props): ColumnDef<TargetRow>[] => {
   const ownerValue = form.watch(`evaluations.${index}.achievementOwner`);
   const checkerValue = form.watch(`evaluations.${index}.achievementChecker`);
   const approverValue = form.watch(`evaluations.${index}.achievementApprover`);
@@ -77,13 +78,17 @@ export const createColumns = ({ form, permissions, index, kpi, hasChecker }: Pro
             }
           >
             {(() => {
-              const id = `owner-${index}-${row.original.id}`;
-              const checked = valueStr === row.original.id;
+              const value = row.original.id === "120" ? 120 : year <= 2025 
+                ? Number(row.original.id) + 10 
+                : Number(row.original.id);
+
+              const id = `owner-${index}-${value}`;
+              const checked = valueStr === value.toString();
               return (
                 <div className="flex items-center justify-center">
                   <RadioGroupItem
                     id={id}
-                    value={row.original.id}
+                    value={value.toString()}
                     aria-label={id}
                     className="sr-only"
                     disabled={!permissions.canPerformOwner}
@@ -110,8 +115,11 @@ export const createColumns = ({ form, permissions, index, kpi, hasChecker }: Pro
             <span className="font-medium text-tertiary text-[10px] uppercase tracking-[1px] me-1 select-none mt-px">
               Value
             </span>
-            <span className="text-xs text-secondary">
-              {Number(form.watch(`evaluations.${index}.achievementOwner`)) / 100 * convertAmountFromUnit(kpi.weight, 2)} %
+            <span className="text-sm text-secondary">
+              {(Number(form.watch(`evaluations.${index}.achievementOwner`)) / 100 * convertAmountFromUnit(kpi.weight, 2)).toLocaleString("en-US", {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+              })} %
             </span>
           </div>
         </div>
@@ -141,13 +149,17 @@ export const createColumns = ({ form, permissions, index, kpi, hasChecker }: Pro
                   }
                 >
                   {(() => {
-                    const id = `checker-${index}-${row.original.id}`;
-                    const checked = valueStr === row.original.id;
+                    const value = row.original.id === "120" ? 120 : year <= 2025 
+                    ? Number(row.original.id) + 10 
+                    : Number(row.original.id);
+
+                    const id = `checker-${index}-${value}`;
+                    const checked = valueStr === value.toString();
                     return (
                       <div className="flex items-center justify-center">
                         <RadioGroupItem
                           id={id}
-                          value={row.original.id}
+                          value={value.toString()}
                           aria-label={id}
                           className="sr-only"
                           disabled={!permissions.canPerformChecker}
@@ -174,8 +186,11 @@ export const createColumns = ({ form, permissions, index, kpi, hasChecker }: Pro
                   <span className="font-medium text-tertiary text-[10px] uppercase tracking-[1px] me-1 select-none mt-px">
                     Value
                   </span>
-                  <span className="text-xs text-secondary">
-                    {Number(form.watch(`evaluations.${index}.achievementChecker`)) / 100 * convertAmountFromUnit(kpi.weight, 2)} %
+                  <span className="text-sm text-secondary">
+                    {(Number(form.watch(`evaluations.${index}.achievementChecker`)) / 100 * convertAmountFromUnit(kpi.weight, 2)).toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      minimumFractionDigits: 2
+                    })} %
                   </span>
                 </div>
               </div>
@@ -205,13 +220,17 @@ export const createColumns = ({ form, permissions, index, kpi, hasChecker }: Pro
             }
           >
             {(() => {
-              const id = `approver-${index}-${row.original.id}`;
-              const checked = valueStr === row.original.id;
+              const value = row.original.id === "120" ? 120 : year <= 2025 
+                ? Number(row.original.id) + 10 
+                : Number(row.original.id);
+
+              const id = `approver-${index}-${value}`;
+              const checked = valueStr === value.toString();
               return (
                 <div className="flex items-center justify-center">
                   <RadioGroupItem
                     id={id}
-                    value={row.original.id}
+                    value={value.toString()}
                     aria-label={id}
                     className="sr-only"
                     disabled={!permissions.canPerformApprover}
@@ -238,8 +257,11 @@ export const createColumns = ({ form, permissions, index, kpi, hasChecker }: Pro
             <span className="font-medium text-tertiary text-[10px] uppercase tracking-[1px] me-1 select-none mt-px">
               Value
             </span>
-            <span className="text-xs text-secondary">
-              {Number(form.watch(`evaluations.${index}.achievementApprover`)) / 100 * convertAmountFromUnit(kpi.weight, 2)} %
+            <span className="text-sm text-secondary">
+              {(Number(form.watch(`evaluations.${index}.achievementApprover`)) / 100 * convertAmountFromUnit(kpi.weight, 2)).toLocaleString("en-US", {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+              })} %
             </span>
           </div>
         </div>

@@ -55,9 +55,9 @@ export const Table = <TData extends RowData>({ table, last = 2, variant = "defau
                 ) : (
                   <th 
                     key={header.id}
+                    style={{ width }}
                     className={cn(headerVariants({ variant }), "px-3",
                       isBeforeLast && "border-none",
-                      width,
                     )}
                   >
                     <div className="flex items-center h-full">
