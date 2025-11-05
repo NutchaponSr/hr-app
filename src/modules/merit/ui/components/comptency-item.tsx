@@ -5,25 +5,27 @@ import { UseFormReturn } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon } from "lucide-react";
 
-import { 
+import {
   FormControl,
-  FormField, 
+  FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 
 import { MeritSchema } from "../../schema";
-import { CompetencyType } from "@/generated/prisma";
+import { CompetencyType, Position } from "@/generated/prisma";
 import { useTRPC } from "@/trpc/client";
 import { CommandSearch } from "@/components/command-search";
 import { cn } from "@/lib/utils";
+import { MANAGER_UP, typeToName } from "../../type";
 
 interface Props {
   index: number;
   label: string;
   types: CompetencyType[];
   canPerform: boolean;
+  ownerLevel: Position;
   form: UseFormReturn<MeritSchema>;
 }
 
@@ -32,22 +34,42 @@ export const CompetencyItem = ({
   label,
   index,
   types,
-  canPerform
+  canPerform,
+  ownerLevel,
 }: Props) => {
   const trpc = useTRPC();
 
-  const { data: competencyQuery } = useQuery(trpc.competency.getMany.queryOptions({ types }));
+  const { data: competencyQuery } = useQuery(
+    trpc.competency.getMany.queryOptions({ types }),
+  );
+
+  const competencyId = form.watch(`competencies.${index}.competencyId`);
 
   const competencies = competencyQuery || [];
 
+  const isChiefDown = !MANAGER_UP.includes(ownerLevel);
+
+  const type = competencyQuery?.find(f => f.id === competencyId)?.type
+
+  const competencyLabel = () => {
+    if (isChiefDown) {
+      if (!type) {
+        return "Competency";
+      }
+      return typeToName[type];
+    }
+
+    return label;
+  };
+
   return (
     <div className="flex flex-col gap-1.5">
-      <FormField 
+      <FormField
         control={form.control}
         name={`competencies.${index}.competencyId`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{label}</FormLabel>
+            <FormLabel>{competencyLabel()}</FormLabel>
             <FormControl>
               <CommandSearch
                 className="w-100 p-2"
@@ -58,7 +80,8 @@ export const CompetencyItem = ({
                     className="border-[1.25px] border-border rounded hover:bg-primary/6 px-2 py-1 gap-2 text-primary whitespace-nowrap text-ellipsis overflow-hidden flex items-center justify-between data-[perform=true]:opacity-60 data-[perform=true]:pointer-events-none"
                   >
                     <div className="whitespace-nowrap text-ellipsis overflow-hidden">
-                      {competencies.find((f) => f.id === field.value)?.name || "Empty"}
+                      {competencies.find((f) => f.id === field.value)?.name ||
+                        "Empty"}
                     </div>
                     <ChevronsUpDownIcon className="size-3.5 text-tertiary shrink-0" />
                   </div>
@@ -67,7 +90,7 @@ export const CompetencyItem = ({
                 <div className="max-h-[320px] min-h-0 grow z-[1] overflow-x-hidden overflow-y-auto mx-0 mb-0">
                   <Command.Group>
                     {competencies?.map((c) => (
-                      <Command.Item 
+                      <Command.Item
                         key={c.id}
                         onSelect={() => field.onChange(c.id)}
                         className={cn(
@@ -99,9 +122,11 @@ export const CompetencyItem = ({
       <div className="flex flex-col gap-1">
         <div className="text-secondary text-xs">Description</div>
         <p className="text-xs text-primary leading-4 whitespace-break-spaces text-ellipsis overflow-hidden">
-          {competencies.find((f) => f.id === form.watch(`competencies.${index}.competencyId`))?.definition || "Empty"}
+          {competencies.find(
+            (f) => f.id === form.watch(`competencies.${index}.competencyId`),
+          )?.definition || "Empty"}
         </p>
       </div>
     </div>
   );
-}
+};

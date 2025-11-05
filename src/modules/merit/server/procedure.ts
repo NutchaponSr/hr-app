@@ -20,7 +20,7 @@ import {
   cultureEvaluationSchema,
   meritSchema,
 } from "../schema";
-import { MANAGER_UP } from "../type";
+import { MANAGER_UP, typeToName } from "../type";
 import { columns } from "../constants";
 import { formatMeritExport } from "../utils";
 import { buildPermissionContext } from "@/modules/tasks/utils";
@@ -92,9 +92,15 @@ export const meritProcedure = createTRPCRouter({
       return {
         id: meritForm?.id,
         task: {
-          inDraft: meritForm?.tasks.find((f) => f.context === String(Period.IN_DRAFT)),
-          evaluation1st: meritForm?.tasks.find((f) => f.context === String(Period.EVALUATION_1ST)),
-          evaluation2nd: meritForm?.tasks.find((f) => f.context === String(Period.EVALUATION_2ND)),
+          inDraft: meritForm?.tasks.find(
+            (f) => f.context === String(Period.IN_DRAFT),
+          ),
+          evaluation1st: meritForm?.tasks.find(
+            (f) => f.context === String(Period.EVALUATION_1ST),
+          ),
+          evaluation2nd: meritForm?.tasks.find(
+            (f) => f.context === String(Period.EVALUATION_2ND),
+          ),
         },
         chartInfo: [
           {
@@ -400,13 +406,6 @@ export const meritProcedure = createTRPCRouter({
         },
       });
 
-      const typeToName: Record<CompetencyType, string> = {
-        [CompetencyType.MC]: "Managerial Competency",
-        [CompetencyType.FC]: "Functional Competency",
-        [CompetencyType.TC]: "Technical Competency",
-        [CompetencyType.CC]: "Core Competency",
-      };
-
       const [cultureComments, competencyComments] = await Promise.all([
         fetchCommentsForRecords(
           task.meritForm?.cultureRecords?.map((r) => r.id) ?? [],
@@ -451,8 +450,13 @@ export const meritProcedure = createTRPCRouter({
             return records.map((record) => ({
               ...record,
               comments: competencyCommentsMap[record.id] || [],
-              type: [CompetencyType.TC, CompetencyType.FC],
-              label: `${typeToName[CompetencyType.TC]}, ${typeToName[CompetencyType.FC]}`,
+              type: [
+                CompetencyType.TC,
+                CompetencyType.FC,
+                CompetencyType.MC,
+                CompetencyType.CC,
+              ],
+              label: "Competency",
             }));
           })();
 
@@ -478,30 +482,45 @@ export const meritProcedure = createTRPCRouter({
             cultureRecords: cultureRecordsWithComments || [],
           },
           kpiForm: {
-            kpi: task.meritForm?.period === Period.EVALUATION_2ND ? {
-              owner: kpiForm?.kpis.reduce((acc, comp, idx) => {
-                const level = Number(comp.achievementOwner ?? 0);
-                const weight = convertAmountFromUnit(kpiForm?.kpis[idx]?.weight ?? 0, 2);
-                
-                return acc + (level / 100) * weight;
-              }, 0) || 0,
-              checker: kpiForm?.kpis.reduce((acc, comp, idx) => {
-                const level = Number(comp.achievementChecker ?? 0);
-                const weight = convertAmountFromUnit(kpiForm?.kpis[idx]?.weight ?? 0, 2);
-                
-                return acc + ((level / 100) * weight);
-              }, 0) || 0,
-              approver: kpiForm?.kpis.reduce((acc, comp, idx) => {
-                const level = Number(comp.achievementApprover ?? 0);
-                const weight = convertAmountFromUnit(kpiForm?.kpis[idx]?.weight ?? 0, 2);
-                
-                return acc + ((level / 100) * weight);
-              }, 0) || 0,
-            } : {
-              owner: 0,
-              checker: 0,
-              approver: 0,
-            },
+            kpi:
+              task.meritForm?.period === Period.EVALUATION_2ND
+                ? {
+                    owner:
+                      kpiForm?.kpis.reduce((acc, comp, idx) => {
+                        const level = Number(comp.achievementOwner ?? 0);
+                        const weight = convertAmountFromUnit(
+                          kpiForm?.kpis[idx]?.weight ?? 0,
+                          2,
+                        );
+
+                        return acc + (level / 100) * weight;
+                      }, 0) || 0,
+                    checker:
+                      kpiForm?.kpis.reduce((acc, comp, idx) => {
+                        const level = Number(comp.achievementChecker ?? 0);
+                        const weight = convertAmountFromUnit(
+                          kpiForm?.kpis[idx]?.weight ?? 0,
+                          2,
+                        );
+
+                        return acc + (level / 100) * weight;
+                      }, 0) || 0,
+                    approver:
+                      kpiForm?.kpis.reduce((acc, comp, idx) => {
+                        const level = Number(comp.achievementApprover ?? 0);
+                        const weight = convertAmountFromUnit(
+                          kpiForm?.kpis[idx]?.weight ?? 0,
+                          2,
+                        );
+
+                        return acc + (level / 100) * weight;
+                      }, 0) || 0,
+                  }
+                : {
+                    owner: 0,
+                    checker: 0,
+                    approver: 0,
+                  },
           },
         },
         permission: {
@@ -529,16 +548,23 @@ export const meritProcedure = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      const periods = [Period.IN_DRAFT, Period.EVALUATION_1ST, Period.EVALUATION_2ND] as const;
+      const periods = [
+        Period.IN_DRAFT,
+        Period.EVALUATION_1ST,
+        Period.EVALUATION_2ND,
+      ] as const;
 
       if (input.period !== Period.IN_DRAFT) {
-        const currentIndex = periods.indexOf(input.period as typeof periods[number]);
+        const currentIndex = periods.indexOf(
+          input.period as (typeof periods)[number],
+        );
 
         // ถ้า year >= 2025 ให้ถอย 2 step แต่ไม่ให้น้อยกว่า 0
         const step = input.year >= 2025 ? 1 : 2;
-        const previousPeriod = currentIndex > 0
-          ? periods[Math.max(0, currentIndex - step)]
-          : Period.IN_DRAFT;
+        const previousPeriod =
+          currentIndex > 0
+            ? periods[Math.max(0, currentIndex - step)]
+            : Period.IN_DRAFT;
 
         // ดึง merit task ที่ approve แล้ว
         const approvedMeritTask = await prisma.task.findFirst({
@@ -574,13 +600,15 @@ export const meritProcedure = createTRPCRouter({
           ) {
             throw new TRPCError({
               code: "INTERNAL_SERVER_ERROR",
-              message: "You must finish merit evaluation and get approved first!",
+              message:
+                "You must finish merit evaluation and get approved first!",
             });
           }
         }
 
         if (
-          (!approvedKpiTask || approvedKpiTask.status !== Status.APPROVED) && approvedMeritTask?.meritForm?.period === Period.EVALUATION_1ST
+          (!approvedKpiTask || approvedKpiTask.status !== Status.APPROVED) &&
+          approvedMeritTask?.meritForm?.period === Period.EVALUATION_1ST
         ) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
@@ -588,7 +616,6 @@ export const meritProcedure = createTRPCRouter({
           });
         }
       }
-
 
       const cultures = await prisma.culture.findMany({
         orderBy: {

@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
 
-import { Period, Status } from "@/generated/prisma";
+import { App, Period, Status } from "@/generated/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { getUserRole } from "@/modules/bonus/permission";
@@ -13,9 +13,7 @@ import { buildPermissionContext } from "../utils";
 import { readCSV } from "@/seeds/utils/csv";
 import { ApprovalCSVProps } from "@/types/approval";
 
-function getAppStatus(
-  form: { period: Period } | null,
-): string {
+function getAppStatus(form: { period: Period } | null): string {
   if (!form) {
     return Status.NOT_STARTED as string;
   }
@@ -76,8 +74,6 @@ export const taskProcedure = createTRPCRouter({
       },
     });
 
-    console.log(tasks);
-
     return tasks.map((task) => ({
       taskId: task.id,
       app: task.type,
@@ -99,46 +95,55 @@ export const taskProcedure = createTRPCRouter({
       const approvalFile = path.join(process.cwd(), "src/data", "approval.csv");
       const approvalRecords = readCSV<ApprovalCSVProps>(approvalFile);
 
-      const targetApproval = approvalRecords.filter((f) =>
-        f.checkerEMPID === ctx.user.employee.id ||
-        f.approverEMPID === ctx.user.employee.id,
-      ).map((record) => record.employeeId);
+      const targetApproval = approvalRecords
+        .filter(
+          (f) =>
+            f.checkerEMPID === ctx.user.employee.id ||
+            f.approverEMPID === ctx.user.employee.id,
+        )
+        .map((record) => record.employeeId);
 
-      const [tasks, employees] = await Promise.all([
-        prisma.task.findMany({
+      const [kpiForms, meritForms, employees] = await Promise.all([
+        prisma.kpiForm.findMany({
           where: {
             AND: [
               {
-                preparedBy: {
+                employeeId: {
                   in: targetApproval,
                 },
               },
               {
-                OR: [
-                  {
-                    kpiForm: {
-                      year: {
-                        gte: input.year - 1,
-                        lte: input.year,
-                      },
-                    },
-                  },
-                  {
-                    meritForm: {
-                      year: {
-                        gte: input.year - 1,
-                        lte: input.year,
-                      },
-                    },
-                  },
-                ],
+                year: {
+                  gte: input.year - 1,
+                  lte: input.year,
+                },
               },
             ],
           },
           include: {
-            preparer: true,
-            kpiForm: true,
-            meritForm: true,
+            tasks: true,
+            employee: true,
+          },
+        }),
+        prisma.meritForm.findMany({
+          where: {
+            AND: [
+              {
+                employeeId: {
+                  in: targetApproval,
+                },
+              },
+              {
+                year: {
+                  gte: input.year - 1,
+                  lte: input.year,
+                },
+              },
+            ],
+          },
+          include: {
+            tasks: true,
+            employee: true,
           },
         }),
         prisma.employee.findMany({
@@ -150,29 +155,94 @@ export const taskProcedure = createTRPCRouter({
         }),
       ]);
 
-      const tasksByEmployee = tasks.reduce<Record<string, typeof tasks>>(
-        (acc, task) => {
-          const empId = task.preparer.id;
-          acc[empId] ??= [];
-          acc[empId].push(task);
-          return acc;
-        },
-        {},
+      const kpiFormsByEmployee = kpiForms.reduce<
+        Record<string, (typeof kpiForms)[0][]>
+      >((acc, form) => {
+        acc[form.employeeId] ??= [];
+        acc[form.employeeId].push(form);
+        return acc;
+      }, {});
+
+      const meritFormsByEmployee = meritForms.reduce<
+        Record<string, (typeof meritForms)[0][]>
+      >((acc, form) => {
+        acc[form.employeeId] ??= [];
+        acc[form.employeeId].push(form);
+        return acc;
+      }, {});
+
+      // หา employee ที่ไม่มี form ใดๆ
+      const employeesWithNoForm = employees.filter(
+        (emp) =>
+          !kpiFormsByEmployee[emp.id]?.length &&
+          !meritFormsByEmployee[emp.id]?.length,
       );
+      
+      
+      const bonusPending = kpiForms
+        .flatMap((k) => k.tasks)
+        .filter((t) => t.status === Status.PENDING_CHECKER || t.status === Status.PENDING_APPROVER)
+        .length;
 
-      return employees.map((employee) => {
-        const employeeTasks = tasksByEmployee[employee.id] || [];
-        const kpiForm = employeeTasks.find((task) => task.kpiForm !== null)?.kpiForm || null;
-        const meritForm = employeeTasks.find((task) => task.meritForm !== null)?.meritForm || null;
+      const meritPending = meritForms
+        .flatMap((m) => m.tasks)
+        .filter((t) => t.status === Status.PENDING_CHECKER || t.status === Status.PENDING_APPROVER)
+        .length;
 
-        return {
-          employee,
-          apps: {
-            bonus: getAppStatus(kpiForm),
-            merit: getAppStatus(meritForm),
+      return {
+        info: {
+          total: employees.length,
+          done: {
+            bonus: kpiForms.filter((f) => f.period === Period.EVALUATION).length,
+            merit: meritForms.filter((f) => f.period === Period.EVALUATION).length,
           },
-        };
-      });
+          notDone: {
+            bonus:
+              kpiForms.filter((f) => f.period !== Period.EVALUATION).length +
+              employeesWithNoForm.length,
+            merit:
+              meritForms.filter((f) => f.period !== Period.EVALUATION).length +
+              employeesWithNoForm.length,
+          },
+          pending: bonusPending + meritPending,
+        },
+        employees: employees.map((employee) => {
+          const employeeKpiForms = kpiFormsByEmployee[employee.id] || [];
+          const employeeMeritForms = meritFormsByEmployee[employee.id] || [];
+  
+          // หา form ที่ตรงกับปีที่ต้องการ (prioritize current year)
+          const kpiForm =
+            employeeKpiForms.find((f) => f.year === input.year) ||
+            employeeKpiForms[0] ||
+            null;
+          const meritForm =
+            employeeMeritForms.find((f) => f.year === input.year) ||
+            employeeMeritForms[0] ||
+            null;
+  
+          // รวม tasks จาก form ทั้งหมด
+          const allKpiTasks = employeeKpiForms.flatMap((f) => f.tasks);
+          const allMeritTasks = employeeMeritForms.flatMap((f) => f.tasks);
+  
+          return {
+            employee,
+            form: {
+              bonus: kpiForm
+                ? {
+                    ...kpiForm,
+                    tasks: allKpiTasks,
+                  }
+                : null,
+              merit: meritForm
+                ? {
+                    ...meritForm,
+                    tasks: allMeritTasks,
+                  }
+                : null,
+            },
+          };
+        }),
+      };
     }),
   startWorkflow: protectedProcedure
     .input(
