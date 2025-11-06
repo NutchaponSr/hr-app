@@ -25,10 +25,7 @@ export const kpiBonusCreateSchema = z.object({
   strategy: z.string().min(1, "Required").trim(),
   method: z.string().min(1, "Required").trim(),
   type: currentYear === 2025 ? z.string().nullable() : z.string("Required"),
-  target120:
-    currentYear === 2025
-      ? z.coerce.string().nullable()
-      : z.coerce.string().trim().nullable(),
+  target120: z.coerce.string().trim().nullable(),
   target100: z.coerce.string().trim().nullable(),
   target90: z.coerce.string().trim().nullable(),
   target80: z.coerce.string().min(1, "Required").trim(),
