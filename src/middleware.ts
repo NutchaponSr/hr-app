@@ -6,6 +6,7 @@ const protectedRoutes = [
   /^\/dashboard$/,
   /^\/performance\/.*/,
   /^\/performance\/bonus\/.*/,
+  /^\/performance\/merit\/.*/,
 ];
 
 export async function middleware(req: NextRequest) {

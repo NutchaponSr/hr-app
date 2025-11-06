@@ -6,7 +6,6 @@ import { loadSearchParams } from "@/search-params";
 import { getQueryClient, trpc } from "@/trpc/server";
 
 import { BonusView } from "@/modules/bonus/ui/views/bonus-view";
-import { AuthGuard } from "@/modules/auth/ui/components/auth-guard";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -23,10 +22,8 @@ const Page = async ({ params, searchParams }: Props) => {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<p>Loading...</p>}> {/* TODO: Loading Skeleton */}
-        <AuthGuard>
-          <BonusView id={id} period={period} />
-        </AuthGuard>
+      <Suspense fallback={<p>Loading...</p>}> 
+        <BonusView id={id} period={period} />
       </Suspense>
     </HydrationBoundary>
   );
