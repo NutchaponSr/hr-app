@@ -28,8 +28,8 @@ export const kpiBonusCreateSchema = z.object({
   target120: z.coerce.string().trim().nullable(),
   target100: z.coerce.string().trim().nullable(),
   target90: z.coerce.string().trim().nullable(),
-  target80: z.coerce.string().min(1, "Required").trim(),
-  target70: z.coerce.string().min(1, "Required").trim(),
+  target80: z.coerce.string().trim().nullable(),
+  target70: z.coerce.string().trim().nullable(),
 });
 
 export const kpiBonusUpdateSchema = kpiBonusCreateSchema.extend({
