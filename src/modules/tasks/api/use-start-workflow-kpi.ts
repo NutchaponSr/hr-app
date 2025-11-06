@@ -37,7 +37,7 @@ export const useStartWorkflowKpi = (id: string) => {
               to: "weerawat.m@somboon.co.th",
               subject: "Workflow Started",
               description: "Your workflow has been started. Please check it out.",
-              url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${data.id}?period=${period}`,
+              url: `${process.env.NEXT_PUBLIC_APP_URL}/auth/sign-in`,
             });
           }
         },

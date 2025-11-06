@@ -51,7 +51,7 @@ export const useApprovalKpi = (id: string) => {
                 : value.confirm
                   ? "Your workflow has been approved. Please check it out."
                   : "Your workflow has been rejected. Please check it out.",
-              url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${data.id}?period=${period}`,
+              url: `${process.env.NEXT_PUBLIC_APP_URL}/auth/sign-in`,
             });
           }
 
