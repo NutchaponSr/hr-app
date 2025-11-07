@@ -214,6 +214,11 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
       } else {
         toast.error("Something went wrong");
       }
+
+      // Clear file input on error
+      if (fileRef.current) {
+        fileRef.current.value = "";
+      }
     }
   };
 

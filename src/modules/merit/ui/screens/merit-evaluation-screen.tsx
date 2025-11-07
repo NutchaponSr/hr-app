@@ -44,6 +44,7 @@ interface Props {
     ownerCanWrite: boolean;
     checkerCanWrite: boolean;
     approverCanWrite: boolean;
+    canReadOwner: boolean;
   };
 }
 
@@ -215,6 +216,7 @@ export const MeritEvaluationScreen = ({ id, period, merit, hasChecker, canPerfor
                               canPerformOwner: canPerform.ownerCanWrite,
                               canPerformChecker: canPerform.checkerCanWrite,
                               canPerformApprover: canPerform.approverCanWrite,
+                              canPerform: canPerform.canReadOwner && canPerform.canSubmit,
                             }}
                             hasChecker={hasChecker}   
                           />
@@ -297,6 +299,7 @@ export const MeritEvaluationScreen = ({ id, period, merit, hasChecker, canPerfor
                             index={index}
                             form={form}
                             permissions={{
+                              canPerform: canPerform.canReadOwner && canPerform.canSubmit,
                               canPerformOwner: canPerform.ownerCanWrite,
                               canPerformChecker: canPerform.checkerCanWrite,
                               canPerformApprover: canPerform.approverCanWrite,

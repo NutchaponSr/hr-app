@@ -1,7 +1,7 @@
 import { Status } from "@/generated/prisma";
 
 export type Role = "preparer" | "checker" | "approver";
-export type Action = "read" | "write" | "submit" | "approve" | "reject" | "worflow";
+export type Action = "read" | "write" | "submit" | "approve" | "reject" | "worflow" | "read:own";
 
 const statusPermissions: Record<Status, Record<Role, Action[]>> = {
   [Status.NOT_STARTED]: {
@@ -11,37 +11,37 @@ const statusPermissions: Record<Status, Record<Role, Action[]>> = {
   },
 
   [Status.IN_DRAFT]: {
-    preparer: ["read", "write", "submit", "worflow"],
+    preparer: ["read", "write", "submit", "worflow", "read:own"],
     checker: ["read"],
     approver: ["read"]
   },
 
   [Status.PENDING_CHECKER]: {
-    preparer: ["read"],
+    preparer: ["read", "read:own"],
     checker: ["read", "approve", "reject", "write", "submit"],
     approver: ["read"]
   },
 
   [Status.REJECTED_BY_CHECKER]: {
-    preparer: ["read", "write", "worflow", "submit"],
+    preparer: ["read", "read:own", "write", "worflow", "submit"],
     checker: ["read"],
     approver: ["read"]
   },
 
   [Status.PENDING_APPROVER]: {
-    preparer: ["read"],
+    preparer: ["read", "read:own"],
     checker: ["read"],
     approver: ["read", "approve", "reject", "submit", "write"]
   },
 
   [Status.REJECTED_BY_APPROVER]: {
-    preparer: ["read", "write", "submit", "worflow"],
+    preparer: ["read", "read:own", "write", "submit", "worflow"],
     checker: ["read"],
     approver: ["read"]
   },
 
   [Status.APPROVED]: {
-    preparer: ["read"],
+    preparer: ["read", "read:own"],
     checker: ["read"],
     approver: ["read"]
   },

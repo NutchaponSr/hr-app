@@ -40,6 +40,7 @@ export const BarChartInfo = <T extends object>({ chartConfig, data, dataKey }: P
             key={index}
             dataKey={key as string}
             fill={`var(--chart-${index + 1})`}
+            label={{ value: key as string, fill: "var(--primary)", position: "top" }}
             radius={4}
           />
         ))}

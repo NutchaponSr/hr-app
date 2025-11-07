@@ -60,7 +60,7 @@ export const MeritView = ({ id, period }: Props) => {
 
   const permissions = canPerformMany(
     merit.permission.role as Role,
-    ["approve", "reject", "submit", "write", "worflow"],
+    ["approve", "reject", "submit", "write", "worflow", "read:own"],
     merit.permission.ctx?.status
   );
 
@@ -112,7 +112,7 @@ export const MeritView = ({ id, period }: Props) => {
               period={period} 
               merit={merit} 
               canPerform={{
-                canWrite: permissions.write && merit.permission.role === "preparer",
+                canWrite: permissions.write,
                 canSubmit: permissions.submit,
               }}
             />
@@ -127,6 +127,7 @@ export const MeritView = ({ id, period }: Props) => {
                 ownerCanWrite: permissions.write && merit.permission.role === "preparer",
                 checkerCanWrite: permissions.write && merit.permission.role === "checker",
                 approverCanWrite: permissions.write && merit.permission.role === "approver",
+                canReadOwner: permissions["read:own"],
               }}
             />
           )}

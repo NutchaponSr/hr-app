@@ -1,8 +1,8 @@
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
   TableHeader,
   TableRow
 } from "@/components/ui/table";
@@ -86,7 +86,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
             <div className="flex items-center h-full justify-end">
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
-                  {((kpi.owner * 40) / 50).toLocaleString("en-US", {
+                  {kpi.owner.toLocaleString("en-US", {
                     maximumFractionDigits: 2,
                     minimumFractionDigits: 2,
                   })}
@@ -98,7 +98,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
             <div className="flex items-center h-full justify-end">
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
-                  {((kpi.checker * 40) / 50).toLocaleString("en-US", {
+                  {kpi.checker.toLocaleString("en-US", {
                     maximumFractionDigits: 2,
                     minimumFractionDigits: 2,
                   })}
@@ -110,7 +110,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
             <div className="flex items-center h-full justify-end">
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
-                  {((kpi.approver * 40) / 50).toLocaleString("en-US", {
+                  {kpi.approver.toLocaleString("en-US", {
                     maximumFractionDigits: 2,
                     minimumFractionDigits: 2,
                   })}
@@ -144,10 +144,10 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                     const sum = form.watch('competencies')?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelOwner ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
-                      
+
                       return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
-                    
+
                     return sum.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       minimumFractionDigits: 2,
@@ -165,10 +165,10 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                     const sum = form.watch('competencies')?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelChecker ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
-                      
+
                       return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
-                    
+
                     return sum.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       minimumFractionDigits: 2,
@@ -186,10 +186,10 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                     const sum = form.watch('competencies')?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelApprover ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
-                      
+
                       return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
-                    
+
                     return sum.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       minimumFractionDigits: 2,
@@ -225,10 +225,10 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                     const sum = form.watch("cultures")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelBehaviorOwner ?? 0);
                       const weight = convertAmountFromUnit(cultureRecords[idx]?.weight ?? 0, 2);
-                      
+
                       return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
-                    
+
                     return sum.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       minimumFractionDigits: 2,
@@ -246,10 +246,10 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                     const sum = form.watch("cultures")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelBehaviorChecker ?? 0);
                       const weight = convertAmountFromUnit(cultureRecords[idx]?.weight ?? 0, 2);
-                      
+
                       return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
-                    
+
                     return sum.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       minimumFractionDigits: 2,
@@ -267,10 +267,10 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                     const sum = form.watch("cultures")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelBehaviorApprover ?? 0);
                       const weight = convertAmountFromUnit(cultureRecords[idx]?.weight ?? 0, 2);
-                      
+
                       return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
-                    
+
                     return sum.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       minimumFractionDigits: 2,

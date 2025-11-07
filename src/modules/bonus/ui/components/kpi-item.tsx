@@ -23,6 +23,7 @@ interface Props {
   kpi: KpiWithEvaluation;
   form: UseFormReturn<KpiBonusEvaluationsSchema>;
   permissions: {
+    canPerform: boolean;
     canPerformOwner: boolean;
     canPerformChecker: boolean;
     canPerformApprover: boolean;
@@ -215,7 +216,7 @@ export const KpiItem = ({ form, index, kpi, permissions, hasChecker, year }: Pro
                             id={kpi.id}
                             value={field.value as string | null}
                             onChange={field.onChange}
-                            canPerform={!permissions.canPerformOwner}
+                            canPerform={permissions.canPerform}
                           />
                         </FormItem>
                       )}

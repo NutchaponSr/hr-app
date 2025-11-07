@@ -94,10 +94,17 @@ export function meritEvaluationMapValue(merit: inferProcedureOutput<AppRouter["k
 
 export function formatMeritExport(meritForm: MeritFormWithInfo) {
   const calcPercentage = (weight: number, decimal: number, achievement?: number) =>
-    (convertAmountFromUnit(weight, decimal) * ((achievement ?? 0) / 100)).toLocaleString("en-US", {
+    (convertAmountFromUnit(weight, decimal) * ((achievement ?? 0) / 5)).toLocaleString("en-US", {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2,
     });
+
+  const nameOrder = ["S", "M", "A", "R", "T"];
+  const getSortIndex = (name: string | undefined) => {
+    if (!name) return nameOrder.length;
+    const index = nameOrder.indexOf(name);
+    return index === -1 ? nameOrder.length : index;
+  };
 
   // 🟢 IN_DRAFT
   const inDraft = [
@@ -117,19 +124,25 @@ export function formatMeritExport(meritForm: MeritFormWithInfo) {
     })),
 
     // Culture
-    ...meritForm.cultureRecords.map((c) => ({
-      employeeId: meritForm.employeeId,
-      employeeName: meritForm.employee.fullName,
-      year: meritForm.year,
-      period: periods[Period.IN_DRAFT],
-      performer: "Approver",
-      type: "Culture",
-      name: c.culture.code,
-      percentage: (30 / meritForm.cultureRecords.length).toLocaleString("en-US", {
-        maximumFractionDigits: 2,
-        minimumFractionDigits: 2,
-      }),
-    })),
+    ...meritForm.cultureRecords
+      .sort((a, b) => {
+        const indexA = getSortIndex(a.culture.code);
+        const indexB = getSortIndex(b.culture.code);
+        return indexA - indexB;
+      })
+      .map((c) => ({
+        employeeId: meritForm.employeeId,
+        employeeName: meritForm.employee.fullName,
+        year: meritForm.year,
+        period: periods[Period.IN_DRAFT],
+        performer: "Approver",
+        type: "Culture",
+        name: c.culture.code,
+        percentage: (30 / meritForm.cultureRecords.length).toLocaleString("en-US", {
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+        }),
+      })),
   ];
 
   // 🟡 Helper function สำหรับ Evaluation (1st / 2nd)
@@ -155,36 +168,42 @@ export function formatMeritExport(meritForm: MeritFormWithInfo) {
       return performers.map((p) => ({
         ...base,
         performer: p.performer,
-        percentage: calcPercentage(c.weight, 4, p.score || 0),
+        percentage: calcPercentage(c.weight, 2, p.score || 0),
       }));
     });
 
-    const culture = meritForm.cultureRecords.flatMap((c) => {
-      const evaluation = c.cultureEvaluations.find((e) => e.period === periodType);
+    const culture = meritForm.cultureRecords
+      .sort((a, b) => {
+        const indexA = getSortIndex(a.culture.code);
+        const indexB = getSortIndex(b.culture.code);
+        return indexA - indexB;
+      })
+      .flatMap((c) => {
+        const evaluation = c.cultureEvaluations.find((e) => e.period === periodType);
 
-      const base = {
-        employeeId: meritForm.employeeId,
-        employeeName: meritForm.employee.fullName,
-        year: meritForm.year,
-        period: periods[periodType],
-        type: "Culture" as const,
-        name: c.culture.code,
-      };
+        const base = {
+          employeeId: meritForm.employeeId,
+          employeeName: meritForm.employee.fullName,
+          year: meritForm.year,
+          period: periods[periodType],
+          type: "Culture" as const,
+          name: c.culture.code,
+        };
 
-      const weight = 30 / meritForm.cultureRecords.length;
+        const weight = 30 / meritForm.cultureRecords.length;
 
-      const performers = [
-        { performer: "Owner", score: evaluation?.levelBehaviorOwner },
-        { performer: "Checker", score: evaluation?.levelBehaviorChecker },
-        { performer: "Approver", score: evaluation?.levelBehaviorApprover },
-      ];
+        const performers = [
+          { performer: "Owner", score: evaluation?.levelBehaviorOwner },
+          { performer: "Checker", score: evaluation?.levelBehaviorChecker },
+          { performer: "Approver", score: evaluation?.levelBehaviorApprover },
+        ];
 
-      return performers.map((p) => ({
-        ...base,
-        performer: p.performer,
-        percentage: calcPercentage(weight, 4, p.score || 0),
-      }));
-    });
+        return performers.map((p) => ({
+          ...base,
+          performer: p.performer,
+          percentage: calcPercentage(weight, 0, p.score || 0),
+        }));
+      });
 
     return [...competency, ...culture];
   };

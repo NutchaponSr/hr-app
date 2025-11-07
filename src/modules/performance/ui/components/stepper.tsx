@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { colorVariant } from "@/types/color";
 import { StatusVariant } from "@/types/kpi";
@@ -52,14 +53,16 @@ export const Stepper = ({
 
             <div className="mt-1.5 ps-2.5 flex flex-row items-center gap-1.5">
               {action && (
-                <button
+                <Button
                   disabled={action?.state}
                   onClick={action?.onClick}
                   data-active={action?.condition}
-                  className="w-fit px-2 py-1 hidden flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs data-[active=true]:flex"
+                  size="sm"
+                  variant="secondary"
+                  className="w-fit px-2 py-1 hidden flex-row items-center transition bg-[#5448310a] hover:bg-[#54483114] dark:bg-[#252525] dark:hover:bg-[#2f2f2f] rounded text-xs data-[active=true]:flex text-primary"
                 >
                   {action?.label}
-                </button>
+                </Button>
               )}
               {/* <button
                 disabled={action?.state}

@@ -84,35 +84,42 @@ export const AttachButton = ({
       />
 
       <div className="flex items-center gap-2">        
-        <div 
+      <div 
           role="button" 
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
 
-            inputRef.current?.click();
+            if (canPerform && !isUploading) {
+              inputRef.current?.click();
+            }
           }} 
-          data-disabled={canPerform}
-          className="transition border-[1.25px] border-border rounded bg-background hover:bg-primary/6 flex items-center py-1 px-2 w-full min-h-8 group/image relative data-[disabled=true]:opacity-80 data-[disabled=true]:pointer-events-none"
+          data-disabled={isUploading || !canPerform}
+          className="transition border-[1.25px] border-border rounded bg-background hover:bg-primary/6 flex items-center py-1 px-2 w-full min-h-8 group/image relative data-[disabled=true]:opacity-80"
         >
-          {isUploading ? (
-            <>
-              <Loader className="size-4 me-1.5 !text-tertiary" />
-              <div className="whitespace-nowrap overflow-hidden text-ellipsis text-sm text-primary">
-                Uploading...
-              </div>
-            </>
-          ) : (
-            <>
-              <BsFileText className="size-4 me-1.5 text-tertiary" />
-              <div className="whitespace-nowrap overflow-hidden text-ellipsis text-sm text-primary">
-                {value ? "Replace" : "Upload"}
-              </div>
-            </>
-          )}
+          <div 
+            className="flex-1 flex items-center data-[disabled=true]:pointer-events-none"
+            data-disabled={isUploading || !canPerform}
+          >
+            {isUploading ? (
+              <>
+                <Loader className="size-4 me-1.5 !text-tertiary" />
+                <div className="whitespace-nowrap overflow-hidden text-ellipsis text-sm text-primary">
+                  Uploading...
+                </div>
+              </>
+            ) : (
+              <>
+                <BsFileText className="size-4 me-1.5 text-secondary" />
+                <div data-active={!!value} className="whitespace-nowrap overflow-hidden text-ellipsis text-sm text-primary data-[active=true]:text-marine">
+                  {value ? "Replace" : "Upload"}
+                </div>
+              </>
+            )}
+          </div>
 
           {value && (
-            <div className="absolute right-1 border-[1.25px] border-border rounded bg-background p-0.5 opacity-0 group-hover/image:opacity-100 transition-opacity">
+            <div className="absolute right-1 border-[1.25px] border-border rounded bg-background p-0.5 transition-opacit opacity-0 group-hover/image:opacity-100">
               <div className="flex items-center">
                 <div 
                   role="button"
@@ -126,7 +133,7 @@ export const AttachButton = ({
                 >
                   <BsEyeFill className="size-3 shrink-0 text-primary" />
                 </div>
-                {!canPerform && (
+                {canPerform && (
                   <div 
                     role="button" 
                     onClick={(e) => {

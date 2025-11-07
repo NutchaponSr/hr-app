@@ -108,17 +108,17 @@ export const meritProcedure = createTRPCRouter({
             period: "Evaluation 1st",
             competency: {
               owner: convertAmountFromUnit(
-                (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
+                (meritForm?.competencyRecords ?? []).reduce((acc, kpi, idx) => {
                   const evaluation = kpi.competencyEvaluations.find(
                     (f) => f.period === Period.EVALUATION_1ST,
                   );
 
+                  const weight = meritForm?.competencyRecords[idx]?.weight ?? 0;
+
                   if (meritForm) {
                     return (
                       acc +
-                      ((evaluation?.levelOwner ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        kpi.weight
+                      ((evaluation?.levelOwner ?? 0) / 5) * weight
                     );
                   }
 
@@ -127,17 +127,18 @@ export const meritProcedure = createTRPCRouter({
                 2,
               ),
               checker: convertAmountFromUnit(
-                (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
+                (meritForm?.competencyRecords ?? []).reduce((acc, kpi, idx) => {
                   const evaluation = kpi.competencyEvaluations.find(
                     (f) => f.period === Period.EVALUATION_1ST,
                   );
+
+                  const weight = meritForm?.competencyRecords[idx]?.weight ?? 0;
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelChecker ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        kpi.weight
+                        5) * weight
                     );
                   }
 
@@ -146,17 +147,18 @@ export const meritProcedure = createTRPCRouter({
                 2,
               ),
               approver: convertAmountFromUnit(
-                (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
+                (meritForm?.competencyRecords ?? []).reduce((acc, kpi, idx) => {
                   const evaluation = kpi.competencyEvaluations.find(
                     (f) => f.period === Period.EVALUATION_1ST,
                   );
+
+                  const weight = meritForm?.competencyRecords[idx]?.weight ?? 0;
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelApprover ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        kpi.weight
+                        5) * weight
                     );
                   }
 
@@ -166,80 +168,78 @@ export const meritProcedure = createTRPCRouter({
               ),
             },
             culture: {
-              owner: convertAmountFromUnit(
-                (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
+              owner:
+                Number((meritForm?.cultureRecords ?? []).reduce((acc, c) => {
                   const evaluation = c.cultureEvaluations.find(
                     (f) => f.period === Period.EVALUATION_1ST,
                   );
+
+                  const weight = 30 / (meritForm?.cultureRecords?.length ?? 0);
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelBehaviorOwner ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        (30 / meritForm.competencyRecords.length)
+                        5) * weight
                     );
                   }
 
                   return 0;
-                }, 0),
-                2,
-              ),
-              checker: convertAmountFromUnit(
-                (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
+                }, 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })),
+              checker:
+                Number((meritForm?.cultureRecords ?? []).reduce((acc, c) => {
                   const evaluation = c.cultureEvaluations.find(
                     (f) => f.period === Period.EVALUATION_1ST,
                   );
+
+                  const weight = 30 / (meritForm?.cultureRecords?.length ?? 0);
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelBehaviorChecker ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        (30 / meritForm.competencyRecords.length)
+                        5) * weight
                     );
                   }
 
                   return 0;
-                }, 0),
-                2,
-              ),
-              approver: convertAmountFromUnit(
-                (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
+                }, 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })),
+              approver: 
+                Number((meritForm?.cultureRecords ?? []).reduce((acc, c) => {
                   const evaluation = c.cultureEvaluations.find(
                     (f) => f.period === Period.EVALUATION_1ST,
                   );
+
+                    const weight = 30 / (meritForm?.cultureRecords?.length ?? 0);
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelBehaviorApprover ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        (30 / meritForm.competencyRecords.length)
+                        5) * weight
                     );
                   }
 
                   return 0;
-                }, 0),
-                2,
-              ),
+                }, 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })),
             },
           },
           {
             period: "Evaluation 2nd",
             competency: {
               owner: convertAmountFromUnit(
-                (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
+                (meritForm?.competencyRecords ?? []).reduce((acc, kpi, idx) => {
                   const evaluation = kpi.competencyEvaluations.find(
                     (f) => f.period === Period.EVALUATION_2ND,
                   );
+
+                  const weight = meritForm?.competencyRecords[idx]?.weight ?? 0;
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelOwner ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        kpi.weight
+                        5) * weight
                     );
                   }
 
@@ -248,17 +248,18 @@ export const meritProcedure = createTRPCRouter({
                 2,
               ),
               checker: convertAmountFromUnit(
-                (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
+                (meritForm?.competencyRecords ?? []).reduce((acc, kpi, idx) => {
                   const evaluation = kpi.competencyEvaluations.find(
                     (f) => f.period === Period.EVALUATION_2ND,
                   );
+
+                  const weight = meritForm?.competencyRecords[idx]?.weight ?? 0;
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelChecker ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        kpi.weight
+                        5) * weight
                     );
                   }
 
@@ -267,17 +268,18 @@ export const meritProcedure = createTRPCRouter({
                 2,
               ),
               approver: convertAmountFromUnit(
-                (meritForm?.competencyRecords ?? []).reduce((acc, kpi) => {
+                (meritForm?.competencyRecords ?? []).reduce((acc, kpi, idx) => {
                   const evaluation = kpi.competencyEvaluations.find(
                     (f) => f.period === Period.EVALUATION_2ND,
                   );
+
+                  const weight = meritForm?.competencyRecords[idx]?.weight ?? 0;
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelApprover ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        kpi.weight
+                        5) * weight
                     );
                   }
 
@@ -287,63 +289,60 @@ export const meritProcedure = createTRPCRouter({
               ),
             },
             culture: {
-              owner: convertAmountFromUnit(
-                (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
+              owner:
+                Number((meritForm?.cultureRecords ?? []).reduce((acc, c) => {
                   const evaluation = c.cultureEvaluations.find(
                     (f) => f.period === Period.EVALUATION_2ND,
                   );
+
+                  const weight = 30 / (meritForm?.cultureRecords?.length ?? 0);
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelBehaviorOwner ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        (30 / meritForm.competencyRecords.length)
+                        5) * weight
                     );
                   }
 
                   return 0;
-                }, 0),
-                2,
-              ),
-              checker: convertAmountFromUnit(
-                (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
+                }, 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })),
+              checker: 
+                Number((meritForm?.cultureRecords ?? []).reduce((acc, c) => {
                   const evaluation = c.cultureEvaluations.find(
                     (f) => f.period === Period.EVALUATION_2ND,
                   );
+
+                  const weight = 30 / (meritForm?.cultureRecords?.length ?? 0);
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelBehaviorChecker ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        (30 / meritForm.competencyRecords.length)
+                        5) * weight
                     );
                   }
 
                   return 0;
-                }, 0),
-                2,
-              ),
-              approver: convertAmountFromUnit(
-                (meritForm?.cultureRecords ?? []).reduce((acc, c) => {
+                }, 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })),
+              approver: 
+                Number((meritForm?.cultureRecords ?? []).reduce((acc, c) => {
                   const evaluation = c.cultureEvaluations.find(
                     (f) => f.period === Period.EVALUATION_2ND,
                   );
+
+                  const weight = 30 / (meritForm?.cultureRecords?.length ?? 0);
 
                   if (meritForm) {
                     return (
                       acc +
                       ((evaluation?.levelBehaviorApprover ?? 0) /
-                        meritForm.competencyRecords.length) *
-                        (30 / meritForm.competencyRecords.length)
+                        5) * weight
                     );
-                  }
+                  } 
 
                   return 0;
-                }, 0),
-                2,
-              ),
+                }, 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })),
             },
           },
         ],

@@ -26,6 +26,7 @@ interface Props {
     canPerformOwner: boolean;
     canPerformChecker: boolean;
     canPerformApprover: boolean;
+    canPerform: boolean;
   },
   hasChecker: boolean;
 }
@@ -166,7 +167,7 @@ export const CultureCard = ({ index, form, record, permissions, hasChecker }: Pr
                           <p className="text-xs text-tertiary">(Optional)</p>
                           <AttachButton
                             value={field.value as string | null}
-                            canPerform={!permissions.canPerformOwner}
+                            canPerform={permissions.canPerform}
                             onChange={field.onChange}
                             onRemove={() => {
                               deleteCompetencyFile.mutate({

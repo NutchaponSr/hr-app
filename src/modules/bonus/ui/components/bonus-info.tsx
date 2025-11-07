@@ -16,19 +16,20 @@ import { useCreateKpiForm } from "@/modules/bonus/api/use-create-kpi-form";
 import { useExportKpi } from "../../api/use-export-kpi";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
-import { ChartConfig } from "@/components/ui/chart";
-import { BarChartInfo } from "@/components/bar-chart-info";
+import { ChartConfig, ChartTooltipContent, ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { MainHeader, MainTitle } from "@/components/main";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 const chartConfig = {
-  evaluation1st: {
-    label: "Evaluation 1st",
+  label: {
+    label: "Label",
+    color: "var(--chart-1)",
   },
-  evaluation2nd: {
-    label: "Evaluation 2nd",
+  value: {
+    label: "Value",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
-
 interface Props {
   year: number;
 }
@@ -170,11 +171,30 @@ export const BonusInfo = ({ year }: Props) => {
           </MainTitle>
         </MainHeader>
 
-        <BarChartInfo
-          dataKey={["label", "value"]}
-          data={kpiBonus.chartInfo}
-          chartConfig={chartConfig}
-        />
+        <ChartContainer config={chartConfig} className="h-80 w-full">
+          <BarChart accessibilityLayer data={kpiBonus.chartInfo}>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" />
+            <XAxis 
+              dataKey="label"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
+            <YAxis />
+            <ChartTooltip 
+              cursor={false}
+              content={<ChartTooltipContent indicator="dot" className="w-40" />}
+            />
+            {["label", "value"].slice(1).map((key, index) => (
+              <Bar
+                key={index}
+                dataKey={key as string}
+                label={{ value: key, fill: "var(--primary)", position: "top" }}
+                radius={4}
+              />
+            ))}
+          </BarChart>
+        </ChartContainer>
       </article>
     </div>
   );

@@ -71,6 +71,7 @@ export const bonusProcedure = createTRPCRouter({
               }, 0) ?? 0,
               2,
             ),
+            fill: "var(--chart-1)",
           },
           {
             label: "Checker",
@@ -84,6 +85,7 @@ export const bonusProcedure = createTRPCRouter({
               }, 0) ?? 0,
               2,
             ),
+            fill: "var(--chart-2)",
           },
           {
             label: "Approver",
@@ -97,6 +99,7 @@ export const bonusProcedure = createTRPCRouter({
               }, 0) ?? 0,
               2,
             ),
+            fill: "var(--chart-3)",
           },
         ],
       };

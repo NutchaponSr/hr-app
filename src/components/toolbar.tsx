@@ -47,8 +47,7 @@ export const Toolbar = ({
                 <button 
                   type="submit" 
                   disabled={isPending}
-                  data-disabled={isPending}
-                  className="transition flex items-center justify-center whitespace-nowrap px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted shadow-[inset_1px_0_0_rgba(55,53,47,0.16)] gap-1.5 data-[disabled=true]:opacity-80"
+                  className="transition flex items-center justify-center whitespace-nowrap px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted shadow-[inset_1px_0_0_rgba(55,53,47,0.16)] gap-1.5 disabled:opacity-60"
                 >
                   {isPending ? (
                     <>

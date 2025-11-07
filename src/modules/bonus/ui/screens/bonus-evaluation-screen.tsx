@@ -1,3 +1,5 @@
+import React from "react";
+
 import { AppRouter } from "@/trpc/routers/_app";
 import { inferProcedureOutput } from "@trpc/server";
 import { Role } from "../../permission";
@@ -14,9 +16,8 @@ import { KpiItem } from "../components/kpi-item";
 import { useUpdateBulkKpiEvaluations } from "../../api/use-update-bulk-kpi-evaluations";
 import { KpiBonusEvaluationsSchema } from "../../schema";
 import { Button } from "@/components/ui/button";
-import { Loader } from "lucide-react";
-import React from "react";
 import { Separator } from "@/components/ui/separator";
+import { Loader } from "@/components/loader";
 
 interface Props {
   id: string;
@@ -26,6 +27,7 @@ interface Props {
     ownerCanWrite: boolean;
     checkerCanWrite: boolean;
     approverCanWrite: boolean;
+    canReadOwner: boolean;
   };
   role: Role;
   hasChecker: boolean;
@@ -118,6 +120,7 @@ export const BonusEvaluationScreen = ({
                     form={form}
                     kpi={kpi}   
                     permissions={{
+                      canPerform: canPerform.canSubmit && canPerform.canReadOwner,
                       canPerformOwner: canPerform.ownerCanWrite,
                       canPerformChecker: canPerform.checkerCanWrite,
                       canPerformApprover: canPerform.approverCanWrite,

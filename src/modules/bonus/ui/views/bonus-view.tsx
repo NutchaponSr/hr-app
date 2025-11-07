@@ -56,7 +56,7 @@ export const BonusView = ({
   
   const permissions = canPerformMany(
     kpiForm.permission.role as Role,
-    ["approve", "reject", "submit", "write", "worflow"],
+    ["approve", "reject", "submit", "write", "worflow", "read:own"],
     kpiForm.permission.ctx?.status
   );
 
@@ -110,7 +110,7 @@ export const BonusView = ({
               id={id} 
               kpiForm={kpiForm} 
               canPerform={{
-                canWrite: permissions.write && kpiForm.permission.role === "preparer",
+                canWrite: permissions.write,
                 canSubmit: permissions.submit,
               }}
             />
@@ -125,6 +125,7 @@ export const BonusView = ({
                 checkerCanWrite: permissions.write && kpiForm.permission.role === "checker",
                 approverCanWrite: permissions.write && kpiForm.permission.role === "approver",
                 canSubmit: permissions.submit,
+                canReadOwner: permissions["read:own"],
               }}
             />
           )}

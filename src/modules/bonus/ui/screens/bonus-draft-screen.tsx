@@ -46,7 +46,7 @@ export const BonusDraftScreen = ({
   const { mutation: comment } = useCommentKpi(id);
   const { mutation: createKpi } = useCreateKpi(id);
   const { mutation: createBulkKpis } = useCreateBulkKpis(id);
-  const { mutation: updateBulkKpis } = useUpdateBulkKpis(id);
+  const { mutation: updateBulkKpis, opt: updateBulkKpisOpt } = useUpdateBulkKpis(id);
 
   const { handleFileParsing } = useExcelParser();
 
@@ -77,7 +77,6 @@ export const BonusDraftScreen = ({
 
   const { 
     mutation: deleteBulkKpis,
-    isPending: isDeleting,
   } = useDeleteBulkKpis(table, id);
 
   const onSubmit = (values: KpiFormSchema) => {
@@ -174,12 +173,17 @@ export const BonusDraftScreen = ({
                 } else {
                   toast.error("Something went wrong");
                 }
+                
+                // Clear file input on error
+                if (fileRef.current) {
+                  fileRef.current.value = "";
+                }
               }
             }}
           />
           <Toolbar 
             canPerform={canPerform.canSubmit}
-            isPending={isDeleting}
+            isPending={updateBulkKpisOpt.isPending}
             onCreate={() => createKpi({ kpiFormId: kpiForm.data.kpiForm.id! })}
             context={
               <div className="flex flex-row items-center gap-x-2 gap-y-1.5">
