@@ -121,7 +121,11 @@ export const taskProcedure = createTRPCRouter({
             ],
           },
           include: {
-            tasks: true,
+            tasks: {
+              orderBy: {
+                preparedAt: "asc",
+              },
+            },
             employee: true,
           },
         }),
@@ -142,7 +146,11 @@ export const taskProcedure = createTRPCRouter({
             ],
           },
           include: {
-            tasks: true,
+            tasks: {
+              orderBy: {
+                preparedAt: "asc",
+              },
+            },
             employee: true,
           },
         }),
