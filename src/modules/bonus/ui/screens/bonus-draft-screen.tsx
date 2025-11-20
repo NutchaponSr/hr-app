@@ -79,6 +79,18 @@ export const BonusDraftScreen = ({
     mutation: deleteBulkKpis,
   } = useDeleteBulkKpis(table, id);
 
+  const onSave = () => {
+    updateBulkKpis({
+      kpis: form.getValues().kpis.map(kpi => ({
+        id: kpi.id,
+        kpiBonusCreateSchema: {
+          ...kpi,
+        },
+      })),
+      isSubmit: false,
+    });
+  }
+
   const onSubmit = (values: KpiFormSchema) => {
     updateBulkKpis({  
       kpis: values.kpis.map(kpi => ({
@@ -87,6 +99,7 @@ export const BonusDraftScreen = ({
           ...kpi,
         },
       })),
+      isSubmit: true,
     });
   }
 
@@ -185,6 +198,7 @@ export const BonusDraftScreen = ({
             canPerform={canPerform.canSubmit}
             isPending={updateBulkKpisOpt.isPending}
             onCreate={() => createKpi({ kpiFormId: kpiForm.data.kpiForm.id! })}
+            onSave={onSave}
             context={
               <div className="flex flex-row items-center gap-x-2 gap-y-1.5">
                 <SelectionBadge label="Weight" />

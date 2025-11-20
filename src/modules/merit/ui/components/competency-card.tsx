@@ -17,6 +17,10 @@ import { AttachButton } from "@/components/attach-button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { useMeritId } from "../../hooks/use-merit-id";
+import { Button } from "@/components/ui/button";
+import { ClockIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Props {
   index: number;
@@ -147,13 +151,43 @@ export const CompetencyCard = ({ index, form, record, permissions, hasChecker }:
               <td className="w-[40%] p-1.5 shrink-0">
                 <Card className="px-2.5 py-2 h-auto">
                   <div className="w-full h-full relative z-80 flex flex-col gap-4">
-                    <div>
-                      <h3 className="text-sm font-medium text-primary">
-                        Employee
-                      </h3>
-                      <p className="text-xs text-tertiary">
-                        รายละเอียดของผลสำเร็จเพิ่มเติม (Detail of success result)
-                      </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex flex-col items-start">
+                        <h3 className="text-sm font-medium text-primary">
+                          Employee
+                        </h3>
+                        <p className="text-xs text-tertiary">
+                          รายละเอียดของผลสำเร็จเพิ่มเติม (Detail of success result)
+                        </p>
+                      </div>
+
+                      {period === Period.EVALUATION_2ND && (
+                        <Popover>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <PopoverTrigger asChild>
+                                <Button type="button" variant="ghost" size="iconSm">
+                                  <ClockIcon />
+                                </Button>
+                              </PopoverTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent className="p-0" sideOffset={4}>
+                              <p className="px-2 py-1 text-xs text-white font-medium">
+                                Evaluation 1st&apos;s Detail
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <PopoverContent>
+                            {record.previousEvaluation.owner ? (
+                              <div className="flex flex-col items-start">
+                                <p className="text-xs text-primary">
+                                  {record.previousEvaluation.owner}
+                                </p>
+                              </div>
+                            ) : null}
+                          </PopoverContent>
+                        </Popover>
+                      )}
                     </div>
 
                     <FormGenerator 
@@ -194,13 +228,43 @@ export const CompetencyCard = ({ index, form, record, permissions, hasChecker }:
               <td className="w-[25%] p-1.5">
                 <Card className="px-2.5 py-2 h-auto">
                   <div className="w-full h-full relative z-80 flex flex-col gap-4">
-                    <div>
-                      <h3 className="text-sm font-medium text-primary">
-                        Checker
-                      </h3>
-                      <p className="text-xs text-tertiary">
-                        ความคิดเห็น (Comment)
-                      </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex flex-col items-start">
+                        <h3 className="text-sm font-medium text-primary">
+                          Checker
+                        </h3>
+                        <p className="text-xs text-tertiary">
+                          ความคิดเห็น (Comment)
+                        </p>
+                      </div>
+
+                      {period === Period.EVALUATION_2ND && (
+                        <Popover>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <PopoverTrigger asChild>
+                                <Button type="button" variant="ghost" size="iconSm">
+                                  <ClockIcon />
+                                </Button>
+                              </PopoverTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent className="p-0" sideOffset={4}>
+                              <p className="px-2 py-1 text-xs text-white font-medium">
+                                Evaluation 1st&apos;s Detail
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <PopoverContent>
+                            {record.previousEvaluation.owner ? (
+                              <div className="flex flex-col items-start">
+                                <p className="text-xs text-primary">
+                                  {record.previousEvaluation.owner}
+                                </p>
+                              </div>
+                            ) : null}
+                          </PopoverContent>
+                        </Popover>
+                      )}
                     </div>
 
                     <FormGenerator 
@@ -219,13 +283,43 @@ export const CompetencyCard = ({ index, form, record, permissions, hasChecker }:
               <td className="w-[25%] p-1.5">
                 <Card className="px-2.5 py-2 h-auto">
                   <div className="w-full h-full relative z-80 flex flex-col gap-4">
-                    <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex flex-col items-start">
                       <h3 className="text-sm font-medium text-primary">
                         Approver
                       </h3>
                       <p className="text-xs text-tertiary">
                         ความคิดเห็น (Comment)
                       </p>
+                      </div>
+
+                      {period === Period.EVALUATION_2ND && (
+                        <Popover>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <PopoverTrigger asChild>
+                                <Button type="button" variant="ghost" size="iconSm">
+                                  <ClockIcon />
+                                </Button>
+                              </PopoverTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent className="p-0" sideOffset={4}>
+                              <p className="px-2 py-1 text-xs text-white font-medium">
+                                Evaluation 1st&apos;s Detail
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <PopoverContent>
+                            {record.previousEvaluation.approver ? (
+                              <div className="flex flex-col items-start">
+                                <p className="text-xs text-primary">
+                                  {record.previousEvaluation.approver}
+                                </p>
+                              </div>
+                            ) : null}
+                          </PopoverContent>
+                        </Popover>
+                      )}
                     </div>
 
                     <FormGenerator 

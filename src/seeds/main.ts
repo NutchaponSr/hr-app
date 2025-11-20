@@ -4,12 +4,12 @@ import { seedEmployees } from "@/seeds/seed-employee";
 import { seedCompetencies } from "@/seeds/seed-competency";
 
 const seed = async () => {
-  await cleanUpDatabase();
+  // await cleanUpDatabase();
 
   await seedEmployees();
 
-  await seedCompetencies();
-  await seedCulture();
+  // await seedCompetencies();
+  // await seedCulture();
 }
 
 (async () => {

@@ -38,41 +38,53 @@ export const seedEmployees = async () => {
   const employees: Employee[] = [];
   
   for (const record of records) {
-    const employee = await prisma.employee.create({
-      data: {
-        id: String(record.id),
-        fullName: record.fullName,
-        position: record.position,
-        division: record.division as Division,
-        level: record.level as Position,
-        rank: record.rank as Position,
-        department: record.department,
-        email: record.email,
-      },
-    });
+    // const employee = await prisma.employee.create({
+    //   data: {
+    //     id: String(record.id),
+    //     fullName: record.fullName,
+    //     position: record.position,
+    //     division: record.division as Division,
+    //     level: record.level as Position,
+    //     rank: record.rank as Position,
+    //     department: record.department,
+    //     email: record.email,
+    //   },
+    // });
     
-    employees.push(employee);
+    // employees.push(employee);
+
+    // Only update email if it exists
+    if (record.email) {
+      await prisma.employee.update({
+        where: {
+          id: String(record.id),
+        },
+        data: {
+          email: record.email,
+        },
+      });
+    }
   }
 
-  console.log(`✅ Created ${employees.length} employees`);
+  // console.log(`✅ Created ${employees.length} employees`);
 
-  await Promise.all(
-    records.map(async (employee) => {
-      const userEmail = employee.email || "t@somboon.co.th";
-      try {
-        await auth.api.signUpEmail({
-          body: {
-            email: String(userEmail),
-            password: String(employee.password),
-            name: String(employee.fullName),
-            username: String(employee.id),
-          },
-        });
-      } catch (err) {
-        console.error(`❌ Failed to create user for ${employee.fullName}:`, err);
-      }
-    })
-  );
+  // await Promise.all(
+  //   records.map(async (employee) => {
+  //     const userEmail = employee.email || "t@somboon.co.th";
+  //     try {
+  //       await auth.api.signUpEmail({
+  //         body: {
+  //           email: String(userEmail),
+  //           password: String(employee.password),
+  //           name: String(employee.fullName),
+  //           username: String(employee.id),
+  //         },
+  //       });
+  //     } catch (err) {
+  //       console.error(`❌ Failed to create user for ${employee.fullName}:`, err);
+  //     }
+  //   })
+  // );
 
   return employees;
 }

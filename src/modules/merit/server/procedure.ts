@@ -439,6 +439,11 @@ export const meritProcedure = createTRPCRouter({
 
                 return {
                   ...record,
+                  previousEvaluation: {
+                    owner: record.competencyEvaluations.find((f) => f.period === Period.EVALUATION_1ST)?.actualOwner,
+                    checker: record.competencyEvaluations.find((f) => f.period === Period.EVALUATION_1ST)?.actualChecker,
+                    approver: record.competencyEvaluations.find((f) => f.period === Period.EVALUATION_1ST)?.actualApprover,
+                  },
                   comments: competencyCommentsMap[record.id] || [],
                   type: types,
                   label: types.map((t) => typeToName[t]).join(", "),
@@ -449,6 +454,11 @@ export const meritProcedure = createTRPCRouter({
             const records = task.meritForm?.competencyRecords ?? [];
             return records.map((record) => ({
               ...record,
+              previousEvaluation: {
+                owner: record.competencyEvaluations.find((f) => f.period === Period.EVALUATION_1ST)?.actualOwner,
+                checker: record.competencyEvaluations.find((f) => f.period === Period.EVALUATION_1ST)?.actualChecker,
+                approver: record.competencyEvaluations.find((f) => f.period === Period.EVALUATION_1ST)?.actualApprover,
+              },
               comments: competencyCommentsMap[record.id] || [],
               type: [
                 CompetencyType.TC,
@@ -463,6 +473,11 @@ export const meritProcedure = createTRPCRouter({
       const cultureRecordsWithComments = task.meritForm?.cultureRecords?.map(
         (record) => ({
           ...record,
+          previousEvaluation: {
+            owner: record.cultureEvaluations.find((f) => f.period === Period.EVALUATION_1ST)?.actualOwner,
+            checker: record.cultureEvaluations.find((f) => f.period === Period.EVALUATION_1ST)?.actualChecker,
+            approver: record.cultureEvaluations.find((f) => f.period === Period.EVALUATION_1ST)?.actualApprover,
+          },
           comments: cultureCommentsMap[record.id] || [],
           weight: (30 / (task.meritForm?.cultureRecords?.length ?? 1)) * 100,
         }),

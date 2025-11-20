@@ -7,7 +7,7 @@ import type { AppRouter } from "@/trpc/routers/_app";
 import { useSave } from "@/hooks/use-save";
 import { usePeriod } from "@/hooks/use-period";
 
-type RequestType = inferProcedureInput<AppRouter["kpiBonus"]["updateBulkKpiEvaluation"]>;
+type RequestType = inferProcedureInput<AppRouter["kpiBonus"]["updateBulkKpiEvaluation"]> & { isSubmit: boolean };
 
 export const useUpdateBulkKpiEvaluations = (id: string) => {
   const trpc = useTRPC();
@@ -18,7 +18,7 @@ export const useUpdateBulkKpiEvaluations = (id: string) => {
 
   const updateBulkKpi = useMutation(trpc.kpiBonus.updateBulkKpiEvaluation.mutationOptions());
 
-  const mutation = ({ evaluations }: RequestType) => {
+  const mutation = ({ evaluations, isSubmit }: RequestType) => {
     toast.loading("Updating KPIs...", { id: "update-bulk-kpi-evaluations" });
 
     updateBulkKpi.mutate({ evaluations }, {
@@ -28,7 +28,10 @@ export const useUpdateBulkKpiEvaluations = (id: string) => {
         );
 
         toast.success("KPIs Updated!", { id: "update-bulk-kpi-evaluations" });
-        setSave(true);
+
+        if (isSubmit) {
+          setSave(true);
+        }
       },
       onError: (ctx) => {
         toast.error(ctx.message || "Something went wrong", { id: "update-bulk-kpi-evaluations" });

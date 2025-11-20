@@ -136,6 +136,9 @@ export function formatKpiExport(kpiForm: KpiFormWithInfo) {
         employeeName: kpiForm.employee.fullName,
         period: "Evaluation",
         year: kpiForm.year,
+        owner: kpi.actualOwner,
+        checker: kpi.actualChecker,
+        approver: kpi.actualApprover,
         name: kpi.name,
       };
 

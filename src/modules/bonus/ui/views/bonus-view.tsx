@@ -86,6 +86,11 @@ export const BonusView = ({
         <StartWorkflowButton
           perform={permissions.worflow}
           onWorkflow={() => {
+            if (!save) {
+              toast.error("Please confirm the form data first");
+              return;
+            }
+            
             if (totalWeight !== maxAllowedWeight) {
               toast.error(`Total weight (${totalWeight}%) equal allowed for ${kpiForm.data.preparer.rank} position (${maxAllowedWeight}%)`);
               return;

@@ -4,7 +4,7 @@ import { useEdgeStore } from "@/lib/edegstore";
 import { useRef, useState } from "react"
 import { toast } from "sonner";
 import { BsEyeFill, BsFileText, BsTrash3 } from "react-icons/bs";
-import { Loader } from "@/components/loader";
+import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useKpiFormId } from "../../hooks/use-kpi-form-id";
@@ -113,7 +113,7 @@ export const KpiAttachButton = ({ id, value, canPerform, onChange }: Props) => {
           >
             {isUploading ? (
               <>
-                <Loader className="size-4 me-1.5 !text-tertiary" />
+                <Spinner className="size-4 me-1.5 !text-tertiary" />
                 <div className="whitespace-nowrap overflow-hidden text-ellipsis text-sm text-primary">
                   Uploading...
                 </div>
