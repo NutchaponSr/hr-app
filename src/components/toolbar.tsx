@@ -1,5 +1,7 @@
 import { ChevronDownIcon } from "lucide-react";
-import { BsSave, BsFiletypeCsv } from "react-icons/bs";
+import { BsSave, BsFiletypeCsv, BsFloppy2Fill } from "react-icons/bs";
+
+import { cn } from "@/lib/utils";
 
 import { 
   Popover,
@@ -7,8 +9,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Loader } from "./loader";
-import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 interface Props {
   isPending: boolean;
@@ -18,6 +19,7 @@ interface Props {
   onCreate?: () => void;
   onDelete?: () => void;
   onUpload?: () => void;
+  onSave?: () => void;
 } 
 
 export const Toolbar = ({ 
@@ -27,6 +29,7 @@ export const Toolbar = ({
   className,
   onCreate, 
   onUpload,
+  onSave,
 }: Props) => {
   return (
     <div className={cn("min-h-9 px-16 sticky start-0 top-0 bg-background shrink-0 z-86", className)}>
@@ -45,19 +48,37 @@ export const Toolbar = ({
                   New
                 </button>
                 <button 
+                  type="button" 
+                  disabled={isPending}
+                  onClick={onSave}
+                  className="transition flex items-center justify-center whitespace-nowrap px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted shadow-[inset_1px_0_0_rgba(55,53,47,0.16)] gap-1.5 disabled:opacity-60"
+                >
+                  {isPending ? (
+                    <>
+                      <Spinner className="!text-white size-4" />
+                      Saving
+                    </>
+                  ) : (
+                    <>
+                      <BsFloppy2Fill className="stroke-[0.25] size-4" />
+                      Save Draft
+                    </>
+                  )}
+                </button>
+                <button 
                   type="submit" 
                   disabled={isPending}
                   className="transition flex items-center justify-center whitespace-nowrap px-2 font-medium bg-marine text-white text-sm hover:bg-marine-muted shadow-[inset_1px_0_0_rgba(55,53,47,0.16)] gap-1.5 disabled:opacity-60"
                 >
                   {isPending ? (
                     <>
-                      <Loader className="!text-white size-4" />
-                      Saving
+                      <Spinner className="!text-white size-4" />
+                      Submitting
                     </>
                   ) : (
                     <>
                       <BsSave className="stroke-[0.25] size-4" />
-                      Save
+                      Final Confirmation
                     </>
                   )}
                 </button>

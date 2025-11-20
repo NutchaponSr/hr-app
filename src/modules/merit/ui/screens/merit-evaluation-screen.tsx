@@ -1,4 +1,4 @@
-import { BsPersonFill, BsSave, BsTriangleFill } from "react-icons/bs";
+import { BsFloppy2Fill, BsPersonFill, BsSave, BsTriangleFill } from "react-icons/bs";
 import { Resolver, useForm } from "react-hook-form";
 import { inferProcedureOutput } from "@trpc/server";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -60,6 +60,20 @@ export const MeritEvaluationScreen = ({ id, period, merit, hasChecker, canPerfor
     resolver: zodResolver(meritEvaluationSchema) as Resolver<MeritEvaluationSchema>,
     defaultValues: meritEvaluationMapValue(merit, period),
   });
+
+  const onSave = () => {
+    toast.loading("Updating merits...", { id: "update-bulk-merit-evaluations" });
+
+    updateEvaluation.mutate({ meritEvaluationSchema: form.getValues() }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ id, period }));
+        toast.success("Merits Updated!", { id: "update-bulk-merit-evaluations" });
+      },
+      onError: (ctx) => {
+        toast.error(ctx.message || "Something went wrong", { id: "update-bulk-merit-evaluations" });
+      },
+    });
+  }
 
   const onSubmit = (data: MeritEvaluationSchema) => {
     toast.loading("Updating merits...", { id: "update-bulk-merit-evaluations" });
@@ -127,9 +141,13 @@ export const MeritEvaluationScreen = ({ id, period, merit, hasChecker, canPerfor
           <div data-disabled={!canPerform.canSubmit} className="data-[disabled=false]:z-100 min-h-9 px-16 sticky start-0 top-0 bg-background shrink-0 flex items-center -z-1">
             <div className="absolute right-16 top-1 flex items-center gap-1">
               <div className="flex items-end gap-1">
+                <Button type="button" variant="primaryGhost" size="sm" onClick={onSave} disabled={updateEvaluation.isPending}>
+                  <BsFloppy2Fill className="stroke-[0.25]" />
+                  Save Draft
+                </Button>
                 <Button type="submit" variant="primary" size="sm" disabled={updateEvaluation.isPending}>
                   <BsSave className="stroke-[0.25]" />
-                  Save
+                  Final Confirmation
                 </Button>
               </div>
             </div>

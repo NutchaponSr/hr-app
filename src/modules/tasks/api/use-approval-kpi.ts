@@ -7,6 +7,7 @@ import type { AppRouter } from "@/trpc/routers/_app";
 import { useSave } from "@/hooks/use-save";
 import { usePeriod } from "@/hooks/use-period";
 import { sendEmail } from "@/actions/send-email";
+import { isFormatEmail } from "../type";
 
 type RequestType = inferProcedureInput<AppRouter["task"]["confirmation"]>;
 
@@ -36,23 +37,29 @@ export const useApprovalKpi = (id: string) => {
           );
           setSave(false);
 
-          const recipientEmail = "pondpopza5@gmail.com";
-
-          if (process.env.NODE_ENV === "production") {
-            await sendEmail({
-              to: "weerawat.m@somboon.co.th",
-              subject: data.isApproved
-                ? "Workflow Finished!"
-                : value.confirm
-                  ? "Workflow Approved!"
-                  : "Workflow Rejected!",
-              description: data.isApproved
-                ? "Your workflow has been finished. Please check it out."
-                : value.confirm
-                  ? "Your workflow has been approved. Please check it out."
-                  : "Your workflow has been rejected. Please check it out.",
-              url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${id}?period=${period}`,
-            });
+          if (
+            process.env.NODE_ENV === "production" && 
+            Array.isArray(data.emails) && 
+            data.emails.some(email => email && isFormatEmail.includes(email))
+          ) {
+            for (const email of data.emails) {
+              if (email && isFormatEmail.includes(email)) {
+                await sendEmail({
+                  to: email,
+                  subject: data.isApproved
+                    ? "Workflow Finished!"
+                    : value.confirm
+                      ? "Workflow Approved!"
+                      : "Workflow Rejected!",
+                  description: data.isApproved
+                    ? "Your workflow has been finished. Please check it out."
+                    : value.confirm
+                      ? "Your workflow has been approved. Please check it out."
+                      : "Your workflow has been rejected. Please check it out.",
+                  url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${id}?period=${period}`,
+                });
+              }
+            }
           }
 
         },

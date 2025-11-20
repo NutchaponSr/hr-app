@@ -81,7 +81,23 @@ export const columns: ExportColumn[] = [
   },
   {
     key: "name",
-    header: "ชื่อ KPI",
+    header: "ชื่อ",
+  },
+  {
+    key: "detail",
+    header: "Detail",
+  },
+  {
+    key: "owner",
+    header: "Owner",
+  },
+  {
+    key: "checker",
+    header: "Checker",
+  },
+  {
+    key: "approver",
+    header: "Approver",
   },
   {
     key: "percentage",

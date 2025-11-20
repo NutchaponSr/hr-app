@@ -6,6 +6,7 @@ import {
   BsTriangleFill,
   BsDownload,
   BsFiletypeCsv,
+  BsFloppy2Fill,
 } from "react-icons/bs";
 import { toast } from "sonner";
 import { useEffect, useRef } from "react";
@@ -117,6 +118,27 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
     }),
     getCoreRowModel: getCoreRowModel(),
   });
+
+  const onSave = () => {
+    toast.loading("Updating merit...", { id: "update-merit" });
+    
+    update.mutate(
+      {
+        id: merit.data.meritForm.id!,
+        meritSchema: form.getValues(),
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries(trpc.kpiMerit.getByFormId.queryOptions({ id, period }));
+          toast.success("Merit updated!", { id: "update-merit" });
+          setSave(true);
+        },
+        onError: (ctx) => {
+          toast.error(ctx.message || "Something went wrong", { id: "update-merit" });
+        },
+      },
+    );
+  }
 
   const onSubmit = (values: MeritSchema) => {
     toast.loading("Updating merit...", { id: "update-merit" });
@@ -271,9 +293,13 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
             className="data-[disabled=false]:z-[101] sticky top-0 -z-1"
           >
             <div className="absolute right-16 top-1 flex items-center gap-1">
-              <Button type="submit" variant="primary" size="sm">
+              <Button type="button" variant="primaryGhost" size="sm" onClick={onSave} disabled={update.isPending}>
+                <BsFloppy2Fill className="stroke-[0.25]" />
+                Save Draft
+              </Button>
+              <Button type="submit" variant="primary" size="sm" disabled={update.isPending}>
                 <BsSave className="stroke-[0.25]" />
-                Save
+                Final Confirmation  
               </Button>
               <Popover>
                 <PopoverTrigger asChild>

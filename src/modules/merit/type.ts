@@ -14,6 +14,11 @@ import {
 
 export interface CompetencyWithInfo extends CompetencyRecord {
   competency: Competency | null;
+  previousEvaluation: {
+    owner: string | null | undefined;
+    checker: string | null | undefined;
+    approver: string | null | undefined;
+  };
   comments: (Comment & {
     employee: Employee;
   })[];
@@ -25,6 +30,11 @@ export interface CompetencyWithInfo extends CompetencyRecord {
 export interface CultureWithInfo extends CultureRecord {
   culture: Culture | null;
   cultureEvaluations: CultureEvaluation[];
+  previousEvaluation: {
+    owner: string | null | undefined;
+    checker: string | null | undefined;
+    approver: string | null | undefined;
+  };
   comments: (Comment & {
     employee: Employee;
   })[];

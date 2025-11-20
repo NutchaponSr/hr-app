@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 
 import { prisma } from "@/lib/prisma";
 
-import { App, Period, Status } from "@/generated/prisma";
+import { Period, Status } from "@/generated/prisma";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 import { getUserRole } from "@/modules/bonus/permission";
@@ -13,39 +13,11 @@ import { buildPermissionContext } from "../utils";
 import { readCSV } from "@/seeds/utils/csv";
 import { ApprovalCSVProps } from "@/types/approval";
 
-function getAppStatus(form: { period: Period } | null): string {
-  if (!form) {
-    return Status.NOT_STARTED as string;
-  }
-
-  if (form.period === Period.IN_DRAFT) {
-    return Period.IN_DRAFT as string;
-  }
-
-  if (form.period === Period.EVALUATION) {
-    return Period.EVALUATION as string;
-  }
-
-  if (form.period === Period.EVALUATION_1ST) {
-    return Period.EVALUATION_1ST as string;
-  }
-
-  if (form.period === Period.EVALUATION_2ND) {
-    return Period.EVALUATION_2ND as string;
-  }
-
-  return "DONE";
-}
-
 export const taskProcedure = createTRPCRouter({
   getMany: protectedProcedure.query(async ({ ctx }) => {
     const tasks = await prisma.task.findMany({
       where: {
         OR: [
-          {
-            status: Status.IN_DRAFT,
-            preparedBy: ctx.user.employee.id,
-          },
           {
             status: Status.PENDING_CHECKER,
             checkedBy: ctx.user.employee.id,

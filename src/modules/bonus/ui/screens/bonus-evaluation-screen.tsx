@@ -6,7 +6,7 @@ import { Role } from "../../permission";
 import { KpiSummaryTable } from "../components/kpi-summary-table";
 import { UserProfile } from "@/modules/auth/ui/components/user-profile";
 import { RowData } from "@/components/row-data";
-import { BsPersonFill, BsSave } from "react-icons/bs";
+import { BsFloppy2Fill, BsPersonFill, BsSave } from "react-icons/bs";
 import { useKpiEvaluationForm } from "../../hooks/use-kpi-evaluation-form";
 import { useCallback, useMemo } from "react";
 import { convertAmountFromUnit } from "@/lib/utils";
@@ -17,7 +17,7 @@ import { useUpdateBulkKpiEvaluations } from "../../api/use-update-bulk-kpi-evalu
 import { KpiBonusEvaluationsSchema } from "../../schema";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Loader } from "@/components/loader";
+import { Spinner } from "@/components/ui/spinner";
 
 interface Props {
   id: string;
@@ -57,8 +57,12 @@ export const BonusEvaluationScreen = ({
     )
   ), [kpiForm.data.kpiForm.kpis]);
 
+  const onSave = useCallback(() => {
+    updateBulkKpiEvaluations({ evaluations: form.getValues().evaluations, isSubmit: false });
+  }, [updateBulkKpiEvaluations, form]);
+
   const onSubmit = useCallback((data: KpiBonusEvaluationsSchema) => {
-    updateBulkKpiEvaluations({ evaluations: data.evaluations });
+    updateBulkKpiEvaluations({ evaluations: data.evaluations, isSubmit: true });
   }, [updateBulkKpiEvaluations]);
 
   return (
@@ -98,15 +102,25 @@ export const BonusEvaluationScreen = ({
         <form onSubmit={form.handleSubmit(onSubmit)} className="contents">
           {canPerform.canSubmit && (
             <div className="min-h-9 px-16 sticky start-0 top-0 bg-background shrink-0 flex items-center z-100">
-              <div className="w-full flex justify-end items-center">
+              <div className="w-full flex justify-end items-center gap-1">
+                <Button 
+                  type="button" 
+                  variant="primaryGhost" 
+                  size="sm" 
+                  onClick={onSave}
+                  disabled={updateBulkKpiEvaluationsOpt.isPending}
+                >
+                  {updateBulkKpiEvaluationsOpt.isPending ? <Spinner className="!text-white" /> : <BsFloppy2Fill className="stroke-[0.25]" />}
+                  Save Draft
+                </Button>
                 <Button 
                   type="submit" 
                   variant="primary" 
                   size="sm" 
                   disabled={updateBulkKpiEvaluationsOpt.isPending}
                 >
-                  {updateBulkKpiEvaluationsOpt.isPending ? <Loader className="!text-white" /> : <BsSave className="stroke-[0.25]" />}
-                  Save
+                  {updateBulkKpiEvaluationsOpt.isPending ? <Spinner className="!text-white" /> : <BsSave className="stroke-[0.25]" />}
+                  Final Confirmation
                 </Button>
               </div>
             </div>

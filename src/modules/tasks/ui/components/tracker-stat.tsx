@@ -3,9 +3,9 @@ import { NumberTicker } from "@/components/ui/number-ticker";
 import { Card } from "@/components/card";
 
 interface Props {
-  value: number;
+  value?: number;
   title: string;
-  description?: string;
+  description?: React.ReactNode;
 }
 
 export const TrackerStat = ({ value, title, description }: Props) => {
@@ -16,21 +16,16 @@ export const TrackerStat = ({ value, title, description }: Props) => {
           <span className="text-xs font-medium uppercase tracking-wide">
             {title}
           </span>
-          {description && (
-            <p className="text-xs text-primary">
-              In progress{" "}
-              <span className="text-marine text-sm font-medium underline underline-offset-2">
-                {description}
-              </span>
-            </p>
-          )}
+          {description}
         </div>
+        {value && (
         <div className="flex flex-col items-start p-3">
           <NumberTicker
             value={value}
-            className="text-3xl font-semibold tracking-tighter whitespace-pre-wrap text-primary"
-          />
-        </div>
+              className="text-3xl font-semibold tracking-tighter whitespace-pre-wrap text-primary"
+            />
+          </div>
+        )}
       </div>
     </Card>
   );

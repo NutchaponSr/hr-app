@@ -6,6 +6,7 @@ import { UserAvatar } from "@/modules/auth/ui/components/user-avatar";
 import { StatusBadge } from "@/components/status-badge";
 import { STATUS_RECORD } from "@/types/kpi";
 import { Status } from "@/generated/prisma";
+import Link from "next/link";
 
 type TrackerColumn = inferProcedureOutput<AppRouter["task"]["getManyByYear"]>["employees"][0];
 
@@ -57,7 +58,21 @@ export const columns: ColumnDef<TrackerColumn>[] = [
         id: "definition_bonus",
         header: "Definition",
         cell: ({ row }) => (
-          <StatusBadge {...STATUS_RECORD[row.original.form.bonus?.tasks[0]?.status ? row.original.form.bonus?.tasks[0]?.status : Status.NOT_STARTED]} />
+          <>
+            {row.original.form.bonus?.tasks[0] && row.original.form.bonus?.tasks[0]?.status !== Status.NOT_STARTED && ( 
+              <div className="justify-end absolute top-1.5 mx-1 inset-x-0.5 group-hover/row:flex hidden data-[disabled=true]:group-hover/row:hidden">
+                <div className="sticky flex bg-popover p-0.5 h-6 dark:shadow-[0_0_0_1px_#30302e,0px_4px_12px_-2px_#00000029] rounded end-1">
+                  <Link 
+                    href={`/performance/bonus/${row.original.form.bonus?.tasks[0].id}?period=IN_DRAFT`} 
+                    className="flex items-center justify-center text-[11px] font-medium whitespace-nowrap overflow-hidden text-ellipsis text-primary tracking-wider uppercase px-1 hover:bg-accent rounded"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            )}
+            <StatusBadge {...STATUS_RECORD[row.original.form.bonus?.tasks[0]?.status ? row.original.form.bonus?.tasks[0]?.status : Status.NOT_STARTED]} />
+          </>
         ),
         meta: {
           width: "15%",
@@ -68,7 +83,23 @@ export const columns: ColumnDef<TrackerColumn>[] = [
         id: "evaluation",
         header: "Evaluation",
         cell: ({ row }) => (
-          <StatusBadge {...STATUS_RECORD[row.original.form.bonus?.tasks[1]?.status ? row.original.form.bonus?.tasks[1]?.status : Status.NOT_STARTED]} />
+          <>
+            {row.original.form.bonus?.tasks[1] && row.original.form.bonus?.tasks[1]?.status !== Status.NOT_STARTED && (
+              <div 
+                className="justify-end absolute top-1.5 mx-1 inset-x-0.5 group-hover/row:flex hidden data-[disabled=true]:group-hover/row:hidden"
+              >
+                <div className="sticky flex bg-popover p-0.5 h-6 dark:shadow-[0_0_0_1px_#30302e,0px_4px_12px_-2px_#00000029] rounded end-1">
+                  <Link 
+                    href={`/performance/bonus/${row.original.form.bonus?.tasks[1].id}?period=EVALUATION`} 
+                    className="flex items-center justify-center text-[11px] font-medium whitespace-nowrap overflow-hidden text-ellipsis text-primary tracking-wider uppercase px-1 hover:bg-accent rounded"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            )}
+            <StatusBadge {...STATUS_RECORD[row.original.form.bonus?.tasks[1]?.status ? row.original.form.bonus?.tasks[1]?.status : Status.NOT_STARTED]} />
+          </>
         ),
         meta: {
           width: "15%",
@@ -89,7 +120,21 @@ export const columns: ColumnDef<TrackerColumn>[] = [
         id: "definition_merit",
         header: "Definition",
         cell: ({ row }) => (
-          <StatusBadge {...STATUS_RECORD[row.original.form.merit?.tasks[0]?.status ? row.original.form.merit?.tasks[0]?.status : Status.NOT_STARTED]} />
+          <>
+            {row.original.form.merit?.tasks[0] && row.original.form.merit?.tasks[0]?.status !== Status.NOT_STARTED && (
+              <div className="justify-end absolute top-1.5 mx-1 inset-x-0.5 group-hover/row:flex hidden data-[disabled=true]:group-hover/row:hidden">
+                <div className="sticky flex bg-popover p-0.5 h-6 dark:shadow-[0_0_0_1px_#30302e,0px_4px_12px_-2px_#00000029] rounded end-1">
+                  <Link 
+                    href={`/performance/merit/${row.original.form.merit?.tasks[0].id}?period=IN_DRAFT`} 
+                    className="flex items-center justify-center text-[11px] font-medium whitespace-nowrap overflow-hidden text-ellipsis text-primary tracking-wider uppercase px-1 hover:bg-accent rounded"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            )}
+            <StatusBadge {...STATUS_RECORD[row.original.form.merit?.tasks[0]?.status ? row.original.form.merit?.tasks[0]?.status : Status.NOT_STARTED]} />
+          </>
         ),
         meta: {
           width: "15%",
@@ -100,7 +145,21 @@ export const columns: ColumnDef<TrackerColumn>[] = [
         header: "Evaluation 1st",
         id: "evaluation1st_merit",  
         cell: ({ row }) => (
-          <StatusBadge {...STATUS_RECORD[row.original.form.merit?.tasks[1]?.status ? row.original.form.merit?.tasks[1]?.status : Status.NOT_STARTED]} />
+          <>
+            {row.original.form.merit?.tasks[1] && row.original.form.merit?.tasks[1]?.status !== Status.NOT_STARTED && (
+              <div className="justify-end absolute top-1.5 mx-1 inset-x-0.5 group-hover/row:flex hidden data-[disabled=true]:group-hover/row:hidden">
+                <div className="sticky flex bg-popover p-0.5 h-6 dark:shadow-[0_0_0_1px_#30302e,0px_4px_12px_-2px_#00000029] rounded end-1">
+                  <Link 
+                    href={`/performance/merit/${row.original.form.merit?.tasks[1].id}?period=EVALUATION_1ST`} 
+                    className="flex items-center justify-center text-[11px] font-medium whitespace-nowrap overflow-hidden text-ellipsis text-primary tracking-wider uppercase px-1 hover:bg-accent rounded"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            )}
+            <StatusBadge {...STATUS_RECORD[row.original.form.merit?.tasks[1]?.status ? row.original.form.merit?.tasks[1]?.status : Status.NOT_STARTED]} />
+          </>
         ),
         meta: {
           width: "15%",
@@ -111,7 +170,21 @@ export const columns: ColumnDef<TrackerColumn>[] = [
         header: "Evaluation 2nd",
         id: "evaluation2nd_merit",
         cell: ({ row }) => (
-          <StatusBadge {...STATUS_RECORD[row.original.form.merit?.tasks[2]?.status ? row.original.form.merit?.tasks[2]?.status : Status.NOT_STARTED]} />
+          <>
+            {row.original.form.merit?.tasks[2] && row.original.form.merit?.tasks[2]?.status !== Status.NOT_STARTED && (
+              <div className="justify-end absolute top-1.5 mx-1 inset-x-0.5 group-hover/row:flex hidden data-[disabled=true]:group-hover/row:hidden">
+                <div className="sticky flex bg-popover p-0.5 h-6 dark:shadow-[0_0_0_1px_#30302e,0px_4px_12px_-2px_#00000029] rounded end-1">
+                  <Link 
+                    href={`/performance/merit/${row.original.form.merit?.tasks[2].id}?period=EVALUATION_2ND`} 
+                    className="flex items-center justify-center text-[11px] font-medium whitespace-nowrap overflow-hidden text-ellipsis text-primary tracking-wider uppercase px-1 hover:bg-accent rounded"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            )}
+            <StatusBadge {...STATUS_RECORD[row.original.form.merit?.tasks[2]?.status ? row.original.form.merit?.tasks[2]?.status : Status.NOT_STARTED]} />
+          </>
         ),
         meta: {
           width: "15%",

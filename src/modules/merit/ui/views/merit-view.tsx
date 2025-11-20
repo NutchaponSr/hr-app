@@ -88,6 +88,11 @@ export const MeritView = ({ id, period }: Props) => {
           perform={permissions.worflow}
           title="Start Workflow Merit"
           onWorkflow={() => {
+            if (!save) {
+              toast.error("Please confirm the form data first");
+              return;
+            }
+
             if (totalWeight !== 30) {
               toast.error("The total competencies weight must equal 30%");
               return;

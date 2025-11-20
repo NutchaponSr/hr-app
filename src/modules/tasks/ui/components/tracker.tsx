@@ -18,8 +18,7 @@ import { columns } from "@/modules/tasks/ui/components/tracker-columns";
 import { TrackerStat } from "@/modules/tasks/ui/components/tracker-stat";
 import { Button } from "@/components/ui/button";
 import { CircleDashedIcon } from "lucide-react";
-import { StatusBadge } from "@/components/status-badge";
-import { Status } from "@/generated/prisma";
+import { Period, Status } from "@/generated/prisma";
 import { StatusVariant } from "@/types/kpi";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -117,24 +116,66 @@ export const Tracker = ({ year }: Props) => {
           <TrackerStat title="Employee" value={table.getRowModel().rows.length} />
           <TrackerStat
             title="Bonus approved"
-            value={kpiBonus.filter((row) => row.original.form.bonus?.tasks?.some((task) => task.status === Status.APPROVED)).length}
             description={
-              String(kpiBonus.filter((row) => row.original.form.bonus?.tasks?.some((task) => task.status !== Status.APPROVED)).length + 
-              table.getRowModel().rows.filter((row) => !row.original.form.bonus).length)
+              <ul className="flex flex-col items-start list-disc list-inside">
+                <li className="text-xs text-primary">
+                  Definition: {" "}
+                  <span className="text-marine text-sm font-medium underline underline-offset-2">
+                    {kpiBonus.filter((row) => row.original.form.bonus?.tasks?.some((task) => task.status === Status.APPROVED && task.context === "IN_DRAFT")).length}
+                  </span>
+                </li>
+                <li className="text-xs text-primary">
+                  Evaluation: {" "}
+                  <span className="text-marine text-sm font-medium underline underline-offset-2">
+                    {kpiBonus.filter((row) => row.original.form.bonus?.tasks?.some((task) => task.status === Status.APPROVED && task.context === "EVALUATION")).length}
+                  </span>
+                </li>
+              </ul>
             }
           />
           <TrackerStat
             title="Merit approved"
-            value={merit.filter((row) => row.original.form.merit?.tasks?.some((task) => task.status === Status.APPROVED)).length}
             description={
-              String(merit.filter((row) => row.original.form.merit?.tasks?.some((task) => task.status !== Status.APPROVED)).length + 
-              table.getRowModel().rows.filter((row) => !row.original.form.merit).length)
+              <ul className="flex flex-col items-start list-disc list-inside">
+                <li className="text-xs text-primary">
+                  Definition: {" "}
+                  <span className="text-marine text-sm font-medium underline underline-offset-2">
+                    {merit.filter((row) => row.original.form.merit?.tasks?.some((task) => task.status === Status.APPROVED && task.context === "IN_DRAFT")).length}
+                  </span>
+                </li>
+                <li className="text-xs text-primary">
+                  Evaluation 1st: {" "}
+                  <span className="text-marine text-sm font-medium underline underline-offset-2">
+                    {merit.filter((row) => row.original.form.merit?.tasks?.some((task) => task.status === Status.APPROVED && task.context === "EVALUATION_1ST")).length}
+                  </span>
+                </li>
+                <li className="text-xs text-primary">
+                  Evaluation 2nd: {" "}
+                  <span className="text-marine text-sm font-medium underline underline-offset-2">
+                    {merit.filter((row) => row.original.form.merit?.tasks?.some((task) => task.status === Status.APPROVED && task.context === "EVALUATION_2ND")).length}
+                  </span>
+                </li>
+              </ul>
             }
           />
           <TrackerStat 
             title="Pending" 
-            value={kpiBonus.flatMap((f) => f.original.form.bonus?.tasks?.filter((task) => task.status === Status.PENDING_CHECKER || task.status === Status.PENDING_APPROVER)).length + 
-              merit.flatMap((f) => f.original.form.merit?.tasks?.filter((task) => task.status === Status.PENDING_CHECKER || task.status === Status.PENDING_APPROVER)).length} 
+            description={
+              <ul className="flex flex-col items-start list-disc list-inside">
+                <li className="text-xs text-primary">
+                  Bonus: {" "}
+                  <span className="text-marine text-sm font-medium underline underline-offset-2">
+                    {kpiBonus.filter((row) => row.original.form.bonus?.tasks?.some((task) => task.status === Status.PENDING_APPROVER || task.status === Status.PENDING_CHECKER)).length}
+                  </span>
+                </li>
+                <li className="text-xs text-primary">
+                  Merit: {" "}
+                  <span className="text-marine text-sm font-medium underline underline-offset-2">
+                    {merit.filter((row) => row.original.form.merit?.tasks?.some((task) => task.status === Status.PENDING_APPROVER || task.status === Status.PENDING_CHECKER)).length}
+                  </span>
+                </li>
+              </ul>
+            }
           />
         </div>
 
@@ -210,11 +251,8 @@ export const Tracker = ({ year }: Props) => {
                     colSpan={header.colSpan}
                     style={{ width: header.column.columnDef.meta?.width }}
                     className={cn(
-                      headerGroup.id === "0" &&
-                        "border-r-[1.25px] border-border border-b-[1.25px]",
-                      (header.id === "name" || header.id === "evaluation") &&
-                        "border-r-[1.25px] border-border",
-                      "first:border-b-0 last:border-r-0",
+                      headerGroup.id === "0" && "border-r-[1.25px] border-border border-b-[1.25px]",
+                      "border-r-[1.25px] border-border first:border-b-0 last:border-r-0",
                     )}
                   >
                     <div className="flex items-center text-xs text-secondary font-normal h-8 px-2">
@@ -223,7 +261,7 @@ export const Tracker = ({ year }: Props) => {
                         : flexRender(
                             header.column.columnDef.header,
                             header.getContext(),
-                          )}
+                      )}
                     </div>
                   </th>
                 ))}
@@ -239,28 +277,20 @@ export const Tracker = ({ year }: Props) => {
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="border-b-[1.25px] border-border">
-                    {row.getVisibleCells().map((cell) => {
-                      const columnMatched = ["name", "evaluation"].includes(
-                        cell.id.split("_")[1],
-                      );
-
-                      return (
-                        <td
-                          key={cell.id}
-                          className={cn(
-                            columnMatched && "border-r-[1.25px] border-border",
+                  <tr key={row.id} className="border-b-[1.25px] border-border relative group/row">
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className={cn("border-r-[1.25px] border-border last:border-r-0")}
+                      >
+                        <div className="flex items-center text-xs text-secondary font-normal h-10 px-2 relative">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
                           )}
-                        >
-                          <div className="flex items-center text-xs text-secondary font-normal h-10 px-2">
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </div>
-                        </td>
-                      );
-                    })} 
+                        </div>
+                      </td>
+                    ))}
                 </tr>
               ))
             )}

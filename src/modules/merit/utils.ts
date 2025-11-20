@@ -156,6 +156,10 @@ export function formatMeritExport(meritForm: MeritFormWithInfo) {
         year: meritForm.year,
         period: periods[periodType],
         type: "Competency" as const,
+        detail: evaluation?.result,
+        owner: evaluation?.actualOwner,
+        checker: evaluation?.actualChecker,
+        approver: evaluation?.actualApprover,
         name: c.competency?.name,
       };
 
@@ -188,6 +192,10 @@ export function formatMeritExport(meritForm: MeritFormWithInfo) {
           period: periods[periodType],
           type: "Culture" as const,
           name: c.culture.code,
+          detail: evaluation?.result,
+          owner: evaluation?.actualOwner,
+          checker: evaluation?.actualChecker,
+          approver: evaluation?.actualApprover,
         };
 
         const weight = 30 / meritForm.cultureRecords.length;
