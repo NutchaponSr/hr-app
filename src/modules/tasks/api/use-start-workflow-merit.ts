@@ -6,7 +6,7 @@ import { useTRPC } from "@/trpc/client";
 import type { AppRouter } from "@/trpc/routers/_app";
 import { usePeriod } from "@/hooks/use-period";
 import { sendEmail } from "@/actions/send-email";
-import { isFormatEmail } from "../type";
+import { format } from "date-fns";
 
 type RequestType = inferProcedureInput<AppRouter["task"]["startWorkflow"]>;
 
@@ -31,21 +31,19 @@ export const useStartWorkflowMerit = (id: string) => {
 
           toast.success("Workflow started!", { id: "start-workflow-merit" });
 
-          if (
-            process.env.NODE_ENV === "production" && 
-            Array.isArray(data.emails) && 
-            data.emails.some(email => email && isFormatEmail.includes(email))
-          ) {
-            for (const email of data.emails) {
-              if (email && isFormatEmail.includes(email)) {
-                await sendEmail({
-                  to: email,
-                  subject: "Workflow Started",
-                  description: "Your workflow has been started. Please check it out.",
-                  url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/merit/${id}?period=${period}`,
-                });
-              }
-            }
+          if (!!data.toEmail && !!data.fromEmail) {
+            await sendEmail({
+              to: "pondpopza5@gmail.com",
+              cc: [data.fromEmail],
+              subject: `[E-PMS] Action Required: ตรวจสอบและอนุมัติเอกสารจากระบบประเมินการปฏิบัติงาน - ${data.ownerName}`,
+              body: `มีเอกสารจากระบบประเมินผลการปฏิบัติงาน เข้ามาในระบบเพื่อรอการตรวจสอบและพิจารณา อนุมัติจากท่าน โดยมีรายละเอียดดังนี้:`,
+              checkerName: data.checkerName,
+              employeeName: data.ownerName,
+              documentType: data.app,
+              submitDate: format(new Date(), "yyyy-MM-dd"),
+              status: data.status,
+              url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/merit/${id}?period=${period}`,
+            });
           }
         },
         onError: (ctx) => {

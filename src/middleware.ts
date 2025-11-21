@@ -19,7 +19,7 @@ export async function middleware(req: NextRequest) {
   const isAuthRoute = nextUrl.pathname.startsWith("/auth");
 
   if (isProtectedRoute && !isSignnedIn) {
-    const callbackUrl = encodeURIComponent(nextUrl.pathname);
+    const callbackUrl = encodeURIComponent(nextUrl.pathname + nextUrl.search);
     return NextResponse.redirect(new URL(`/auth/sign-in?callbackUrl=${callbackUrl}`, req.url));
   }
 

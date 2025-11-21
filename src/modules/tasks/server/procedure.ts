@@ -12,6 +12,7 @@ import { getUserRole } from "@/modules/bonus/permission";
 import { buildPermissionContext } from "../utils";
 import { readCSV } from "@/seeds/utils/csv";
 import { ApprovalCSVProps } from "@/types/approval";
+import { statuses, tasks } from "../type";
 
 export const taskProcedure = createTRPCRouter({
   getMany: protectedProcedure.query(async ({ ctx }) => {
@@ -259,7 +260,12 @@ export const taskProcedure = createTRPCRouter({
 
       return {
         id: res.id,
-        emails: [res.preparer.email, res.checker?.email, res.approver?.email],
+        toEmail: res.checker?.email || res.approver?.email,
+        fromEmail: res.preparer?.email,
+        checkerName: res.checker?.fullName || res.approver?.fullName,
+        ownerName: res.preparer?.fullName,
+        status: statuses[res.status],
+        app: tasks[res.type],
       };
     }),
   confirmation: protectedProcedure
@@ -358,8 +364,24 @@ export const taskProcedure = createTRPCRouter({
 
       return {
         id: res.id,
-        emails: [res.preparer.email, res.checker?.email, res.approver?.email],
+        owner: {
+          email: res.preparer?.email,
+          name: res.preparer?.fullName,
+        },
+        checker: {
+          email: res.checker?.email,
+          name: res.checker?.fullName,
+        },
+        approver: {
+          email: res.approver?.email,
+          name: res.approver?.fullName,
+        },
+        status: statuses[res.status],
+        app: tasks[res.type],
+        approvedAt: res.approvedAt,
+        checkedAt: res.checkedAt,
         isApproved: res.status === Status.APPROVED,
+        checkedBy: res.status === Status.REJECTED_BY_CHECKER ? res.checker?.fullName : res.status === Status.REJECTED_BY_APPROVER ? res.approver?.fullName : undefined,
       };
     }),
 });

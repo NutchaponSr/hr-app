@@ -2,26 +2,26 @@
 
 import { transporter } from "@/lib/nodemailer";
 
-export const sendEmail = async ({
+export const sendPending = async ({
   to,
   cc,
   subject,
-  body,
-  checkerName,
   employeeName,
+  checkerName,
+  approverName,
   documentType,
-  submitDate,
+  checkedAt,
   status,
   url,
 }: {
   to: string,
   cc?: string[],
   subject: string,
-  body: string,
-  checkerName: string,
+  checkerName?: string,
+  approverName: string,
   employeeName: string,
   documentType: string,
-  submitDate: string,
+  checkedAt?: string,
   status: string,
   url: string,
 }) => {
@@ -47,11 +47,11 @@ export const sendEmail = async ({
           </div>
 
           <!-- Salutation -->
-          <p style="margin: 20px 0; font-size: 16px; color: #e0e0e0;">เรียน คุณ${checkerName},</p>
+          <p style="margin: 20px 0; font-size: 16px; color: #e0e0e0;">เรียน คุณ${approverName},</p>
 
           <!-- Body -->
           <p style="margin: 20px 0; font-size: 16px; color: #e0e0e0; line-height: 1.6;">
-            ${body}
+            มีเอกสารจากระบบประเมินผลการปฏิบัติงาน เข้ามาในระบบเพื่อรอการตรวจสอบและพิจารณาอนุมัติขั้นสุดท้ายจากท่าน (ผ่านการตรวจสอบแล้ว) โดยมีรายละเอียดดังนี้:
           </p>
 
           <!-- Details Table -->
@@ -73,12 +73,16 @@ export const sendEmail = async ({
                   <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${documentType}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">สถานะ (Current Status):</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">ผู้ตรวจสอบ (Checked By):</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${checkerName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">สถานะ (Status):</td>
                   <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${status}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold;">วันที่ส่ง (Submitted Date):</td>
-                  <td style="padding: 12px 10px; color: #e0e0e0;">${submitDate}</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">วันที่ส่ง (Submitted Date):</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${checkedAt}</td>
                 </tr>
               </tbody>
             </table>
