@@ -6,8 +6,10 @@ import { useTRPC } from "@/trpc/client";
 import type { AppRouter } from "@/trpc/routers/_app";
 import { useSave } from "@/hooks/use-save";
 import { usePeriod } from "@/hooks/use-period";
-import { sendEmail } from "@/actions/send-email";
-import { isFormatEmail } from "../type";
+import { sendApproved } from "@/actions/send-approved";
+import { format } from "date-fns";
+import { sendPending } from "@/actions/send-pending";
+import { sendReject } from "@/actions/send-reject";
 
 type RequestType = inferProcedureInput<AppRouter["task"]["confirmation"]>;
 
@@ -37,31 +39,51 @@ export const useApprovalKpi = (id: string) => {
           );
           setSave(false);
 
-          if (
-            process.env.NODE_ENV === "production" && 
-            Array.isArray(data.emails) && 
-            data.emails.some(email => email && isFormatEmail.includes(email))
-          ) {
-            for (const email of data.emails) {
-              if (email && isFormatEmail.includes(email)) {
-                await sendEmail({
-                  to: email,
-                  subject: data.isApproved
-                    ? "Workflow Finished!"
-                    : value.confirm
-                      ? "Workflow Approved!"
-                      : "Workflow Rejected!",
-                  description: data.isApproved
-                    ? "Your workflow has been finished. Please check it out."
-                    : value.confirm
-                      ? "Your workflow has been approved. Please check it out."
-                      : "Your workflow has been rejected. Please check it out.",
+          if (!!data.owner.email && !!data.approver.email) {
+            if (data.isApproved) {
+              await sendApproved({
+                to: data.owner.email,
+                cc: [data.checker.email || "", data.approver.email],
+                subject: `[E-PMS] Completed: แจ้งผลการอนุมัติเอกสาร ${data.app} - ${data.owner.name}`,
+                checkerName: data.checker.name,
+                employeeName: data.owner.name,
+                approverName: data.approver.name, 
+                documentType: data.app,
+                checkedAt: data.checkedAt ? format(data.checkedAt, "yyyy-MM-dd") : undefined,
+                approvedAt: data.approvedAt ? format(data.approvedAt, "yyyy-MM-dd") : undefined,
+                url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${id}?period=${period}`,
+              });
+            } else {
+              if (value.confirm) {
+                await sendPending({
+                  to: data.approver.email,
+                  cc: [data.checker.email || "", data.owner.email],
+                  subject: `[E-PMS] Action Required: ตรวจสอบและอนุมัติเอกสารจากระบบประเมินการปฏิบัติงาน (Final Approve) - ${data.owner.name}`,
+                  checkerName: data.checker.name,
+                  employeeName: data.owner.name,
+                  approverName: data.approver.name,
+                  documentType: data.app,
+                  checkedAt: data.checkedAt ? format(data.checkedAt, "yyyy-MM-dd") : undefined,
+                  status: data.status,
+                  url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${id}?period=${period}`,
+                });
+              } else {
+                await sendReject({
+                  to: data.owner.email,
+                  cc: [data.checker.email || data.approver.email],
+                  subject: `[E-PMS] Action Required: แจ้งแก้ไขข้อมูล (Declined by Checker) - ${data.app}`,
+                  checkerName: data.checker.name,
+                  employeeName: data.owner.name,
+                  approverName: data.approver.name,
+                  documentType: data.app,
+                  checkedAt: data.checkedAt ? format(data.checkedAt, "yyyy-MM-dd") : undefined,
+                  status: data.status,
+                  checkedBy: data.checkedBy,
                   url: `${process.env.NEXT_PUBLIC_APP_URL}/performance/bonus/${id}?period=${period}`,
                 });
               }
             }
           }
-
         },
         onError: (ctx) => {
           toast.error(ctx.message || "Something went wrong", {

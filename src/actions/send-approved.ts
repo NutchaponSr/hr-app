@@ -1,28 +1,29 @@
 "use server";
 
 import { transporter } from "@/lib/nodemailer";
+import { format } from "date-fns";
 
-export const sendEmail = async ({
+export const sendApproved = async ({
   to,
   cc,
   subject,
-  body,
   checkerName,
+  approverName,
   employeeName,
   documentType,
-  submitDate,
-  status,
+  checkedAt,
+  approvedAt,
   url,
 }: {
   to: string,
   cc?: string[],
   subject: string,
-  body: string,
-  checkerName: string,
+  checkerName?: string,
+  approverName: string,
   employeeName: string,
   documentType: string,
-  submitDate: string,
-  status: string,
+  checkedAt?: string,
+  approvedAt?: string,
   url: string,
 }) => {
   await transporter.sendMail({
@@ -47,11 +48,11 @@ export const sendEmail = async ({
           </div>
 
           <!-- Salutation -->
-          <p style="margin: 20px 0; font-size: 16px; color: #e0e0e0;">เรียน คุณ${checkerName},</p>
+          <p style="margin: 20px 0; font-size: 16px; color: #e0e0e0;">เรียน คุณ${employeeName},</p>
 
           <!-- Body -->
           <p style="margin: 20px 0; font-size: 16px; color: #e0e0e0; line-height: 1.6;">
-            ${body}
+            ขอแจ้งให้ทราบว่าเอกสาร ${documentType} ของท่าน ได้รับการอนุมัติครบทุกขั้นตอนเรียบร้อยแล้ว
           </p>
 
           <!-- Details Table -->
@@ -59,26 +60,26 @@ export const sendEmail = async ({
             <table style="width: 100%; border-collapse: collapse;">
               <thead>
                 <tr>
-                  <th style="text-align: left; padding: 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">รายละเอียด (Details)</th>
-                  <th style="text-align: left; padding: 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">ข้อมูล (Information)</th>
+                  <th style="text-align: left; padding: 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">สถานะ (Status)</th>
+                  <th style="text-align: left; padding: 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">ผู้ดำเนินการ (Action By)</th>
+                  <th style="text-align: left; padding: 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">วันที่ (Date)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">ชื่อพนักงาน (Employee):</td>
-                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${employeeName}</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">Checked</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${checkerName || `-`}</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${checkedAt || `-`}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">ประเภทเอกสาร (Document):</td>
-                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${documentType}</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">Approved</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${approverName}</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${approvedAt || `-`}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">สถานะ (Current Status):</td>
-                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${status}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold;">วันที่ส่ง (Submitted Date):</td>
-                  <td style="padding: 12px 10px; color: #e0e0e0;">${submitDate}</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; font-weight: bold; border-bottom: 1px solid #555;">Current Status</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">Completed</td>
+                  <td style="padding: 12px 10px; color: #e0e0e0; border-bottom: 1px solid #555;">${format(new Date(), "yyyy-MM-dd")}</td>
                 </tr>
               </tbody>
             </table>
@@ -86,7 +87,7 @@ export const sendEmail = async ({
 
           <!-- Call to Action -->
           <p style="margin: 30px 0 20px 0; font-size: 16px; color: #e0e0e0; line-height: 1.6;">
-            กรุณาคลิกปุ่มด้านล่างเพื่อเข้าสู่ระบบเพื่อตรวจสอบและพิจารณา
+            ท่านสามารถเข้าไปดูรายละเอียดผลการอนุมัติได้ที่ปุ่มด้านล่าง
           </p>
 
           <!-- Button -->
