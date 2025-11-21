@@ -33,7 +33,7 @@ export const useStartWorkflowMerit = (id: string) => {
 
           if (!!data.toEmail && !!data.fromEmail) {
             await sendEmail({
-              to: "pondpopza5@gmail.com",
+              to: data.toEmail,
               cc: [data.fromEmail],
               subject: `[E-PMS] Action Required: ตรวจสอบและอนุมัติเอกสารจากระบบประเมินการปฏิบัติงาน - ${data.ownerName}`,
               body: `มีเอกสารจากระบบประเมินผลการปฏิบัติงาน เข้ามาในระบบเพื่อรอการตรวจสอบและพิจารณา อนุมัติจากท่าน โดยมีรายละเอียดดังนี้:`,
