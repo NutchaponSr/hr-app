@@ -736,45 +736,30 @@ export const meritProcedure = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      // First, get the existing records
-      const [existingCompetencyRecords, existingCultureRecords] =
-        await Promise.all([
-          prisma.competencyRecord.findMany({
-            where: { meritFormId: input.id },
-          }),
-          prisma.cultureRecord.findMany({
-            where: { meritFormId: input.id },
-          }),
-        ]);
-
-      // Update competency records
+      // Update competency records using id from input
       await Promise.all(
-        input.meritSchema.competencies.map(async (c, index) => {
-          if (existingCompetencyRecords[index]) {
-            return prisma.competencyRecord.update({
-              where: { id: existingCompetencyRecords[index].id },
-              data: {
-                competencyId: c.competencyId,
-                input: c.input,
-                output: c.output,
-                weight: convertAmountToUnit(parseFloat(c.weight!), 2),
-              },
-            });
-          }
+        input.meritSchema.competencies.map(async (c) => {
+          return prisma.competencyRecord.update({
+            where: { id: c.id },
+            data: {
+              competencyId: c.competencyId,
+              input: c.input,
+              output: c.output,
+              weight: convertAmountToUnit(parseFloat(c.weight!), 2),
+            },
+          });
         }),
       );
 
-      // Update culture records
+      // Update culture records using id from input
       await Promise.all(
-        input.meritSchema.cultures.map(async (culture, index) => {
-          if (existingCultureRecords[index]) {
-            return prisma.cultureRecord.update({
-              where: { id: existingCultureRecords[index].id },
-              data: {
-                evidence: culture.evidence,
-              },
-            });
-          }
+        input.meritSchema.cultures.map(async (culture) => {
+          return prisma.cultureRecord.update({
+            where: { id: culture.id },
+            data: {
+              evidence: culture.evidence,
+            },
+          });
         }),
       );
 
