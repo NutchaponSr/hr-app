@@ -31,7 +31,7 @@ export const useStartWorkflowMerit = (id: string) => {
 
           toast.success("Workflow started!", { id: "start-workflow-merit" });
 
-          if (!!data.toEmail && !!data.fromEmail) {
+          if (!!data.toEmail && !!data.fromEmail && process.env.NODE_ENV === "production") {
             await sendEmail({
               to: data.toEmail,
               cc: [data.fromEmail],

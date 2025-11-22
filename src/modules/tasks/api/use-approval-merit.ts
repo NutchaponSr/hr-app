@@ -36,7 +36,7 @@ export const useApprovalMerit = (id: string) => {
             { id: "approval" },
           );
 
-          if (!!data.owner.email && !!data.approver.email) {
+          if (!!data.owner.email && !!data.approver.email && process.env.NODE_ENV === "production") {
 
             if (data.isApproved) {
               await sendApproved({

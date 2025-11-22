@@ -741,11 +741,9 @@ export const meritProcedure = createTRPCRouter({
         await Promise.all([
           prisma.competencyRecord.findMany({
             where: { meritFormId: input.id },
-            orderBy: { id: "asc" },
           }),
           prisma.cultureRecord.findMany({
             where: { meritFormId: input.id },
-            orderBy: { id: "asc" },
           }),
         ]);
 

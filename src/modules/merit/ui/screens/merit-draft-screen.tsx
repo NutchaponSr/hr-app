@@ -202,6 +202,7 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
               evidence: matchedData.evidence || "",
             };
           }
+          
           return null;
         })
         .filter((item): item is NonNullable<typeof item> => item !== null);
