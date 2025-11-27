@@ -18,6 +18,8 @@ import { KpiBonusEvaluationsSchema } from "../../schema";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { CHIEF_DOWN } from "@/modules/merit/type";
+import { Position } from "@/generated/prisma";
 
 interface Props {
   id: string;
@@ -94,7 +96,11 @@ export const BonusEvaluationScreen = ({
               </div>
             </div>
             <div className="grow-0 shrink-0 col-span-2">
-              <KpiSummaryTable form={form} kpis={kpiForm.data.kpiForm.kpis || []} />
+              <KpiSummaryTable 
+                form={form} 
+                kpis={kpiForm.data.kpiForm.kpis || []} 
+                isChefDown={CHIEF_DOWN.includes(kpiForm.data.preparer.rank)} 
+              />
             </div>
           </div>
         </div>
