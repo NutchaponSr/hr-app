@@ -99,7 +99,7 @@ export const BonusEvaluationScreen = ({
               <KpiSummaryTable 
                 form={form} 
                 kpis={kpiForm.data.kpiForm.kpis || []} 
-                isChefDown={CHIEF_DOWN.includes(kpiForm.data.preparer.rank)} 
+                fullScore={totalWeight} 
               />
             </div>
           </div>

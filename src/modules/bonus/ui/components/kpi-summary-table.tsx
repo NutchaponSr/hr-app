@@ -13,11 +13,11 @@ import { calculateAchievementSum, formatAchievementSum } from "../../util";
 
 interface Props {
   kpis: KpiWithComments[];
-  isChefDown: boolean;
+  fullScore: number;
   form: UseFormReturn<KpiBonusEvaluationsSchema>;
 }
 
-export const KpiSummaryTable = ({ kpis, form, isChefDown }: Props) => {
+export const KpiSummaryTable = ({ kpis, form, fullScore }: Props) => {
   const evaluations = form.watch("evaluations");
   
   const ownerSum = calculateAchievementSum(evaluations, kpis, "achievementOwner");
@@ -78,7 +78,7 @@ export const KpiSummaryTable = ({ kpis, form, isChefDown }: Props) => {
             <div className="flex items-center h-full justify-end">
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
-                  {isChefDown ? "40.00" : "50.00"}
+                  {formatAchievementSum(fullScore)}
                 </div>
               </div>
             </div>
