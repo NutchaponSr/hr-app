@@ -173,7 +173,10 @@ export const bonusProcedure = createTRPCRouter({
           ...task,
           kpiForm: {
             ...task.kpiForm,
-            kpis: kpisWithComments,
+            kpis: kpisWithComments?.map((k, index) => ({
+              ...k,
+              order: index + 1,
+            })),
           },
         },
         permission: {

@@ -18,9 +18,6 @@ import { KpiBonusEvaluationsSchema } from "../../schema";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
-import { CHIEF_DOWN } from "@/modules/merit/type";
-import { Position } from "@/generated/prisma";
-
 interface Props {
   id: string;
   kpiForm: inferProcedureOutput<AppRouter["kpiBonus"]["getById"]>;
@@ -133,7 +130,7 @@ export const BonusEvaluationScreen = ({
           )}
           <div className="grow shrink-0 flex flex-col relative pb-[180px]">
             <div className="relative float-start min-w-full select-none px-16 space-y-4">
-              {kpiForm.data.kpiForm.kpis?.map((kpi, index) => (
+              {kpiForm.data.kpiForm.kpis?.sort((a, b) => a.order - b.order).map((kpi, index) => (
                 <React.Fragment key={kpi.id}>
                   <KpiItem 
                     index={index}
