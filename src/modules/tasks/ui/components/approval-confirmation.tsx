@@ -1,5 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/hooks/use-confirm";
+
+import { Button } from "@/components/ui/button";
 
 interface Props {
   disabled: boolean;
@@ -35,6 +36,7 @@ export const ApprovalConfirmation = ({
     }
 
     const confirmed = await confirm();
+
     if (confirmed) {
       onClick(true);
     }

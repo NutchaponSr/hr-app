@@ -1,4 +1,6 @@
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 import { inferProcedureInput } from "@trpc/server";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -8,14 +10,14 @@ import { usePeriod } from "@/hooks/use-period";
 import { sendReject } from "@/actions/send-reject";
 import { sendPending } from "@/actions/send-pending";
 import { sendApproved } from "@/actions/send-approved";
-import { format } from "date-fns";
 
 type RequestType = inferProcedureInput<AppRouter["task"]["confirmation"]>;
 
 export const useApprovalMerit = (id: string) => {
   const trpc = useTRPC();
+  const router = useRouter();
+  
   const queryClient = useQueryClient();
-
   const { period } = usePeriod();
 
   const confirmation = useMutation(trpc.task.confirmation.mutationOptions());
@@ -82,6 +84,8 @@ export const useApprovalMerit = (id: string) => {
               }
             }
           }
+
+          router.push("/performance");
         },
         onError: (ctx) => {
           toast.error(ctx.message || "Something went wrong", {

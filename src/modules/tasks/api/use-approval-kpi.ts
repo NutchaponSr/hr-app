@@ -10,13 +10,15 @@ import { sendApproved } from "@/actions/send-approved";
 import { format } from "date-fns";
 import { sendPending } from "@/actions/send-pending";
 import { sendReject } from "@/actions/send-reject";
+import { useRouter } from "next/navigation";
 
 type RequestType = inferProcedureInput<AppRouter["task"]["confirmation"]>;
 
 export const useApprovalKpi = (id: string) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-
+  const router = useRouter();
+  
   const { setSave } = useSave();
   const { period } = usePeriod();
 
@@ -84,6 +86,8 @@ export const useApprovalKpi = (id: string) => {
               }
             }
           }
+
+          router.push("/performance");
         },
         onError: (ctx) => {
           toast.error(ctx.message || "Something went wrong", {
