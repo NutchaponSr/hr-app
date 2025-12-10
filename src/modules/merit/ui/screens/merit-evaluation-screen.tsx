@@ -106,7 +106,7 @@ export const MeritEvaluationScreen = ({ id, period, merit, hasChecker, canPerfor
           position={merit.data.preparer.position}
           division={merit.data.preparer.division}
           department={merit.data.preparer.department}
-          weight={60}
+          weight={100}
         />
 
         <div className="w-full max-w-full self-center px-16">

@@ -262,7 +262,7 @@ export const MeritDraftScreen = ({ id, period, merit, canPerform }: Props) => {
           position={merit.data.preparer.position}
           division={merit.data.preparer.division}
           department={merit.data.preparer.department}
-          weight={60}
+          weight={100}
         />
 
         <div className="flex flex-row gap-2 px-16">

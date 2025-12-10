@@ -513,7 +513,9 @@ export const meritProcedure = createTRPCRouter({
                         return acc + (level / 100) * weight;
                       }, 0) || 0;
 
-                      return (sum * 40) / portion;
+                      const res = (sum * 40) / portion > 40 ? 40 : (sum * 40) / portion;
+
+                      return res;
                     })(),
                     checker: (() => {
                       const sum = kpiForm?.kpis.reduce((acc, comp, idx) => {  
@@ -526,7 +528,9 @@ export const meritProcedure = createTRPCRouter({
                         return acc + (level / 100) * weight;
                       }, 0) || 0;
 
-                      return (sum * 40) / portion;
+                      const res = (sum * 40) / portion > 40 ? 40 : (sum * 40) / portion;
+
+                      return res;
                     })(),
                     approver: (() => {
                       const sum = kpiForm?.kpis.reduce((acc, comp, idx) => {
@@ -539,7 +543,9 @@ export const meritProcedure = createTRPCRouter({
                         return acc + (level / 100) * weight;
                       }, 0) || 0;
 
-                      return (sum * 40) / portion;
+                      const res = (sum * 40) / portion > 40 ? 40 : (sum * 40) / portion;
+
+                      return res;
                     })(),
                   }
                 : {
