@@ -296,7 +296,6 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
                   {(() => {
-                    const kpiOwner = (kpi.owner * 40) / 50;
                     const compOwner = form.watch("competencies")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelOwner ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
@@ -308,7 +307,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                       return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
 
-                    const sum = kpiOwner + compOwner + cultOwner;
+                    const sum = kpi.owner + compOwner + cultOwner;
                     return sum.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                   })()}
                 </div>
@@ -320,7 +319,6 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
                   {(() => {
-                    const kpiOwner = (kpi.checker * 40) / 50;
                     const compOwner = form.watch("competencies")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelChecker ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
@@ -332,7 +330,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                       return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
 
-                    const sum = kpiOwner + compOwner + cultOwner;
+                    const sum = kpi.checker + compOwner + cultOwner;
                     return sum.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                   })()}
                 </div>
@@ -344,7 +342,6 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
               <div className="leading-[1.5] whitespace-nowrap break-normal text-end">
                 <div className="leading-[1.5] text-nowrap [white-space-collapse:collapse] break-normal inline text-xs text-primary">
                   {(() => {
-                    const kpiOwner = (kpi.approver * 40) / 50;
                     const compOwner = form.watch("competencies")?.reduce((acc, comp, idx) => {
                       const level = Number(comp.levelApprover ?? 0);
                       const weight = convertAmountFromUnit(competencyRecords[idx]?.weight ?? 0, 2);
@@ -356,7 +353,7 @@ export const MeritSummaryTable = ({ kpi, form, competencyRecords, cultureRecords
                       return acc + ((level / 5) * weight);
                     }, 0) ?? 0;
 
-                    const sum = kpiOwner + compOwner + cultOwner;
+                    const sum = kpi.approver + compOwner + cultOwner;
                     return sum.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                   })()}
                 </div>
