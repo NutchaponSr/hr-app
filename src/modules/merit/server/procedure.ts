@@ -504,7 +504,7 @@ export const meritProcedure = createTRPCRouter({
                 ? {
                     owner: (() => {
                       const sum = kpiForm?.kpis.reduce((acc, comp, idx) => {
-                        const level = Number(comp.achievementOwner ?? 0);
+                        const level = Number(comp.achievementApprover ?? 0);
                         const weight = convertAmountFromUnit(
                           kpiForm?.kpis[idx]?.weight ?? 0,
                           2,
@@ -519,7 +519,7 @@ export const meritProcedure = createTRPCRouter({
                     })(),
                     checker: (() => {
                       const sum = kpiForm?.kpis.reduce((acc, comp, idx) => {  
-                        const level = Number(comp.achievementChecker ?? 0);
+                        const level = Number(comp.achievementApprover ?? 0);
                         const weight = convertAmountFromUnit(
                           kpiForm?.kpis[idx]?.weight ?? 0,
                           2,
