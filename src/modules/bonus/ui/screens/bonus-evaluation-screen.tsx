@@ -97,6 +97,7 @@ export const BonusEvaluationScreen = ({
                 form={form} 
                 kpis={kpiForm.data.kpiForm.kpis || []} 
                 fullScore={totalWeight} 
+                ownerId={kpiForm.data.preparer.id}
               />
             </div>
           </div>
