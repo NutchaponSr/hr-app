@@ -49,6 +49,7 @@ export const PerformanceView = ({ canPerform }: Props) => {
             />
             <div className="border-b-[1.25px] border-border flex justify-between">
               <TabsList>
+                <TabsTrigger value="2026">2026</TabsTrigger>
                 {years.map((y) => (
                   <TabsTrigger key={y} value={String(y)}>
                     {y}

@@ -110,12 +110,12 @@ export const BonusInfo = ({ year }: Props) => {
                 state: kpiFormOption.isPending,
                 condition: true,
                 onClick: () => {
-                  if (!kpiBonus.task.inDraft && !canCreateDraft) {
-                    toast.error(
-                      `You can only create KPI Definition in January - March ${year}`,
-                    );
-                    return;
-                  }
+                  // if (!kpiBonus.task.inDraft && !canCreateDraft) {
+                  //   toast.error(
+                  //     `You can only create KPI Definition in January - March ${year}`,
+                  //   );
+                  //   return;
+                  // }
 
                   createForm(
                     {
@@ -141,12 +141,12 @@ export const BonusInfo = ({ year }: Props) => {
                 state: kpiFormOption.isPending,
                 condition: kpiBonus.task.inDraft?.status === Status.APPROVED,
                 onClick: () => {
-                  if (!kpiBonus.task.evaluate && !canEvaluate) {
-                    toast.error(
-                      `You can only evaluate in January - December ${year}`,
-                    );
-                    return;
-                  }
+                  // if (!kpiBonus.task.evaluate && !canEvaluate) {
+                  //   toast.error(
+                  //     `You can only evaluate in January - December ${year}`,
+                  //   );
+                  //   return;
+                  // }
 
                   createForm(
                     {

@@ -136,12 +136,12 @@ export const MeritInfo = ({ year }: Props) => {
                 state: meritFormOption.isPending,
                 condition: true,
                 onClick: () => {
-                  if (!merit.task.inDraft && !canCreateDraft) {
-                    toast.error(
-                      `You can only create Merit Definition in January - March ${year}`,
-                    );
-                    return;
-                  }
+                  // if (!merit.task.inDraft && !canCreateDraft) {
+                  //   toast.error(
+                  //     `You can only create Merit Definition in January - March ${year}`,
+                  //   );
+                  //   return;
+                  // }
 
                   createForm(
                     {
@@ -167,12 +167,12 @@ export const MeritInfo = ({ year }: Props) => {
                 state: meritFormOption.isPending,
                 condition: merit.task.inDraft?.status === Status.APPROVED,
                 onClick: () => {
-                  if (!merit.task.evaluation2nd && !canEvaluate1st) {
-                    toast.error(
-                      `You can only evaluate in January - June ${year}`,
-                    );
-                    return;
-                  }
+                  // if (!merit.task.evaluation2nd && !canEvaluate1st) {
+                  //   toast.error(
+                  //     `You can only evaluate in January - June ${year}`,
+                  //   );
+                  //   return;
+                  // }
 
                   createForm(
                     {
